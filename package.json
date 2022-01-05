@@ -1,0 +1,43 @@
+{
+  "name": "topsort-events",
+  "version": "1.0.0",
+  "description": "JS library to automatically report events to Topsort's Analytics",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "jest",
+    "test:e2e": "webpack && webpack -c webpack.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
+    "lint": "eslint . --max-warnings 0 --ignore-path ../.gitignore",
+    "lint:fix": "npm run lint -- --fix",
+    "lint:ci": "npm run lint -- --format=compact",
+    "types:check": "tsc"
+  },
+  "author": "Topsort",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/jest": "^27.4.0",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.9.0",
+    "@typescript-eslint/parser": "^5.9.0",
+    "eslint": "^8.6.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jest": "^25.3.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "express": "^4.17.2",
+    "isomorphic-fetch": "^3.0.0",
+    "jest": "^27.4.5",
+    "nock": "^13.2.1",
+    "prettier": "^2.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^6.2.1",
+    "terser-webpack-plugin": "^5.3.0",
+    "ts-jest": "^27.1.2",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}

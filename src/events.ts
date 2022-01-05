@@ -13,7 +13,7 @@ interface Placement {
 interface Impression {
   placement: Placement;
   productId: string;
-  id?: string;
+  id: string;
   auctionId?: string;
 }
 
@@ -28,15 +28,17 @@ interface ImpressionEvent {
   eventType: "impression";
   session: Session;
   impressions: Impression[];
+  occurredAt: string;
 }
 
 interface ClickEvent {
   eventType: "click";
   session: Session;
-  id?: string;
+  id: string;
   placement: Placement;
   productId: string;
   auctionId?: string;
+  occurredAt: string;
 }
 
 interface PurchaseEvent {

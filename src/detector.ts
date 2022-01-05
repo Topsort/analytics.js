@@ -43,6 +43,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
   const placement = {
     page: event.page,
   };
+  const t = new Date(event.t * 1000).toISOString();
   if (eventType === "click") {
     return {
       eventType,
@@ -51,11 +52,13 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
       productId: event.sku,
       auctionId: event.auction,
       placement,
+      occurredAt: t,
     };
   } else if (eventType === "impression") {
     return {
       eventType,
       session,
+      occurredAt: t,
       impressions: [
         {
           id: event.id,
@@ -70,7 +73,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
       eventType,
       session,
       id: event.id,
-      purchasedAt: new Date(event.t * 1000).toISOString(),
+      purchasedAt: t,
       // TODO: is this needed?
       items: (event.items || []).map((e) => ({
         productId: e.sku,

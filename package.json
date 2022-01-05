@@ -7,7 +7,7 @@
     "build": "webpack",
     "test": "jest",
     "test:e2e": "webpack && webpack -c webpack.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
-    "lint": "eslint . --max-warnings 0 --ignore-path ../.gitignore",
+    "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
     "lint:ci": "npm run lint -- --format=compact",
     "types:check": "tsc"

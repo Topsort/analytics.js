@@ -56,7 +56,6 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
     return {
       eventType,
       session,
-      id: event.id,
       impressions: [
         {
           id: event.id,
@@ -73,7 +72,6 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
       id: event.id,
       purchasedAt: new Date(event.t * 1000).toISOString(),
       // TODO: is this needed?
-      currency: "USD",
       items: (event.items || []).map((e) => ({
         productId: e.sku,
         quantity: e.quantity,

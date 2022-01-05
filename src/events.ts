@@ -27,7 +27,6 @@ interface Item {
 interface ImpressionEvent {
   eventType: "impression";
   session: Session;
-  id: string;
   impressions: Impression[];
 }
 
@@ -45,7 +44,6 @@ interface PurchaseEvent {
   session: Session;
   id: string;
   purchasedAt: string;
-  currency: string;
   items: Item[];
 }
 

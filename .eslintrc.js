@@ -5,7 +5,6 @@ module.exports = {
     "jest/globals": true,
   },
   extends: [
-    //'xo',
     "plugin:@typescript-eslint/recommended",
     "plugin:jest/recommended",
     "plugin:prettier/recommended",

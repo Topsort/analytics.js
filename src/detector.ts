@@ -6,12 +6,12 @@ const MAX_EVENTS_SIZE = 2500;
 let seenEvents: string[] = [];
 
 /**
- * Hack to get a uuid.
+ * Generate an id.
  *
- * Note: in case the createObjectUrl is not available it will default to a
- * random number;
+ * In modern browsers this will be a UUID, otherwise if createObjectUrl is not available it will
+ * just be a random number;
  */
-function uuid(): string {
+function generateId(): string {
   return (
     window.URL.createObjectURL?.(new Blob()).split("/").pop() ||
     Math.random() + ""
@@ -23,7 +23,7 @@ function getUserId(): string {
   if (userId) {
     return userId;
   }
-  const newUserId = uuid();
+  const newUserId = generateId();
   setUserIdCookie(newUserId);
   return newUserId;
 }
@@ -34,7 +34,7 @@ function setUserIdCookie(value: string): void {
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {
-  return /(^|;)\s*tsuid\s*=\s*([^;]+)/.exec(document.cookie)?.pop() || "";
+  return /(^|;)\s*tsuid\s*=\s*([^;]+)/.exec(document.cookie)?.pop();
 }
 
 function getApiPayload(event: ProductEvent): TopsortEvent {
@@ -172,7 +172,7 @@ function getEvent(type: EventType, node: unknown): ProductEvent {
     auction,
     t: Date.now() / 1000,
     page: getPage(),
-    id: uuid(),
+    id: generateId(),
     uid: getUserId(),
   };
   if (type === "purchase") {

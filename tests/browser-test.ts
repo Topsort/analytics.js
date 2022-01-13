@@ -53,7 +53,7 @@ async function checkEventExists(
   sku: string,
   event: ProductEvent
 ): Promise<boolean> {
-  const testId = (window as any).testId;
+  const testId = window.testId;
   const r = await fetch(`/test/events?productId=${sku}&session=${testId}`);
   const data = await r.json();
   const result = data.some((e: any) => match(e, event));

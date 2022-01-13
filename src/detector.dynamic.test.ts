@@ -1,5 +1,5 @@
 test("dynamic content", async () => {
-  (window as any).TS = {
+  window.TS = {
     token: "token",
   };
   const events: any[] = [];

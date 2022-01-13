@@ -1,5 +1,5 @@
 test("check impresssions", async () => {
-  (window as any).TS = {
+  window.TS = {
     token: "token",
   };
   const events: any[] = [];

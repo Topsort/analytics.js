@@ -93,7 +93,7 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
   const promises = [];
   for (const entry of data) {
     promises.push(
-      reportEvent(getApiPayload(entry), (window as any).TS)
+      reportEvent(getApiPayload(entry), window.TS)
         .then((result) => {
           const q = result.retry ? r.retry : r.done;
           q.push(entry.id);
@@ -228,15 +228,15 @@ function mutationCallback(mutationsList: MutationRecord[]) {
 }
 
 function start() {
-  if (!(window as any).TS.token) {
+  if (!window.TS?.token) {
     console.error("Missing TS token");
     return;
   }
   checkChildren(document);
   const MutationObserverImpl =
     window.MutationObserver ||
-    (window as any).WebKitMutationObserver ||
-    (window as any).MozMutationObserver;
+    window.WebKitMutationObserver ||
+    window.MozMutationObserver;
   const mutationObserver = new MutationObserverImpl(mutationCallback);
   mutationObserver.observe(document, {
     attributes: true,

@@ -18,13 +18,15 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
-    "alwaysStrict": false
+    "alwaysStrict": false,
+    "typeRoots": ["@types", "node_modules/@types"]
   },
   "include": [
     "src/**/*.ts",
     "mocks/**/*.ts",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "@types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

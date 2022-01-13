@@ -44,43 +44,44 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
     page: event.page,
   };
   const t = new Date(event.t * 1000).toISOString();
-  if (eventType === "click") {
-    return {
-      eventType,
-      session,
-      id: event.id,
-      productId: event.sku,
-      auctionId: event.auction,
-      placement,
-      occurredAt: t,
-    };
-  } else if (eventType === "impression") {
-    return {
-      eventType,
-      session,
-      occurredAt: t,
-      impressions: [
-        {
-          id: event.id,
-          productId: event.sku,
-          auctionId: event.auction,
-          placement,
-        },
-      ],
-    };
-  } else {
-    return {
-      eventType,
-      session,
-      id: event.id,
-      purchasedAt: t,
-      // TODO: is this needed?
-      items: (event.items || []).map((e) => ({
-        productId: e.sku,
-        quantity: e.quantity,
-        unitPrice: e.price,
-      })),
-    };
+  switch (eventType) {
+    case "click":
+      return {
+        eventType,
+        session,
+        id: event.id,
+        productId: event.sku,
+        auctionId: event.auction,
+        placement,
+        occurredAt: t,
+      };
+    case "impression":
+      return {
+        eventType,
+        session,
+        occurredAt: t,
+        impressions: [
+          {
+            id: event.id,
+            productId: event.sku,
+            auctionId: event.auction,
+            placement,
+          },
+        ],
+      };
+    case "purchase":
+      return {
+        eventType,
+        session,
+        id: event.id,
+        purchasedAt: t,
+        // TODO: is this needed?
+        items: (event.items || []).map((e) => ({
+          productId: e.sku,
+          quantity: e.quantity,
+          unitPrice: e.price,
+        })),
+      };
   }
 }
 

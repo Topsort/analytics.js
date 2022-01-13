@@ -189,7 +189,10 @@ function checkChildren(node: Element | Document) {
   const matchedNodes = node.querySelectorAll(PRODUCT_SELECTOR);
   for (let i = 0; i < matchedNodes.length; i++) {
     const node = matchedNodes[i];
-    if ((node as any).dataset.sku) {
+    if (!(node instanceof HTMLElement)) {
+      continue;
+    }
+    if (node.dataset.sku) {
       logEvent(getEvent("impression", node), node);
       node.addEventListener("click", interactionHandler);
     } else {
@@ -213,7 +216,7 @@ function mutationCallback(mutationsList: MutationRecord[]) {
           }
         }
         for (const node of newParents) {
-          checkChildren(node as any);
+          checkChildren(node);
         }
       }
     } else if (mutation.type === "attributes") {

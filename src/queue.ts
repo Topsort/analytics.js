@@ -47,6 +47,15 @@ function expBackoff(startTime: number, retries: number): number {
   return 0;
 }
 
+/**
+ * Probes the different store implementations looking for one that works in the current browser.
+ *
+ * To do so, it checks {@link LocalStorageStore} is actually functional by adding a dummy object and
+ * checking the retrived result is the same.
+ *
+ * Note: there's nothing special about the id, but it need to be ideally a length one string, in
+ * order to minimize the JS library size.
+ */
 function getStore(): Store<RetryableEntry> {
   const localStore = new LocalStorageStore<{ x: string }>(STORAGE_TEST_KEY);
   try {

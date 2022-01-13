@@ -75,7 +75,6 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         session,
         id: event.id,
         purchasedAt: t,
-        // TODO: is this needed?
         items: (event.items || []).map((e) => ({
           productId: e.sku,
           quantity: e.quantity,
@@ -109,8 +108,6 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
 }
 
 const queue = new Queue(processor);
-
-// todo: implement purchase events
 
 export type EventType = "click" | "purchase" | "impression";
 
@@ -150,7 +147,6 @@ function getId(event: ProductEvent): string {
   return [event.page, event.type, event.sku, event.auction].join("-");
 }
 
-// TODO: move somewhere else and test
 function parseSkuAuction(skuAuction: string): [string, string | undefined] {
   const [sku, auction] = skuAuction.split(":");
   return [sku, auction && auction.length === 36 ? auction : undefined];

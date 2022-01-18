@@ -3,7 +3,7 @@ import { ProcessorResult, Queue } from "./queue";
 import { reportEvent } from "./reporter";
 
 const MAX_EVENTS_SIZE = 2500;
-let seenEvents = new Set<string>();
+const seenEvents = new Set<string>();
 
 /**
  * Generate an id.

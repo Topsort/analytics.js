@@ -4,14 +4,14 @@ let processedEvents: Entry[] = [];
 async function processor(chunk: Entry[]): Promise<ProcessorResult> {
   processedEvents.push(...chunk);
   const r: ProcessorResult = {
-    done: [],
-    retry: [],
+    done: new Set(),
+    retry: new Set(),
   };
   for (const entry of chunk) {
     if (entry.id.includes("-done")) {
-      r.done.push(entry.id);
+      r.done.add(entry.id);
     } else if (entry.id.includes("-retry")) {
-      r.retry.push(entry.id);
+      r.retry.add(entry.id);
     } else {
       console.error(`Unknown id ${entry.id}`);
     }
@@ -25,7 +25,7 @@ function expectEmptyQueue<T extends Entry>(q: Queue<T>): void {
     processing: (q as any)._processing,
     scheduled: (q as any)._scheduled,
   };
-  expect(qData).toEqual({ store: [], processing: [], scheduled: false });
+  expect(qData).toEqual({ store: [], processing: new Set(), scheduled: false });
 }
 
 function now(): number {

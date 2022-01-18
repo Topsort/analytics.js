@@ -8,8 +8,8 @@ const MAX_PROCESSING_SIZE = 25;
 const WAIT_TIME_MS = 250;
 
 export interface ProcessorResult {
-  done: string[];
-  retry: string[];
+  done: Set<string>;
+  retry: Set<string>;
 }
 
 export interface Entry {
@@ -71,13 +71,13 @@ function getStore(): Store<RetryableEntry> {
 
 export class Queue<T extends Entry> {
   private _store: Store<RetryableEntry>;
-  private _processing: string[];
+  private _processing: Set<string>;
   private _processor: Processor<T>;
   private _scheduled: boolean;
 
   constructor(processor: Processor<T>) {
     this._store = getStore();
-    this._processing = [];
+    this._processing = new Set<string>();
     this._scheduled = false;
     this._processor = processor;
   }
@@ -107,24 +107,24 @@ export class Queue<T extends Entry> {
       const retryableEntry = entries[i];
       const entry = retryableEntry.e;
       if (
-        this._processing.indexOf(entry.id) === -1 &&
+        !this._processing.has(entry.id) &&
         expBackoff(entry.t, retryableEntry.r) <= Date.now() / 1000
       ) {
         chunk.push(entry as T);
-        this._processing.push(entry.id);
+        this._processing.add(entry.id);
       }
     }
     if (!chunk.length) {
       this._scheduleProcessing();
       return;
     }
-    let r: ProcessorResult = { done: [], retry: [] };
+    let r: ProcessorResult = { done: new Set(), retry: new Set() };
     try {
       r = await this._processor(chunk);
     } catch (error) {
       // Mark all as failed
       for (const entry of chunk) {
-        r.done.push(entry.id);
+        r.done.add(entry.id);
       }
     }
     // Remove entries from processing
@@ -134,14 +134,14 @@ export class Queue<T extends Entry> {
         newProcessing.push(entryId);
       }
     }
-    this._processing = newProcessing;
+    this._processing = new Set(newProcessing);
     // Modify entries
     const oldEntries = this._store.get();
     const newEntries: RetryableEntry[] = [];
     for (const entry of oldEntries) {
-      if (r.done.indexOf(entry.e.id) !== -1) {
+      if (r.done.has(entry.e.id)) {
         // do nothing
-      } else if (r.retry.indexOf(entry.e.id) !== -1) {
+      } else if (r.retry.has(entry.e.id)) {
         if (entry.r < MAX_RETRIES) {
           entry.r += 1;
           newEntries.push(entry);

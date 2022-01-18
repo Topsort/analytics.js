@@ -3,7 +3,7 @@ import { ProcessorResult, Queue } from "./queue";
 import { reportEvent } from "./reporter";
 
 const MAX_EVENTS_SIZE = 2500;
-let seenEvents: string[] = [];
+let seenEvents = new Set<string>();
 
 /**
  * Generate an id.
@@ -87,8 +87,8 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
 // TODO: batch requests. Unfortunately at the moment only the impressions are batchable.
 async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
   const r: ProcessorResult = {
-    done: [],
-    retry: [],
+    done: new Set(),
+    retry: new Set(),
   };
   const promises = [];
   for (const entry of data) {
@@ -96,10 +96,10 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
       reportEvent(getApiPayload(entry), window.TS)
         .then((result) => {
           const q = result.retry ? r.retry : r.done;
-          q.push(entry.id);
+          q.add(entry.id);
         })
         .catch(() => {
-          r.done.push(entry.id);
+          r.done.add(entry.id);
         })
     );
   }
@@ -130,11 +130,15 @@ interface ProductEvent {
 
 function logEvent(info: ProductEvent, node: Node) {
   const id = getId(info);
-  if (seenEvents.indexOf(id) !== -1) {
+  if (seenEvents.has(id)) {
     return;
   }
-  seenEvents.push(id);
-  seenEvents = seenEvents.slice(-MAX_EVENTS_SIZE);
+  seenEvents.add(id);
+  if (seenEvents.size > MAX_EVENTS_SIZE) {
+    seenEvents = new Set(
+      Array.from(seenEvents.values()).slice(-MAX_EVENTS_SIZE)
+    );
+  }
   queue.append(info);
 
   // Raise a custom event, so that clients can trigger their own logic.
@@ -206,13 +210,13 @@ function mutationCallback(mutationsList: MutationRecord[]) {
     if (mutation.type === "childList") {
       // Here we could just do a mutation.target.querySelectorAll, but that could also bring the
       // nodes we have already seen before. Instead we just check the added nodes.
-      const newParents: HTMLElement[] = [];
+      const newParents = new Set<HTMLElement>();
       for (let i = 0; i < mutation.addedNodes.length; i++) {
         const newNode = mutation.addedNodes[i];
         if (newNode.nodeType === Node.ELEMENT_NODE) {
           const parent = newNode.parentElement;
-          if (parent && newParents.indexOf(parent) === -1) {
-            newParents.push(parent);
+          if (parent && !newParents.has(parent)) {
+            newParents.add(parent);
           }
         }
         for (const node of newParents) {

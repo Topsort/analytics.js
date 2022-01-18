@@ -137,9 +137,9 @@ function logEvent(info: ProductEvent, node: Node) {
   if (seenEvents.size > MAX_EVENTS_SIZE) {
     const iterator = seenEvents.values();
     for (let i = 0; i < seenEvents.size - MAX_EVENTS_SIZE; --i) {
-      iterator.next();
+      const eventId = iterator.next().value;
+      seenEvents.delete(eventId);
     }
-    seenEvents = new Set(iterator);
   }
   queue.append(info);
 

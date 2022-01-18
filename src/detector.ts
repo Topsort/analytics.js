@@ -117,10 +117,10 @@ interface Purchase {
   price: number;
 }
 
-export interface ProductEvent {
+interface ProductEvent {
   type: EventType;
   sku: string;
-  auction: string | undefined;
+  auction?: string;
   t: number;
   page: string;
   id: string;

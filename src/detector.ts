@@ -3,7 +3,7 @@ import { ProcessorResult, Queue } from "./queue";
 import { reportEvent } from "./reporter";
 
 const MAX_EVENTS_SIZE = 2500;
-const seenEvents = new Set<string>();
+let seenEvents = new Set<string>();
 
 /**
  * Generate an id.
@@ -137,9 +137,9 @@ function logEvent(info: ProductEvent, node: Node) {
   if (seenEvents.size > MAX_EVENTS_SIZE) {
     const iterator = seenEvents.values();
     for (let i = 0; i < seenEvents.size - MAX_EVENTS_SIZE; --i) {
-      const eventId = iterator.next().value;
-      seenEvents.delete(eventId);
+      iterator.next();
     }
+    seenEvents = new Set(iterator);
   }
   queue.append(info);
 

@@ -138,7 +138,7 @@ function logEvent(info: ProductEvent, node: Node) {
   queue.append(info);
 
   // Raise a custom event, so that clients can trigger their own logic.
-  // One conrete use of this if for testing purposes.
+  // One concrete use of this is for testing purposes.
   const event = new CustomEvent("topsort", { bubbles: true, detail: info });
   node.dispatchEvent(event);
 }

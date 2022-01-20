@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <style>
+      td:nth-child(2) {
+        background-color: #ffee58;
+      }
+      td.fail {
+        background-color: #ef5350;
+      }
+      td.ok {
+        background-color: #66bb6a;
+      }
+      #root {
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <div id="results">
+    <table>
+      <tr>
+        <th>Test</th>
+        <th>Result</th>
+      </tr>
+      <tr>
+        <td>Static Impression</td>
+        <td id="test-impression">Pending</td>
+      </tr>
+      <tr>
+        <td>New Element Impression</td>
+        <td id="test-new-impression">Pending</td>
+      </tr>
+      <tr>
+        <td>Change Attributes Impression</td>
+        <td id="test-attributes-impression">Pending</td>
+      </tr>
+      <tr>
+        <td>React Impression</td>
+        <td id="test-react-impression">Pending</td>
+      </tr>
+      <tr>
+        <td>Click</td>
+        <td id="test-click">Pending</td>
+      </tr>
+      <tr>
+        <td>Purchase</td>
+        <td id="test-purchase">Pending</td>
+      </tr>
+      <tr>
+        <td>React Navigation</td>
+        <td id="test-react-navigation">Pending</td>
+      </tr>
+      <tr>
+        <td>No Errors</td>
+        <td id="test-no-errors">Pending</td>
+      </tr>
+    </table>
+  </div>
+  <div id="vanilla-js">
+    <div data-sku="product-id-impression-1:17785055-9d99-4b4e-9fb0-5fc4cff0af3f"></div>
+    <div id="click1" data-sku="product-id-click-1:dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d"></div>
+    <div data-action="purchase" data-items='[{"sku": "product-id-purchase-1", "quantity":1, "price": 2399}, {"sku": "product-id-purchase-2", "quantity": 2, "price": 399}]'></div>
+    <div id="old-product" data-sku="product-id-attr-impression-1"></div>
+  </div>
+  <div id="root"></div>
+  <script>
+    window.testId = Math.random() + ":" + Math.random();
+    window.TS = {
+      token: "ts-test-token",
+      url: window.location.origin + "/" + testId,
+    };
+  </script>
+  <script src="/js/ts.js"></script>
+  <script src="/js/test-bundle-react.js"></script>
+  <script src="/js/tests/browser-test.js"></script>
+</html>

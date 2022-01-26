@@ -7,19 +7,19 @@ describe("check ids api", () => {
   });
 
   test("generate id", () => {
-    expect(window.TSJS.getUserId()).toMatch(/./);
+    expect(window.TS.getUserId?.()).toMatch(/./);
   });
 
   test("reset id", () => {
-    const userId = window.TSJS.getUserId();
-    window.TSJS.resetUserId();
-    const newUserId = window.TSJS.getUserId();
+    const userId = window.TS.getUserId?.();
+    window.TS.resetUserId?.();
+    const newUserId = window.TS.getUserId?.();
     expect(newUserId).not.toEqual(userId);
     expect(newUserId).toMatch(/./);
   });
 
   test("set custom id", () => {
-    window.TSJS.setUserId("customId");
-    expect(window.TSJS.getUserId()).toEqual("customId");
+    window.TS.setUserId?.("customId");
+    expect(window.TS.getUserId?.()).toEqual("customId");
   });
 });

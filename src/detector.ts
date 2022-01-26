@@ -45,11 +45,9 @@ function resetUserId(): string {
   return getUserId();
 }
 
-window.TSJS = {
-  setUserId: setUserIdCookie,
-  getUserId,
-  resetUserId,
-};
+window.TS.setUserId = setUserIdCookie;
+window.TS.getUserId = getUserId;
+window.TS.resetUserId = resetUserId;
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {

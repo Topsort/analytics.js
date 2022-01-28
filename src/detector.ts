@@ -18,9 +18,15 @@ function generateId(): string {
   );
 }
 
+let globalUserId: string | undefined;
+
 function getUserId(): string {
+  if (globalUserId) {
+    return globalUserId;
+  }
   const userId = getUserIdCookie();
   if (userId) {
+    globalUserId = userId;
     return userId;
   }
   const newUserId = generateId();
@@ -28,9 +34,20 @@ function getUserId(): string {
   return newUserId;
 }
 
-function setUserIdCookie(value: string): void {
-  document.cookie = "tsuid=" + value + ";max-age=31536000";
+function setUserIdCookie(id: string): void {
+  globalUserId = id;
+  document.cookie = "tsuid=" + id + ";max-age=31536000";
 }
+
+function resetUserId(): string {
+  globalUserId = undefined;
+  document.cookie = "tsuid=";
+  return getUserId();
+}
+
+window.TS.setUserId = setUserIdCookie;
+window.TS.getUserId = getUserId;
+window.TS.resetUserId = resetUserId;
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {

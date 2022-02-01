@@ -5,6 +5,7 @@ declare global {
     TS: {
       token: string;
       url?: string;
+      cookieName?: string;
       getUserId?: () => string;
       resetUserId?: () => string;
       setUserId?: (id: string) => void;

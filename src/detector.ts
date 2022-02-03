@@ -35,8 +35,9 @@ function getUserId(): string {
 }
 
 function setUserIdCookie(id: string): void {
+  const cookieName = window.TS.cookieName || "tsuid";
   globalUserId = id;
-  document.cookie = "tsuid=" + id + ";max-age=31536000";
+  document.cookie = cookieName + "=" + id + ";max-age=31536000";
 }
 
 function resetUserId(): string {
@@ -51,7 +52,9 @@ window.TS.resetUserId = resetUserId;
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {
-  return /(^|;)\s*tsuid\s*=\s*([^;]+)/.exec(document.cookie)?.pop();
+  const cookieName = window.TS.cookieName || "tsuid";
+  const regex = new RegExp("/(^|;)\\s*" + cookieName + "\\s*=\\s*([^;]+)/");
+  return regex.exec(document.cookie)?.pop();
 }
 
 function getApiPayload(event: ProductEvent): TopsortEvent {

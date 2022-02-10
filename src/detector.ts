@@ -70,7 +70,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         eventType,
         session,
         id: event.id,
-        productId: event.sku,
+        productId: event.product,
         auctionId: event.auction,
         placement,
         occurredAt: t,
@@ -83,7 +83,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         impressions: [
           {
             id: event.id,
-            productId: event.sku,
+            productId: event.product,
             auctionId: event.auction,
             placement,
           },
@@ -96,7 +96,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         id: event.id,
         purchasedAt: t,
         items: (event.items || []).map((e) => ({
-          productId: e.sku,
+          productId: e.product,
           quantity: e.quantity,
           unitPrice: e.price,
         })),
@@ -132,14 +132,14 @@ const queue = new Queue(processor);
 export type EventType = "click" | "purchase" | "impression";
 
 interface Purchase {
-  sku: string;
+  product: string;
   quantity: number;
   price: number;
 }
 
 interface ProductEvent {
   type: EventType;
-  sku: string;
+  product: string;
   auction?: string;
   t: number;
   page: string;
@@ -170,12 +170,7 @@ function logEvent(info: ProductEvent, node: Node) {
 }
 
 function getId(event: ProductEvent): string {
-  return [event.page, event.type, event.sku, event.auction].join("-");
-}
-
-function parseSkuAuction(skuAuction: string): [string, string | undefined] {
-  const [sku, auction] = skuAuction.split(":");
-  return [sku, auction && auction.length === 36 ? auction : undefined];
+  return [event.page, event.type, event.product, event.auction].join("-");
 }
 
 function getPage(): string {
@@ -187,11 +182,11 @@ function getPage(): string {
 }
 
 function getEvent(type: EventType, node: unknown): ProductEvent {
-  const skuAuction = (node as HTMLElement)?.dataset.sku || "";
-  const [sku, auction] = parseSkuAuction(skuAuction);
+  const product = (node as HTMLElement)?.dataset.tsProduct || "";
+  const auction = (node as HTMLElement)?.dataset.tsAuction;
   const event: ProductEvent = {
     type,
-    sku,
+    product,
     auction,
     t: Date.now() / 1000,
     page: getPage(),
@@ -199,7 +194,7 @@ function getEvent(type: EventType, node: unknown): ProductEvent {
     uid: getUserId(),
   };
   if (type === "purchase") {
-    event.items = JSON.parse((node as HTMLElement)?.dataset.items || "[]");
+    event.items = JSON.parse((node as HTMLElement)?.dataset.tsItems || "[]");
   }
   return event;
 }
@@ -209,7 +204,8 @@ function interactionHandler(event: Event): void {
   logEvent(getEvent("click", t), t);
 }
 
-const PRODUCT_SELECTOR = "[data-sku],[data-action],[data-items]";
+const PRODUCT_SELECTOR =
+  "[data-ts-product],[data--ts-auction],[data-ts-action],[data-ts-items]";
 
 function checkChildren(node: Element | Document) {
   const matchedNodes = node.querySelectorAll(PRODUCT_SELECTOR);
@@ -218,7 +214,7 @@ function checkChildren(node: Element | Document) {
     if (!(node instanceof HTMLElement)) {
       continue;
     }
-    if (node.dataset.sku) {
+    if (node.dataset.tsProduct) {
       logEvent(getEvent("impression", node), node);
       node.addEventListener("click", interactionHandler);
     } else {
@@ -246,7 +242,7 @@ function mutationCallback(mutationsList: MutationRecord[]) {
         }
       }
     } else if (mutation.type === "attributes") {
-      if ((mutation.target as any).dataset.sku) {
+      if ((mutation.target as any).dataset.tsProduct) {
         logEvent(getEvent("impression", mutation.target), mutation.target);
         mutation.target.addEventListener("click", interactionHandler);
       } else {
@@ -271,7 +267,12 @@ function start() {
     attributes: true,
     childList: true,
     subtree: true,
-    attributeFilter: ["data-sku", "data-action", "data-items"],
+    attributeFilter: [
+      "data-ts-product",
+      "data-ts-auction",
+      "data-ts-action",
+      "data-ts-items",
+    ],
   });
 }
 

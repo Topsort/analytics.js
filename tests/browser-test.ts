@@ -50,11 +50,13 @@ function match(event: any, productEvent: ProductEvent): boolean {
 }
 
 async function checkEventExists(
-  sku: string,
+  productId: string,
   event: ProductEvent
 ): Promise<boolean> {
   const testId = window.testId;
-  const r = await fetch(`/test/events?productId=${sku}&session=${testId}`);
+  const r = await fetch(
+    `/test/events?productId=${productId}&session=${testId}`
+  );
   const data = await r.json();
   const result = data.some((e: any) => match(e, event));
   if (!result) {

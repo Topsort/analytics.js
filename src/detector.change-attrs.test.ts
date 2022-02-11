@@ -7,13 +7,14 @@ test("change attributes", async () => {
     events.push((e as any).detail);
   });
   document.body.innerHTML = `
-    <div id="product" data-sku="product-id-mod-1:1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
+    <div id="product" data-ts-product="product-id-mod-1" data-ts-auction="1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
   `;
   await import("./detector");
 
   const p = document.getElementById("product");
   if (p) {
-    p.dataset.sku = "product-id-mod-2";
+    p.dataset.tsProduct = "product-id-mod-2";
+    delete p.dataset.tsAuction;
   }
   await new Promise(process.nextTick);
   const uid = events[0]?.uid;
@@ -21,7 +22,7 @@ test("change attributes", async () => {
     {
       type: "impression",
       page: "/",
-      sku: "product-id-mod-1",
+      product: "product-id-mod-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
@@ -29,7 +30,7 @@ test("change attributes", async () => {
     {
       type: "impression",
       page: "/",
-      sku: "product-id-mod-2",
+      product: "product-id-mod-2",
       auction: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
@@ -38,14 +39,15 @@ test("change attributes", async () => {
 
   // Reverting changes should not generate another impression
   if (p) {
-    p.dataset.sku = "product-id-mod-1:1247eaae-63a1-4c20-9b52-9efdcdef3095";
+    p.dataset.tsProduct = "product-id-mod-1";
+    p.dataset.tsAuction = "1247eaae-63a1-4c20-9b52-9efdcdef3095";
   }
   await new Promise(process.nextTick);
   expect(events).toMatchObject([
     {
       type: "impression",
       page: "/",
-      sku: "product-id-mod-1",
+      product: "product-id-mod-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
@@ -53,7 +55,7 @@ test("change attributes", async () => {
     {
       type: "impression",
       page: "/",
-      sku: "product-id-mod-2",
+      product: "product-id-mod-2",
       auction: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,

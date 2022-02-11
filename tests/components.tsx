@@ -3,22 +3,39 @@ import ReactDom from "react-dom";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 function Product({
-  sku,
-  auction,
-}: React.HTMLProps<HTMLDivElement> & { sku: string; auction?: string }) {
-  return <div data-sku={`${sku}:${auction}`}>{sku}</div>;
+  productId,
+  auctionId,
+}: React.HTMLProps<HTMLDivElement> & {
+  productId: string;
+  auctionId?: string;
+}) {
+  return (
+    <div data-ts-product={productId} data-ts-auction={auctionId}>
+      {productId}
+    </div>
+  );
 }
 
 function Page({ idx }: { idx: number }) {
   const products = [
-    { sku: `p-r-${3 * (idx - 1) + 1}`, auction: idx === 1 ? "a-1" : undefined },
-    { sku: `p-r-${3 * (idx - 1) + 2}`, auction: idx === 1 ? "a-1" : undefined },
-    { sku: `p-r-${3 * (idx - 1) + 3}`, auction: undefined },
+    {
+      productId: `p-r-${3 * (idx - 1) + 1}`,
+      auctionId: idx === 1 ? "a-1" : undefined,
+    },
+    {
+      productId: `p-r-${3 * (idx - 1) + 2}`,
+      auctionId: idx === 1 ? "a-1" : undefined,
+    },
+    { productId: `p-r-${3 * (idx - 1) + 3}`, auctionId: undefined },
   ];
   return (
     <div>
       {products.map((p) => (
-        <Product sku={p.sku} auction={p.auction} key={p.sku} />
+        <Product
+          productId={p.productId}
+          auctionId={p.auctionId}
+          key={p.productId}
+        />
       ))}
     </div>
   );

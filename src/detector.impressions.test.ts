@@ -7,9 +7,8 @@ test("check impresssions", async () => {
     events.push((e as any).detail);
   });
   document.body.innerHTML = `
-    <div data-sku="product-id-imp-1"></div>
-    <div data-sku="product-id-imp-2:bogus-auction"></div>
-    <div data-sku="product-id-imp-3:1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
+    <div data-ts-product="product-id-imp-1"></div>
+    <div data-ts-product="product-id-imp-2" data-ts-auction="1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
   `;
   await import("./detector");
 
@@ -18,7 +17,7 @@ test("check impresssions", async () => {
     {
       type: "impression",
       page: "/",
-      sku: "product-id-imp-1",
+      product: "product-id-imp-1",
       auction: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
@@ -26,14 +25,7 @@ test("check impresssions", async () => {
     {
       type: "impression",
       page: "/",
-      sku: "product-id-imp-2",
-      auction: undefined,
-      id: expect.stringMatching(/[\d.a-zA-Z-]+/),
-    },
-    {
-      type: "impression",
-      page: "/",
-      sku: "product-id-imp-3",
+      product: "product-id-imp-2",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,

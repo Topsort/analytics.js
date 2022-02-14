@@ -200,12 +200,21 @@ function getEvent(type: EventType, node: unknown): ProductEvent {
 }
 
 function interactionHandler(event: Event): void {
-  const t = event.currentTarget as any;
-  logEvent(getEvent("click", t), t);
+  const t = event.currentTarget as HTMLElement;
+  const container = t.closest(PRODUCT_SELECTOR);
+  if (container) {
+    logEvent(getEvent("click", container), container);
+  }
 }
 
 const PRODUCT_SELECTOR =
-  "[data-ts-product],[data--ts-auction],[data-ts-action],[data-ts-items]";
+  "[data-ts-product],[data-ts-auction],[data-ts-action],[data-ts-items]";
+
+function addClickHandler(node: HTMLElement) {
+  const clickables = node.querySelectorAll("[data-ts-clickable]");
+  const elements = clickables.length === 0 ? [node] : clickables;
+  elements.forEach((e) => e.addEventListener("click", interactionHandler));
+}
 
 function checkChildren(node: Element | Document) {
   const matchedNodes = node.querySelectorAll(PRODUCT_SELECTOR);
@@ -216,7 +225,7 @@ function checkChildren(node: Element | Document) {
     }
     if (node.dataset.tsProduct) {
       logEvent(getEvent("impression", node), node);
-      node.addEventListener("click", interactionHandler);
+      addClickHandler(node);
     } else {
       logEvent(getEvent("purchase", node), node);
     }

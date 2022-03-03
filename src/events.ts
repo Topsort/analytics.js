@@ -12,9 +12,10 @@ interface Placement {
 
 interface Impression {
   placement: Placement;
-  productId: string;
+  productId?: string;
   id: string;
   auctionId?: string;
+  resolvedBidId?: string;
 }
 
 interface Item {
@@ -36,8 +37,9 @@ interface ClickEvent {
   session: Session;
   id: string;
   placement: Placement;
-  productId: string;
+  productId?: string;
   auctionId?: string;
+  resolvedBidId?: string;
   occurredAt: string;
 }
 

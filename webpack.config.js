@@ -42,7 +42,7 @@ module.exports = {
             inline: true,
           },
           enclose:
-            "window,document,Math,JSON,undefined:window,document,Math,JSON,void 0",
+            "window,document,Math,JSON,undefined,HTMLElement:window,document,Math,JSON,void 0,HTMLElement",
           mangle: {
             properties: {
               regex: "^_",

@@ -1,4 +1,4 @@
-test("check clicks", async () => {
+test("check purchase", async () => {
   window.TS = {
     token: "token",
   };
@@ -15,7 +15,7 @@ test("check clicks", async () => {
     {
       type: "purchase",
       page: "/",
-      product: "",
+      product: undefined,
       auction: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       items: [

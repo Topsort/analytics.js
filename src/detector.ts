@@ -72,6 +72,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         id: event.id,
         productId: event.product,
         auctionId: event.auction,
+        resolvedBidId: event.bid,
         placement,
         occurredAt: t,
       };
@@ -85,6 +86,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
             id: event.id,
             productId: event.product,
             auctionId: event.auction,
+            resolvedBidId: event.bid,
             placement,
           },
         ],
@@ -139,8 +141,9 @@ interface Purchase {
 
 interface ProductEvent {
   type: EventType;
-  product: string;
+  product?: string;
   auction?: string;
+  bid?: string;
   t: number;
   page: string;
   id: string;
@@ -170,7 +173,9 @@ function logEvent(info: ProductEvent, node: Node) {
 }
 
 function getId(event: ProductEvent): string {
-  return [event.page, event.type, event.product, event.auction].join("-");
+  return [event.page, event.type, event.product, event.auction, event.bid].join(
+    "-"
+  );
 }
 
 function getPage(): string {
@@ -181,34 +186,38 @@ function getPage(): string {
   return location.pathname;
 }
 
-function getEvent(type: EventType, node: unknown): ProductEvent {
-  const product = (node as HTMLElement)?.dataset.tsProduct || "";
-  const auction = (node as HTMLElement)?.dataset.tsAuction;
+function getEvent(type: EventType, node: HTMLElement): ProductEvent {
+  const product = node.dataset.tsProduct;
+  const auction = node.dataset.tsAuction;
+  const bid = node.dataset.tsResolvedBid;
   const event: ProductEvent = {
     type,
     product,
     auction,
+    bid,
     t: Date.now() / 1000,
     page: getPage(),
     id: generateId(),
     uid: getUserId(),
   };
   if (type === "purchase") {
-    event.items = JSON.parse((node as HTMLElement)?.dataset.tsItems || "[]");
+    event.items = JSON.parse(node.dataset.tsItems || "[]");
   }
   return event;
 }
 
 function interactionHandler(event: Event): void {
-  const t = event.currentTarget as HTMLElement;
-  const container = t.closest(PRODUCT_SELECTOR);
-  if (container) {
+  if (!(event.currentTarget instanceof HTMLElement)) {
+    return;
+  }
+  const container = event.currentTarget.closest(PRODUCT_SELECTOR);
+  if (container && container instanceof HTMLElement) {
     logEvent(getEvent("click", container), container);
   }
 }
 
 const PRODUCT_SELECTOR =
-  "[data-ts-product],[data-ts-auction],[data-ts-action],[data-ts-items]";
+  "[data-ts-product],[data-ts-auction],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";
 
 function addClickHandler(node: HTMLElement) {
   const clickables = node.querySelectorAll("[data-ts-clickable]");
@@ -223,13 +232,17 @@ function checkChildren(node: Element | Document) {
     if (!(node instanceof HTMLElement)) {
       continue;
     }
-    if (node.dataset.tsProduct) {
+    if (!isPurchase(node)) {
       logEvent(getEvent("impression", node), node);
       addClickHandler(node);
     } else {
       logEvent(getEvent("purchase", node), node);
     }
   }
+}
+
+function isPurchase(node: HTMLElement): boolean {
+  return node.dataset.tsAction === "purchase";
 }
 
 function mutationCallback(mutationsList: MutationRecord[]) {
@@ -251,7 +264,10 @@ function mutationCallback(mutationsList: MutationRecord[]) {
         }
       }
     } else if (mutation.type === "attributes") {
-      if ((mutation.target as any).dataset.tsProduct) {
+      if (!(mutation.target instanceof HTMLElement)) {
+        continue;
+      }
+      if (!isPurchase(mutation.target)) {
         logEvent(getEvent("impression", mutation.target), mutation.target);
         mutation.target.addEventListener("click", interactionHandler);
       } else {
@@ -281,6 +297,7 @@ function start() {
       "data-ts-auction",
       "data-ts-action",
       "data-ts-items",
+      "data-ts-resolved-bid",
     ],
   });
 }

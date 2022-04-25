@@ -89,16 +89,16 @@ async function checkTests() {
 
   // Add new product
   const newProduct = document.createElement("div");
-  newProduct.dataset.sku =
-    "product-id-dyn-impression-1:27785055-1d99-3b4e-94b0-5fc5cf60af3f";
+  newProduct.dataset.tsProduct = "product-id-dyn-impression-1";
+  newProduct.dataset.tsAuction = "27785055-1d99-3b4e-94b0-5fc5cf60af3f";
   const container = document.getElementById("vanilla-js");
   container?.appendChild(newProduct);
 
   // Modify product
   const oldProduct = document.getElementById("old-product");
   if (oldProduct) {
-    oldProduct.dataset.sku =
-      "product-id-attr-impression-2:27785055-2345-6789-94b0-5fc5cf60af3f";
+    oldProduct.dataset.tsProduct = "product-id-attr-impression-2";
+    oldProduct.dataset.tsAuction = "27785055-2345-6789-94b0-5fc5cf60af3f";
   }
 
   // Fetch next react page

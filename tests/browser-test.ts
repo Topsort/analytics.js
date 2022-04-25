@@ -84,12 +84,12 @@ async function setTestResult(
 
 async function checkTests() {
   // Click on product
-  const el = document.getElementById("click1");
-  el?.click();
+  const product = document.getElementById("click1");
+  product?.click();
 
   // Click on product area
-  const elArea = document.getElementById("click-area");
-  elArea?.click();
+  const productArea = document.getElementById("click-area");
+  productArea?.click();
 
   // Add new product
   const newProduct = document.createElement("div");

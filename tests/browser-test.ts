@@ -84,8 +84,12 @@ async function setTestResult(
 
 async function checkTests() {
   // Click on product
-  const el = document.getElementById("click1");
-  el?.click();
+  const product = document.getElementById("click1");
+  product?.click();
+
+  // Click on product area
+  const productArea = document.getElementById("click-area");
+  productArea?.click();
 
   // Add new product
   const newProduct = document.createElement("div");
@@ -159,6 +163,18 @@ async function checkTests() {
       eventType: "click",
       productId: "product-id-click-1",
       auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d",
+      placement: {
+        page: "/test.html",
+      },
+    })
+  );
+
+  await setTestResult(
+    "test-click-area",
+    checkEventExists("product-id-click-2", {
+      eventType: "click",
+      productId: "product-id-click-2",
+      auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e30000",
       placement: {
         page: "/test.html",
       },

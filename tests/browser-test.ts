@@ -87,18 +87,22 @@ async function checkTests() {
   const el = document.getElementById("click1");
   el?.click();
 
+  // Click on product area
+  const elArea = document.getElementById("click-area");
+  elArea?.click();
+
   // Add new product
   const newProduct = document.createElement("div");
-  newProduct.dataset.sku =
-    "product-id-dyn-impression-1:27785055-1d99-3b4e-94b0-5fc5cf60af3f";
+  newProduct.dataset.tsProduct = "product-id-dyn-impression-1";
+  newProduct.dataset.tsAuction = "27785055-1d99-3b4e-94b0-5fc5cf60af3f";
   const container = document.getElementById("vanilla-js");
   container?.appendChild(newProduct);
 
   // Modify product
   const oldProduct = document.getElementById("old-product");
   if (oldProduct) {
-    oldProduct.dataset.sku =
-      "product-id-attr-impression-2:27785055-2345-6789-94b0-5fc5cf60af3f";
+    oldProduct.dataset.tsProduct = "product-id-attr-impression-2";
+    oldProduct.dataset.tsAuction = "27785055-2345-6789-94b0-5fc5cf60af3f";
   }
 
   // Fetch next react page
@@ -159,6 +163,18 @@ async function checkTests() {
       eventType: "click",
       productId: "product-id-click-1",
       auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d",
+      placement: {
+        page: "/test.html",
+      },
+    })
+  );
+
+  await setTestResult(
+    "test-click-area",
+    checkEventExists("product-id-click-2", {
+      eventType: "click",
+      productId: "product-id-click-2",
+      auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e30000",
       placement: {
         page: "/test.html",
       },

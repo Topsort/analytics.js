@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "es2015"],
-    "target": "es5",
+    "lib": ["es5", "es2015.promise", "dom", "es2015"],
+    "target": "es2015",
     "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
@@ -11,17 +11,15 @@
     "noUnusedLocals": true,
     "outDir": "dist",
     // Required for tslib to emit tree-shakeable code
-    "module": "commonjs",
+    "module": "es2020",
     "moduleResolution": "node",
-    "sourceMap": true,
-    "declaration": true,
+    "declaration": false,
     "jsx": "react",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "alwaysStrict": false,
-    "typeRoots": ["@types", "node_modules/@types"],
-    "downlevelIteration": true
+    "typeRoots": ["@types", "node_modules/@types"]
   },
   "include": [
     "src/**/*.ts",
@@ -30,5 +28,5 @@
     "tests/**/*.tsx",
     "@types/**/*.ts"
   ],
-  "exclude": ["node_modules", "mocks", "src/*.test.ts", "test"]
+  "exclude": ["node_modules"]
 }

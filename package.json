@@ -2,18 +2,19 @@
   "name": "topsort-events",
   "version": "1.0.0",
   "description": "JS library to automatically report events to Topsort's Analytics",
-  "main": "index.js",
+  "main": "dist/ts.js",
   "scripts": {
-    "build": "webpack",
+    "build": "npm run clean && tsc && tsc -m es6 --outDir lib-esm && webpack",
     "test": "jest",
-    "test:e2e": "webpack && webpack -c webpack.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
+    "test:e2e": "webpack && webpack -c webpack.config.browser-test.js && tsc -p ./tsconfig.test.json && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
     "lint:ci": "npm run lint -- --format=compact",
-    "types:check": "tsc"
+    "types:check": "tsc",
+    "clean": "shx rm -rf _bundles lib lib-esm"
   },
   "author": "Topsort",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.1",
@@ -33,9 +34,11 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.2.2",
+    "shx": "^0.3.4",
     "terser-webpack-plugin": "^5.3.1",
     "ts-jest": "^27.1.4",
     "ts-loader": "^9.2.6",
+    "tslib": "^2.4.0",
     "typescript": "^4.6.2",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2"

@@ -5,7 +5,18 @@ const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: "./src/detector.ts",
+  entry: {
+    ts: "./src/detector.ts",
+    "ts.min": "./src/detector.ts",
+  },
+  output: {
+    path: path.resolve(__dirname, "_bundles"),
+    filename: "[name].js",
+    libraryTarget: "umd",
+    library: "ts",
+    umdNamedDefine: true,
+  },
+  devtool: "source-map",
   mode: "production",
   module: {
     rules: [

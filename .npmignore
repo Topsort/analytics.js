@@ -1,0 +1,9 @@
+.*
+@types
+mocks
+src
+tests
+jest.config.js
+tsconfig.json
+webpack.config.*
+node_modules

@@ -2,7 +2,7 @@
   "name": "topsort-events",
   "version": "1.0.0",
   "description": "JS library to automatically report events to Topsort's Analytics",
-  "main": "index.js",
+  "main": "dist/ts.js",
   "scripts": {
     "build": "webpack",
     "test": "jest",

@@ -1,9 +1,14 @@
 {
   "name": "@topsort/analytics.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JS library to automatically report events to Topsort's Analytics",
   "main": "dist/ts.js",
-  "keywords": ["ads", "sponsored listings", "auctions", "analytics"],
+  "keywords": [
+    "ads",
+    "sponsored listings",
+    "auctions",
+    "analytics"
+  ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
     "build": "webpack",

@@ -31,7 +31,7 @@ npm install topsort-events --save
 <div class="product" data-ts-product="<productId>" data-ts-auction="<auctionId>">...</div>
 ```
 
-Additionally, in case not all the container is clickable (i.e., does not produce an action or does not take you to the product page) or parts of it lead you to a non-related product page, make sure to use the data-ts-clickable attribute to indicate what portions of the product should count as a conversion.
+Additionally, in case not all the container is clickable (i.e., does not produce an action or does not take you to the product page) or parts of it lead you to a non-related product page, make sure to use the `data-ts-clickable` attribute to indicate what portions of the product should count as a conversion.
 
 ```html
 <div class="product" ...>

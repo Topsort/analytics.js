@@ -1,5 +1,5 @@
 {
-  "name": "topsort-events",
+  "name": "@topsort/topsort-events",
   "version": "1.0.0",
   "description": "JS library to automatically report events to Topsort's Analytics",
   "main": "dist/ts.js",

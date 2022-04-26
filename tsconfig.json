@@ -13,7 +13,10 @@
     // Required for tslib to emit tree-shakeable code
     "module": "es2020",
     "moduleResolution": "node",
-    "declaration": false,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "dist",
     "jsx": "react",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

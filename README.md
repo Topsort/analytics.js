@@ -5,10 +5,10 @@ Use this to send clicks and impressions to the Topsort API.
 
 # Installation
 
-With bower
+With npm
 
 ```
-bower install git://github.com/topsort/analytics.git --save
+npm install topsort-events --save
 ```
 
 # Usage
@@ -22,7 +22,7 @@ bower install git://github.com/topsort/analytics.git --save
     url: "YOUR PRODUCTION OR STAGING TOPSORT URL",
   };
 </script>
-<script src="bower_components/topsort/dist/topsort.js"></script>
+<script src="node_modules/topsort-events/dist/topsort.js"></script>
 ```
 
 ### Add markup to your products

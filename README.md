@@ -22,7 +22,7 @@ npm install @topsort/analytics.js --save
     url: "YOUR PRODUCTION OR STAGING TOPSORT URL",
   };
 </script>
-<script src="node_modules/topsort-events/dist/topsort.js"></script>
+<script src="node_modules/@topsort/analytics.js/dist/ts.js"></script>
 ```
 
 ### Add markup to your products

@@ -8,7 +8,7 @@ Use this to send clicks and impressions to the Topsort API.
 With npm
 
 ```
-npm install topsort-events --save
+npm install @topsort/events.js --save
 ```
 
 # Usage

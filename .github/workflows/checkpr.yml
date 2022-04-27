@@ -6,6 +6,9 @@ on:
       - opened
       - edited
       - synchronize
+  push:
+    branches:
+      - main
 
 # This is to avoid running multiple actions when a PR is updated repeatedly. See
 # https://docs.github.com/en/actions/using-jobs/using-concurrency

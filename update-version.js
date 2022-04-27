@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
 const fs = require("fs");
 
 const { version } = JSON.parse(fs.readFileSync("package.json"));

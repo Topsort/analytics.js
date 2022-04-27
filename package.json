@@ -7,7 +7,8 @@
     "ads",
     "sponsored listings",
     "auctions",
-    "analytics"
+    "analytics",
+    "topsort"
   ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {

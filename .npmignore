@@ -109,6 +109,7 @@ src
 tests
 mocks
 @types
+update-version.js
 
 # Uneeded dist
 dist/mocks
@@ -123,3 +124,5 @@ dist/test-bundle-react.js
 jest.config.js
 tsconfig.json
 webpack.*
+
+package-lock.json

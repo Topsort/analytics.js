@@ -11,6 +11,7 @@
   ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
+    "prepublishOnly": "npm run build && node update-version.js"
     "build": "webpack",
     "test": "jest",
     "test:e2e": "webpack && webpack -c webpack.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",

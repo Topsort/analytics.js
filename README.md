@@ -1,3 +1,9 @@
+![version](https://img.shields.io/npm/v/@topsort/analytics.js)
+![downloads](https://img.shields.io/npm/dw/@topsort/analytics.js)
+![license](https://img.shields.io/github/license/Topsort/analytics.js)
+![GitHub Repo stars](https://img.shields.io/github/stars/topsort/analytics.js?style=social)
+
+
 # Topsort analytics.js
 Topsort's JS analytics event library
 

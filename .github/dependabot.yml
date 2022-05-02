@@ -10,6 +10,7 @@ updates:
     open-pull-requests-limit: 3
     allow:
       - dependency-type: development
+    versioning-strategy: increase
     reviewers:
       - "sk-"
 

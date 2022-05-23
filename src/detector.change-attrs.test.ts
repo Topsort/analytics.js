@@ -20,7 +20,7 @@ test("change attributes", async () => {
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
     {
-      type: "impression",
+      type: "Impression",
       page: "/",
       product: "product-id-mod-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
@@ -28,7 +28,7 @@ test("change attributes", async () => {
       uid,
     },
     {
-      type: "impression",
+      type: "Impression",
       page: "/",
       product: "product-id-mod-2",
       auction: undefined,
@@ -45,7 +45,7 @@ test("change attributes", async () => {
   await new Promise(process.nextTick);
   expect(events).toMatchObject([
     {
-      type: "impression",
+      type: "Impression",
       page: "/",
       product: "product-id-mod-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
@@ -53,7 +53,7 @@ test("change attributes", async () => {
       uid,
     },
     {
-      type: "impression",
+      type: "Impression",
       page: "/",
       product: "product-id-mod-2",
       auction: undefined,

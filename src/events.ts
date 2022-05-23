@@ -26,14 +26,14 @@ interface Item {
 }
 
 interface ImpressionEvent {
-  eventType: "impression";
+  eventType: "Impression";
   session: Session;
   impressions: Impression[];
   occurredAt: string;
 }
 
 interface ClickEvent {
-  eventType: "click";
+  eventType: "ClickEvent";
   session: Session;
   id: string;
   placement: Placement;
@@ -44,7 +44,7 @@ interface ClickEvent {
 }
 
 interface PurchaseEvent {
-  eventType: "purchase";
+  eventType: "Purchase";
   session: Session;
   id: string;
   purchasedAt: string;

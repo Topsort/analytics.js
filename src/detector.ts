@@ -65,7 +65,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
   };
   const t = new Date(event.t * 1000).toISOString();
   switch (eventType) {
-    case "click":
+    case "ClickEvent":
       return {
         eventType,
         session,
@@ -76,7 +76,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         placement,
         occurredAt: t,
       };
-    case "impression":
+    case "Impression":
       return {
         eventType,
         session,
@@ -91,7 +91,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           },
         ],
       };
-    case "purchase":
+    case "Purchase":
       return {
         eventType,
         session,
@@ -131,7 +131,7 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
 
 const queue = new Queue(processor);
 
-export type EventType = "click" | "purchase" | "impression";
+export type EventType = "ClickEvent" | "Purchase" | "Impression";
 
 interface Purchase {
   product: string;
@@ -200,7 +200,7 @@ function getEvent(type: EventType, node: HTMLElement): ProductEvent {
     id: generateId(),
     uid: getUserId(),
   };
-  if (type === "purchase") {
+  if (type === "Purchase") {
     event.items = JSON.parse(node.dataset.tsItems || "[]");
   }
   return event;
@@ -212,7 +212,7 @@ function interactionHandler(event: Event): void {
   }
   const container = event.currentTarget.closest(PRODUCT_SELECTOR);
   if (container && container instanceof HTMLElement) {
-    logEvent(getEvent("click", container), container);
+    logEvent(getEvent("ClickEvent", container), container);
   }
 }
 
@@ -233,10 +233,10 @@ function checkChildren(node: Element | Document) {
       continue;
     }
     if (!isPurchase(node)) {
-      logEvent(getEvent("impression", node), node);
+      logEvent(getEvent("Impression", node), node);
       addClickHandler(node);
     } else {
-      logEvent(getEvent("purchase", node), node);
+      logEvent(getEvent("Purchase", node), node);
     }
   }
 }
@@ -268,10 +268,10 @@ function mutationCallback(mutationsList: MutationRecord[]) {
         continue;
       }
       if (!isPurchase(mutation.target)) {
-        logEvent(getEvent("impression", mutation.target), mutation.target);
+        logEvent(getEvent("Impression", mutation.target), mutation.target);
         mutation.target.addEventListener("click", interactionHandler);
       } else {
-        logEvent(getEvent("purchase", mutation.target), mutation.target);
+        logEvent(getEvent("Purchase", mutation.target), mutation.target);
       }
     }
   }

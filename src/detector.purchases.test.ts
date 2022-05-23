@@ -13,7 +13,7 @@ test("check purchase", async () => {
 
   expect(events).toMatchObject([
     {
-      type: "purchase",
+      type: "Purchase",
       page: "/",
       product: undefined,
       auction: undefined,

@@ -21,7 +21,7 @@ test("check clicks", async () => {
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
     {
-      type: "impression",
+      type: "Impression",
       page: "/",
       product: "product-id-click-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
@@ -29,7 +29,7 @@ test("check clicks", async () => {
       uid,
     },
     {
-      type: "click",
+      type: "ClickEvent",
       page: "/",
       product: "product-id-click-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",

@@ -15,7 +15,7 @@ test("dynamic content", async () => {
   await new Promise(process.nextTick);
   expect(events).toMatchObject([
     {
-      type: "impression",
+      type: "Impression",
       page: "/",
       product: "product-id-dyn-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",

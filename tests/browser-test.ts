@@ -118,7 +118,7 @@ async function checkTests() {
   await setTestResult(
     "test-impression",
     checkEventExists("product-id-impression-1", {
-      eventType: "impression",
+      eventType: "Impression",
       impressions: [
         {
           productId: "product-id-impression-1",
@@ -134,7 +134,7 @@ async function checkTests() {
   await setTestResult(
     "test-new-impression",
     checkEventExists("product-id-dyn-impression-1", {
-      eventType: "impression",
+      eventType: "Impression",
       impressions: [
         {
           productId: "product-id-dyn-impression-1",
@@ -147,7 +147,7 @@ async function checkTests() {
   await setTestResult(
     "test-attributes-impression",
     checkEventExists("product-id-attr-impression-2", {
-      eventType: "impression",
+      eventType: "Impression",
       impressions: [
         {
           productId: "product-id-attr-impression-2",
@@ -160,7 +160,7 @@ async function checkTests() {
   await setTestResult(
     "test-click",
     checkEventExists("product-id-click-1", {
-      eventType: "click",
+      eventType: "ClickEvent",
       productId: "product-id-click-1",
       auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d",
       placement: {
@@ -172,7 +172,7 @@ async function checkTests() {
   await setTestResult(
     "test-click-area",
     checkEventExists("product-id-click-2", {
-      eventType: "click",
+      eventType: "ClickEvent",
       productId: "product-id-click-2",
       auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e30000",
       placement: {
@@ -184,7 +184,7 @@ async function checkTests() {
   await setTestResult(
     "test-purchase",
     checkEventExists("product-id-purchase-1", {
-      eventType: "purchase",
+      eventType: "Purchase",
       items: [
         { productId: "product-id-purchase-1", quantity: 1, unitPrice: 2399 },
         { productId: "product-id-purchase-2", quantity: 2, unitPrice: 399 },
@@ -195,7 +195,7 @@ async function checkTests() {
   await setTestResult(
     "test-react-impression",
     checkEventExists("p-r-6", {
-      eventType: "impression",
+      eventType: "Impression",
       impressions: [
         {
           productId: "p-r-6",
@@ -207,7 +207,7 @@ async function checkTests() {
   await setTestResult(
     "test-react-navigation",
     checkEventExists("p-r-3", {
-      eventType: "impression",
+      eventType: "Impression",
       impressions: [
         {
           productId: "p-r-3",

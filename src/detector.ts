@@ -278,6 +278,10 @@ function mutationCallback(mutationsList: MutationRecord[]) {
 }
 
 function start() {
+  if (window.TS?.loaded) {
+    return;
+  }
+  window.TS.loaded = true;
   if (!window.TS?.token) {
     console.error("Missing TS token");
     return;

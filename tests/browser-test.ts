@@ -82,7 +82,11 @@ async function setTestResult(
   el.innerText = result.toUpperCase();
 }
 
-async function checkTests() {
+async function delay(timeout: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+}
+
+async function runTests() {
   // Click on product
   const product = document.getElementById("click1");
   product?.click();
@@ -105,15 +109,31 @@ async function checkTests() {
     oldProduct.dataset.tsAuction = "27785055-2345-6789-94b0-5fc5cf60af3f";
   }
 
+  // Make product visible
+  const hiddenProduct = document.getElementById("hidden-product");
+  if (hiddenProduct) {
+    hiddenProduct.style.visibility = "visible";
+  }
+
   // Fetch next react page
   const button = document.getElementById("next-page-react");
   button?.click();
+  await delay(250);
 
   // React router
   const link = document.getElementById("react-link");
   link?.click();
+  await delay(250);
 
-  await new Promise((resolve) => setTimeout(resolve, 2500));
+  // Go to Home so we can refresh the page
+  document.getElementById("react-home")?.click();
+
+  await delay(2500);
+  await checkTests();
+}
+
+async function checkTests() {
+  console.info("Checking results ...");
 
   await setTestResult(
     "test-impression",
@@ -123,6 +143,21 @@ async function checkTests() {
         {
           productId: "product-id-impression-1",
           auctionId: "17785055-9d99-4b4e-9fb0-5fc4cff0af3f",
+          placement: {
+            page: "/test.html",
+          },
+        },
+      ],
+    })
+  );
+
+  await setTestResult(
+    "test-hidden-impression",
+    checkEventExists("product-id-impression-hidden", {
+      eventType: "Impression",
+      impressions: [
+        {
+          productId: "product-id-impression-hidden",
           placement: {
             page: "/test.html",
           },
@@ -221,8 +256,7 @@ async function checkTests() {
 
   await setTestResult("test-no-errors", checkNoErrors());
 
-  // Go to Home so we can refresh the page
-  document.getElementById("react-home")?.click();
+  console.info("Done checking results");
 }
 
-window.addEventListener("DOMContentLoaded", checkTests);
+window.addEventListener("DOMContentLoaded", runTests);

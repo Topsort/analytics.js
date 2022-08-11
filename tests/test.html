@@ -10,7 +10,10 @@
       td.ok {
         background-color: #66bb6a;
       }
-      #root {
+      #vanilla-js, #root, a:active, a:visited, a:hover {
+        color: white;
+      }
+      button {
         visibility: hidden;
       }
     </style>
@@ -24,6 +27,10 @@
       <tr>
         <td>Static Impression</td>
         <td id="test-impression">Pending</td>
+      </tr>
+      <tr>
+        <td>Hidden Impression</td>
+        <td id="test-hidden-impression">Pending</td>
       </tr>
       <tr>
         <td>New Element Impression</td>
@@ -60,11 +67,12 @@
     </table>
   </div>
   <div id="vanilla-js">
-    <div data-ts-product="product-id-impression-1" data-ts-auction="17785055-9d99-4b4e-9fb0-5fc4cff0af3f"></div>
-    <div id="click1" data-ts-product="product-id-click-1" data-ts-auction="dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d"></div>
+    <div data-ts-product="product-id-impression-1" data-ts-auction="17785055-9d99-4b4e-9fb0-5fc4cff0af3f">P</div>
+    <div id="click1" data-ts-product="product-id-click-1" data-ts-auction="dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d">P</div>
     <div id="click2" data-ts-product="product-id-click-2" data-ts-auction="dc7d20e0-c56f-4a2f-9359-cfb363e30000"><a id="click-area" style="visibility: hidden;">Link</a></div>
-    <div data-ts-action="purchase" data-ts-items='[{"product": "product-id-purchase-1", "quantity":1, "price": 2399}, {"product": "product-id-purchase-2", "quantity": 2, "price": 399}]'></div>
-    <div id="old-product" data-ts-product="product-id-attr-impression-1"></div>
+    <div data-ts-action="purchase" data-ts-items='[{"product": "product-id-purchase-1", "quantity":1, "price": 2399}, {"product": "product-id-purchase-2", "quantity": 2, "price": 399}]'>P</div>
+    <div id="old-product" data-ts-product="product-id-attr-impression-1">P</div>
+    <div id="hidden-product" data-ts-product="product-id-impression-hidden" style="visibility: none;">H</div>
   </div>
   <div id="root"></div>
   <script>

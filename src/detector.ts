@@ -3,6 +3,8 @@ import { ProcessorResult, Queue } from "./queue";
 import { reportEvent } from "./reporter";
 
 const MAX_EVENTS_SIZE = 2500;
+// See https://support.google.com/admanager/answer/4524488?hl=en
+const INTERSECTION_THRESHOLD = 0.5;
 let seenEvents = new Set<string>();
 
 /**
@@ -63,7 +65,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
   const placement = {
     page: event.page,
   };
-  const t = new Date(event.t * 1000).toISOString();
+  const t = new Date(event.t).toISOString();
   switch (eventType) {
     case "ClickEvent":
       return {
@@ -195,7 +197,7 @@ function getEvent(type: EventType, node: HTMLElement): ProductEvent {
     product,
     auction,
     bid,
-    t: Date.now() / 1000,
+    t: Date.now(),
     page: getPage(),
     id: generateId(),
     uid: getUserId(),
@@ -216,6 +218,27 @@ function interactionHandler(event: Event): void {
   }
 }
 
+const intersectionObserver = !!window.IntersectionObserver
+  ? new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const node = entry.target;
+            if (node instanceof HTMLElement) {
+              logEvent(getEvent("Impression", node), node);
+              if (intersectionObserver) {
+                intersectionObserver.unobserve(node);
+              }
+            }
+          }
+        }
+      },
+      {
+        threshold: INTERSECTION_THRESHOLD,
+      }
+    )
+  : undefined;
+
 const PRODUCT_SELECTOR =
   "[data-ts-product],[data-ts-auction],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";
 
@@ -225,6 +248,19 @@ function addClickHandler(node: HTMLElement) {
   elements.forEach((e) => e.addEventListener("click", interactionHandler));
 }
 
+function processChild(node: HTMLElement) {
+  if (!isPurchase(node)) {
+    if (intersectionObserver) {
+      intersectionObserver.observe(node);
+    } else {
+      logEvent(getEvent("Impression", node), node);
+    }
+    addClickHandler(node);
+  } else {
+    logEvent(getEvent("Purchase", node), node);
+  }
+}
+
 function checkChildren(node: Element | Document) {
   const matchedNodes = node.querySelectorAll(PRODUCT_SELECTOR);
   for (let i = 0; i < matchedNodes.length; i++) {
@@ -232,12 +268,7 @@ function checkChildren(node: Element | Document) {
     if (!(node instanceof HTMLElement)) {
       continue;
     }
-    if (!isPurchase(node)) {
-      logEvent(getEvent("Impression", node), node);
-      addClickHandler(node);
-    } else {
-      logEvent(getEvent("Purchase", node), node);
-    }
+    processChild(node);
   }
 }
 
@@ -267,12 +298,7 @@ function mutationCallback(mutationsList: MutationRecord[]) {
       if (!(mutation.target instanceof HTMLElement)) {
         continue;
       }
-      if (!isPurchase(mutation.target)) {
-        logEvent(getEvent("Impression", mutation.target), mutation.target);
-        mutation.target.addEventListener("click", interactionHandler);
-      } else {
-        logEvent(getEvent("Purchase", mutation.target), mutation.target);
-      }
+      processChild(mutation.target);
     }
   }
 }

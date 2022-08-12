@@ -6,6 +6,14 @@ function errorHandler(error: any) {
 window.addEventListener("error", errorHandler);
 window.addEventListener("unhandledrejection", errorHandler);
 
+const eventsCount: Record<string, number> = {};
+function recordEvent(event: any) {
+  const d = event.detail;
+  const k = `${d.type}-${d.product}`;
+  eventsCount[k] = eventsCount[k] === undefined ? 1 : eventsCount[k] + 1;
+}
+window.addEventListener("topsort", recordEvent);
+
 interface Purchase {
   productId?: string;
   quantity?: number;
@@ -69,6 +77,19 @@ function checkNoErrors(): boolean {
   return errors.length === 0;
 }
 
+function checkEvents(
+  eventType: string,
+  productId: string,
+  expected: number
+): boolean {
+  const k = `${eventType}-${productId}`;
+  if (eventsCount[k] !== expected) {
+    console.info(`Found ${eventsCount[k]} events but wanted ${expected}`);
+    return false;
+  }
+  return true;
+}
+
 async function setTestResult(
   testId: string,
   ok: boolean | Promise<boolean>
@@ -112,6 +133,10 @@ async function runTests() {
   // Make product visible
   const hiddenProduct = document.getElementById("hidden-product");
   if (hiddenProduct) {
+    hiddenProduct.style.visibility = "visible";
+    await delay(250);
+    hiddenProduct.style.visibility = "none";
+    await delay(250);
     hiddenProduct.style.visibility = "visible";
   }
 
@@ -164,6 +189,13 @@ async function checkTests() {
         },
       ],
     })
+  );
+
+  await setTestResult(
+    "test-hidden-impression-twice",
+    Promise.resolve(
+      checkEvents("Impression", "product-id-impression-hidden", 1)
+    )
   );
 
   await setTestResult(

@@ -29,7 +29,7 @@ function expectEmptyQueue<T extends Entry>(q: Queue<T>): void {
 }
 
 function now(): number {
-  return Date.now() / 1000;
+  return Date.now();
 }
 
 async function flushPromises(timeMs?: number): Promise<void> {

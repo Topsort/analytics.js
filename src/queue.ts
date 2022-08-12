@@ -40,7 +40,7 @@ export type Processor<T extends Entry> = (
 
 function expBackoff(startTime: number, retries: number): number {
   if (retries > 0) {
-    return startTime + Math.random() + Math.pow(2, retries);
+    return startTime + (Math.random() + Math.pow(2, retries)) * 1000;
   }
   // This could be just startTime, but we chose to return 0, just to ensure
   // that the event is always added the first time. Even if the clock changed.
@@ -108,7 +108,7 @@ export class Queue<T extends Entry> {
       const entry = retryableEntry.e;
       if (
         !this._processing.has(entry.id) &&
-        expBackoff(entry.t, retryableEntry.r) <= Date.now() / 1000
+        expBackoff(entry.t, retryableEntry.r) <= Date.now()
       ) {
         chunk.push(entry as T);
         this._processing.add(entry.id);

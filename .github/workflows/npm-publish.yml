@@ -97,7 +97,7 @@ jobs:
           mv dist/ts.js upload/ts.js
           mv dist/ts.map.js upload/ts.map.js
 
-      - name: Configure AWS credentials from Test account
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.GITHUB_ROLE }}

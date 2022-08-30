@@ -1,8 +1,8 @@
 name: npm-publish
 on:
-  push:
-    branches:
-      - main # Change this to your default branch
+  release:
+    types: [published]
+
 jobs:
   npm-publish:
     name: npm-publish
@@ -68,11 +68,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Prepare
+        run: |
+          mkdir upload
+          mv dist/ts.js upload/ts.js
+          mv dist/ts.map.js upload/ts.map.js
+
       - name: Upload to S3
         uses: lbertenasco/s3-deploy@v1
         with:
-            folder: dist
+            folder: upload
             bucket: ${{ secrets.S3_BUCKET }}
+            bucket-region: ${{ secrets.AWS_DEFAULT_REGION }}
             dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
             invalidation: / *
 

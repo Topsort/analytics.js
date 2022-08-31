@@ -17,14 +17,11 @@ phases:
     commands:
       - echo Building project...
       - npm run build
-      - mkdir upload
-      - mv dist/ts.js upload/ts.js
-      - mv dist/ts.map.js upload/ts.map.js
 
   post_build:
     commands:
       - echo Uploading files to S3...
-      - aws s3 sync upload s3://$BUCKET_NAME
+      - aws s3 cp dist/ts.js s3://$BUCKET_NAME
       - echo Invalidating Cloudfront cache
       - aws cloudfront create-invalidation \
           --distribution-id $DISTRIBUTION_ID

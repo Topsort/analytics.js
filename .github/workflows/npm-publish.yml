@@ -1,9 +1,36 @@
 name: npm-publish
 on:
-  push:
-    branches:
-      - main # Change this to your default branch
+  release:
+    types: [published]
+
 jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Cache node modules
+        id: cache-node
+        uses: actions/cache@v3.0.5
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
   npm-publish:
     name: npm-publish
     runs-on: ubuntu-latest

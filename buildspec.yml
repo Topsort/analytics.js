@@ -23,9 +23,9 @@ phases:
 
   deploy:
     commands:
-      - aws s3 sync upload s3://$S3_BUCKET
+      - aws s3 sync upload s3://$BUCKET_NAME
 
   invalidate_cache_cloudfront_cache:
     commands:
       - aws cloudfront create-invalidation \
-          --distribution-id $AWS_CLOUDFRONT_DISTRIBUTION_ID
+          --distribution-id $DISTRIBUTION_ID

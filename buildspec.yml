@@ -1,31 +1,30 @@
 version: 0.2
 
 phases:
+
+  install:
+    commands:
+      - npm ci
+
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 160485138118.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-
-  install_deps:
-    commands:
-      - npm ci
-
-  test:
-    commainds:
+      - echo Running tests
       - npm run test
 
   build:
     commands:
+      - echo Building project...
       - npm run build
       - mkdir upload
       - mv dist/ts.js upload/ts.js
       - mv dist/ts.map.js upload/ts.map.js
 
-  deploy:
+  post_build:
     commands:
+      - echo Uploading files to S3...
       - aws s3 sync upload s3://$BUCKET_NAME
-
-  invalidate_cache_cloudfront_cache:
-    commands:
+      - echo Invalidating Cloudfront cache
       - aws cloudfront create-invalidation \
           --distribution-id $DISTRIBUTION_ID

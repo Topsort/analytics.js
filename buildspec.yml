@@ -23,5 +23,4 @@ phases:
       - echo Uploading files to S3...
       - aws s3 cp dist/ts.js s3://$BUCKET_NAME
       - echo Invalidating Cloudfront cache
-      - aws cloudfront create-invalidation \
-          --distribution-id $DISTRIBUTION_ID
+      - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID

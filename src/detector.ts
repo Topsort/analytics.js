@@ -67,7 +67,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
   };
   const t = new Date(event.t).toISOString();
   switch (eventType) {
-    case "ClickEvent":
+    case "Click":
       return {
         eventType,
         session,
@@ -133,7 +133,7 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
 
 const queue = new Queue(processor);
 
-export type EventType = "ClickEvent" | "Purchase" | "Impression";
+export type EventType = "Click" | "Purchase" | "Impression";
 
 interface Purchase {
   product: string;
@@ -214,7 +214,7 @@ function interactionHandler(event: Event): void {
   }
   const container = event.currentTarget.closest(PRODUCT_SELECTOR);
   if (container && container instanceof HTMLElement) {
-    logEvent(getEvent("ClickEvent", container), container);
+    logEvent(getEvent("Click", container), container);
   }
 }
 

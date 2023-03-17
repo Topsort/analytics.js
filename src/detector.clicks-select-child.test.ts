@@ -29,7 +29,7 @@ test("check clicks", async () => {
       uid,
     },
     {
-      type: "ClickEvent",
+      type: "Click",
       page: "/",
       product: "product-id-click-1",
       auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",

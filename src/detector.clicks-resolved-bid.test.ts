@@ -22,7 +22,7 @@ test("check clicks", async () => {
       uid,
     },
     {
-      type: "ClickEvent",
+      type: "Click",
       page: "/",
       bid: "1212eaae-12a1-4c20-9b52-9efdcdef3095",
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),

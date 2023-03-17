@@ -33,7 +33,7 @@ interface ImpressionEvent {
 }
 
 interface ClickEvent {
-  eventType: "ClickEvent";
+  eventType: "Click";
   session: Session;
   id: string;
   placement: Placement;

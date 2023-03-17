@@ -1,11 +1,12 @@
 import { version } from "./version";
+import type { TopsortEvent } from "./events";
 
 interface Config {
   token: string;
   url?: string;
 }
 
-export async function reportEvent(e: any, config: Config) {
+export async function reportEvent(e: TopsortEvent, config: Config) {
   try {
     const url = (config.url || "https://api.topsort.com") + "/v1/events";
     const r = await fetch(url, {

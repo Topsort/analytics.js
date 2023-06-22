@@ -25,10 +25,10 @@ npm install @topsort/analytics.js --save
 <script>
   window.TS = {
     token: "<YOUR-TOPSORT.JS-TOKEN>",
-    url: "YOUR PRODUCTION OR STAGING TOPSORT URL",
+    url: "https://api.topsort.com", // change this if you want to test against the staging environment
   };
 </script>
-<script src="node_modules/@topsort/analytics.js/dist/ts.js"></script>
+<script src="https://unpkg.com/@topsort/analytics.js@1.0.5/dist/ts.js"></script>
 ```
 
 ### Add markup to your products

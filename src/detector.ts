@@ -55,7 +55,7 @@ window.TS.resetUserId = resetUserId;
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {
   const cookieName = window.TS.cookieName || "tsuid";
-  const regex = new RegExp("/(^|;)\\s*" + cookieName + "\\s*=\\s*([^;]+)/");
+  const regex = new RegExp("(^|;)\\s*" + cookieName + "\\s*=\\s*([^;]+)");
   return regex.exec(document.cookie)?.pop();
 }
 

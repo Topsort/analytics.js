@@ -1,8 +1,9 @@
 describe("check ids api", () => {
-  window.TS = {
-    token: "token",
-  };
-  beforeAll(async () => {
+  beforeEach(async () => {
+    window.TS = {
+      token: "token",
+    };
+    jest.resetModules();
     await import("./detector");
   });
 
@@ -20,6 +21,11 @@ describe("check ids api", () => {
 
   test("set custom id", () => {
     window.TS.setUserId?.("customId");
+    expect(window.TS.getUserId?.()).toEqual("customId");
+  });
+
+  test("reads id from cookie correctly", () => {
+    document.cookie = "foo=bar; tsuid=customId";
     expect(window.TS.getUserId?.()).toEqual("customId");
   });
 });

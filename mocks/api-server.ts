@@ -51,7 +51,7 @@ app.post("/:session/v1/events", (req, res) => {
   const session = req.params.session;
   console.info(session, req.body);
   const payload = req.body;
-  if (payload.eventType === "ClickEvent") {
+  if (payload.eventType === "Click") {
     addEvent(payload.productId, payload, session);
   } else if (payload.eventType === "Impression") {
     for (const imp of payload.impressions) {

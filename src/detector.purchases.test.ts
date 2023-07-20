@@ -16,7 +16,7 @@ test("check purchase", async () => {
       type: "Purchase",
       page: "/",
       product: undefined,
-      auction: undefined,
+      bid: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       items: [
         { product: "product-id-purchase1", price: "2399", quantity: 1 },

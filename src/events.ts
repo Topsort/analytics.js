@@ -1,54 +1,45 @@
-interface Session {
-  sessionId: string;
-  consumerId?: string;
-  orderIntentId?: string;
-  orderId?: string;
+interface Placement {
+  path: string;
 }
 
-interface Placement {
-  page: string;
-  location?: string;
+export interface Entity {
+  type: "product";
+  id: string;
 }
 
 interface Impression {
-  placement: Placement;
-  productId?: string;
-  id: string;
-  auctionId?: string;
   resolvedBidId?: string;
+  entity?: Entity;
+  placement: Placement;
+  occurredAt: string;
+  opaqueUserId: string;
+  id: string;
+}
+
+interface Click {
+  resolvedBidId?: string;
+  entity?: Entity;
+  placement: Placement;
+  occurredAt: string;
+  opaqueUserId: string;
+  id: string;
 }
 
 interface Item {
   productId: string;
-  auctionId?: string;
-  quantity?: number;
+  quantity: number;
   unitPrice: number;
 }
 
-interface ImpressionEvent {
-  eventType: "Impression";
-  session: Session;
-  impressions: Impression[];
+interface Purchase {
   occurredAt: string;
-}
-
-interface ClickEvent {
-  eventType: "Click";
-  session: Session;
+  opaqueUserId: string;
   id: string;
-  placement: Placement;
-  productId?: string;
-  auctionId?: string;
-  resolvedBidId?: string;
-  occurredAt: string;
-}
-
-interface PurchaseEvent {
-  eventType: "Purchase";
-  session: Session;
-  id: string;
-  purchasedAt: string;
   items: Item[];
 }
 
-export type TopsortEvent = ImpressionEvent | ClickEvent | PurchaseEvent;
+export interface TopsortEvent {
+  impressions?: Impression[];
+  clicks?: Click[];
+  purchases?: Purchase[];
+}

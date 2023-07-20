@@ -1,4 +1,4 @@
-import { TopsortEvent } from "./events";
+import { TopsortEvent, Entity } from "./events";
 import { ProcessorResult, Queue } from "./queue";
 import { reportEvent } from "./reporter";
 
@@ -61,47 +61,58 @@ function getUserIdCookie(): string | undefined {
 
 function getApiPayload(event: ProductEvent): TopsortEvent {
   const eventType = event.type;
-  const session = { sessionId: event.uid };
   const placement = {
-    page: event.page,
+    path: event.page,
   };
+  let entity: Entity | undefined = undefined;
+  if (event.product) {
+    entity = {
+      type: "product",
+      id: event.product,
+    };
+  }
   const t = new Date(event.t).toISOString();
   switch (eventType) {
     case "Click":
       return {
-        eventType,
-        session,
-        id: event.id,
-        productId: event.product,
-        resolvedBidId: event.bid,
-        placement,
-        occurredAt: t,
+        clicks: [
+          {
+            resolvedBidId: event.bid,
+            entity,
+            placement,
+            occurredAt: t,
+            opaqueUserId: event.uid,
+            id: event.id,
+          },
+        ],
       };
     case "Impression":
       return {
-        eventType,
-        session,
-        occurredAt: t,
         impressions: [
           {
-            id: event.id,
-            productId: event.product,
             resolvedBidId: event.bid,
+            entity,
             placement,
+            occurredAt: t,
+            opaqueUserId: event.uid,
+            id: event.id,
           },
         ],
       };
     case "Purchase":
       return {
-        eventType,
-        session,
-        id: event.id,
-        purchasedAt: t,
-        items: (event.items || []).map((e) => ({
-          productId: e.product,
-          quantity: e.quantity,
-          unitPrice: e.price,
-        })),
+        purchases: [
+          {
+            occurredAt: t,
+            opaqueUserId: event.uid,
+            items: (event.items || []).map((e) => ({
+              productId: e.product,
+              quantity: e.quantity,
+              unitPrice: e.price,
+            })),
+            id: event.id,
+          },
+        ],
       };
   }
 }

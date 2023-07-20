@@ -21,7 +21,12 @@ interface Purchase {
 }
 
 interface Placement {
-  page: string;
+  path: string;
+}
+
+interface Entity {
+  type: "product";
+  id: string;
 }
 
 interface Impression {
@@ -34,7 +39,7 @@ interface Impression {
 interface ProductEvent {
   eventType?: string;
   placement?: Placement;
-  productId?: string;
+  entity?: Entity;
   resolvedBidId?: string | null;
   impressions?: Impression[];
   items?: Purchase[];
@@ -59,11 +64,12 @@ function match(event: any, productEvent: ProductEvent): boolean {
 
 async function checkEventExists(
   productId: string,
+  eventType: string,
   event: ProductEvent
 ): Promise<boolean> {
   const testId = window.testId;
   const r = await fetch(
-    `/test/events?productId=${productId}&session=${testId}`
+    `/test/events?productId=${productId}&eventType=${eventType}&session=${testId}`
   );
   const data = await r.json();
   const result = data.some((e: any) => match(e, event));
@@ -162,32 +168,25 @@ async function checkTests() {
 
   await setTestResult(
     "test-impression",
-    checkEventExists("product-id-impression-1", {
-      eventType: "Impression",
-      impressions: [
-        {
-          productId: "product-id-impression-1",
-          resolvedBidId: "17785055-9d99-4b4e-9fb0-5fc4cff0af3f",
-          placement: {
-            page: "/test.html",
-          },
-        },
-      ],
+    checkEventExists("product-id-impression-1", "impression", {
+      entity: {
+        id: "product-id-impression-1",
+        type: "product",
+      },
+      resolvedBidId: "17785055-9d99-4b4e-9fb0-5fc4cff0af3f",
+      placement: {
+        path: "/test.html",
+      },
     })
   );
 
   await setTestResult(
     "test-hidden-impression",
-    checkEventExists("product-id-impression-hidden", {
-      eventType: "Impression",
-      impressions: [
-        {
-          productId: "product-id-impression-hidden",
-          placement: {
-            page: "/test.html",
-          },
-        },
-      ],
+    checkEventExists("product-id-impression-hidden", "impression", {
+      entity: { id: "product-id-impression-hidden", type: "product" },
+      placement: {
+        path: "/test.html",
+      },
     })
   );
 
@@ -200,58 +199,45 @@ async function checkTests() {
 
   await setTestResult(
     "test-new-impression",
-    checkEventExists("product-id-dyn-impression-1", {
-      eventType: "Impression",
-      impressions: [
-        {
-          productId: "product-id-dyn-impression-1",
-          resolvedBidId: "27785055-1d99-3b4e-94b0-5fc5cf60af3f",
-        },
-      ],
+    checkEventExists("product-id-dyn-impression-1", "impression", {
+      entity: { id: "product-id-dyn-impression-1", type: "product" },
+      resolvedBidId: "27785055-1d99-3b4e-94b0-5fc5cf60af3f",
     })
   );
 
   await setTestResult(
     "test-attributes-impression",
-    checkEventExists("product-id-attr-impression-2", {
-      eventType: "Impression",
-      impressions: [
-        {
-          productId: "product-id-attr-impression-2",
-          resolvedBidId: "27785055-2345-6789-94b0-5fc5cf60af3f",
-        },
-      ],
+    checkEventExists("product-id-attr-impression-2", "impression", {
+      entity: { id: "product-id-attr-impression-2", type: "product" },
+      resolvedBidId: "27785055-2345-6789-94b0-5fc5cf60af3f",
     })
   );
 
   await setTestResult(
     "test-click",
-    checkEventExists("product-id-click-1", {
-      eventType: "Click",
-      productId: "product-id-click-1",
+    checkEventExists("product-id-click-1", "click", {
+      entity: { id: "product-id-click-1", type: "product" },
       resolvedBidId: "dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d",
       placement: {
-        page: "/test.html",
+        path: "/test.html",
       },
     })
   );
 
   await setTestResult(
     "test-click-area",
-    checkEventExists("product-id-click-2", {
-      eventType: "Click",
-      productId: "product-id-click-2",
+    checkEventExists("product-id-click-2", "click", {
+      entity: { id: "product-id-click-2", type: "product" },
       resolvedBidId: "dc7d20e0-c56f-4a2f-9359-cfb363e30000",
       placement: {
-        page: "/test.html",
+        path: "/test.html",
       },
     })
   );
 
   await setTestResult(
     "test-purchase",
-    checkEventExists("product-id-purchase-1", {
-      eventType: "Purchase",
+    checkEventExists("product-id-purchase-1", "purchase", {
       items: [
         { productId: "product-id-purchase-1", quantity: 1, unitPrice: 2399 },
         { productId: "product-id-purchase-2", quantity: 2, unitPrice: 399 },
@@ -261,28 +247,21 @@ async function checkTests() {
 
   await setTestResult(
     "test-react-impression",
-    checkEventExists("p-r-6", {
-      eventType: "Impression",
-      impressions: [
-        {
-          productId: "p-r-6",
-        },
-      ],
+    checkEventExists("p-r-6", "impression", {
+      entity: {
+        id: "p-r-6",
+        type: "product",
+      },
     })
   );
 
   await setTestResult(
     "test-react-navigation",
-    checkEventExists("p-r-3", {
-      eventType: "Impression",
-      impressions: [
-        {
-          productId: "p-r-3",
-          placement: {
-            page: "/other-test.html",
-          },
-        },
-      ],
+    checkEventExists("p-r-3", "impression", {
+      entity: { id: "p-r-3", type: "product" },
+      placement: {
+        path: "/other-test.html",
+      },
     })
   );
 

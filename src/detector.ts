@@ -172,9 +172,7 @@ function logEvent(info: ProductEvent, node: Node) {
 }
 
 function getId(event: ProductEvent): string {
-  return [event.page, event.type, event.product, event.bid].join(
-    "-"
-  );
+  return [event.page, event.type, event.product, event.bid].join("-");
 }
 
 function getPage(): string {

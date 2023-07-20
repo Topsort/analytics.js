@@ -8,8 +8,12 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+## Version 2.0.0 (2023-07-13)
+
 ### Changed
 - Remove usages of `data-ts-auction` as that only works when using API v1
+- When specifying purchases, the price must now be specified as a float in the marketplace currency (i.e. USD) instead of cents.
+
 
 ### Refactor
 - Use [Events API v2](https://docs.topsort.com/reference/reportevents-2)

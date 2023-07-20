@@ -28,7 +28,7 @@ npm install @topsort/analytics.js --save
     url: "https://api.topsort.com", // change this if you want to test against the staging environment
   };
 </script>
-<script src="https://unpkg.com/@topsort/analytics.js@1.0.6/dist/ts.js"></script>
+<script src="https://unpkg.com/@topsort/analytics.js@2.0.0/dist/ts.js"></script>
 ```
 
 ### Add markup to your products

@@ -8,7 +8,7 @@ interface Config {
 
 export async function reportEvent(e: TopsortEvent, config: Config) {
   try {
-    const url = (config.url || "https://api.topsort.com") + "/v1/events";
+    const url = (config.url || "https://api.topsort.com") + "/v2/events";
     const r = await fetch(url, {
       method: "POST",
       headers: {

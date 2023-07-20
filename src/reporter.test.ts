@@ -5,7 +5,7 @@ import "isomorphic-fetch";
 import nock from "nock";
 
 test("success", async () => {
-  nock("https://api.topsort.com").post("/v1/events").reply(200, {});
+  nock("https://api.topsort.com").post("/v2/events").reply(200, {});
   await expect(
     reportEvent({} as TopsortEvent, { token: "token" })
   ).resolves.toEqual({
@@ -15,7 +15,7 @@ test("success", async () => {
 });
 
 test("permanent error", async () => {
-  nock("https://api.topsort.com").post("/v1/events").reply(400, {});
+  nock("https://api.topsort.com").post("/v2/events").reply(400, {});
   await expect(
     reportEvent({} as TopsortEvent, { token: "token" })
   ).resolves.toEqual({
@@ -25,7 +25,7 @@ test("permanent error", async () => {
 });
 
 test("retryable error", async () => {
-  nock("https://api.topsort.com").post("/v1/events").reply(429, {});
+  nock("https://api.topsort.com").post("/v2/events").reply(429, {});
   await expect(
     reportEvent({} as TopsortEvent, { token: "token" })
   ).resolves.toEqual({
@@ -35,7 +35,7 @@ test("retryable error", async () => {
 });
 
 test("unexpected error", async () => {
-  nock("https://api.topsort.com").post("/v2/events").reply(200, {});
+  nock("https://api.topsort.com").post("/v1/events").reply(200, {});
   await expect(
     reportEvent({} as TopsortEvent, { token: "token" })
   ).resolves.toEqual({
@@ -45,7 +45,7 @@ test("unexpected error", async () => {
 });
 
 test("custom url", async () => {
-  nock("https://demo.api.topsort.com").post("/v1/events").reply(200, {});
+  nock("https://demo.api.topsort.com").post("/v2/events").reply(200, {});
   await expect(
     reportEvent({} as TopsortEvent, {
       token: "token",

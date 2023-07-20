@@ -28,8 +28,13 @@ app.use(express.json());
 
 const events: Record<string, any[]> = {};
 
-function addEvent(productId: string, event: any, session: string): void {
-  const namespacedProductId = `${session}-${productId}`;
+function addEvent(
+  productId: string,
+  eventType: string,
+  event: any,
+  session: string
+): void {
+  const namespacedProductId = `${session}-${eventType}-${productId}`;
   if (!events[namespacedProductId]) {
     events[namespacedProductId] = [];
   }
@@ -47,21 +52,27 @@ function getNetworkIp(): string {
   return "127.0.0.1";
 }
 
-app.post("/:session/v1/events", (req, res) => {
+app.post("/:session/v2/events", (req, res) => {
   const session = req.params.session;
   console.info(session, req.body);
   const payload = req.body;
-  if (payload.eventType === "Click") {
-    addEvent(payload.productId, payload, session);
-  } else if (payload.eventType === "Impression") {
-    for (const imp of payload.impressions) {
-      addEvent(imp.productId, payload, session);
+  let totalEvents = 0;
+  for (const event of payload.impressions ?? []) {
+    addEvent(event.entity.id, "impression", event, session);
+    totalEvents++;
+  }
+  for (const event of payload.clicks ?? []) {
+    addEvent(event.entity.id, "click", event, session);
+    totalEvents++;
+  }
+  for (const event of payload.purchases ?? []) {
+    for (const item of event.items) {
+      addEvent(item.productId, "purchase", event, session);
+      totalEvents++;
     }
-  } else if (payload.eventType === "Purchase") {
-    for (const item of payload.items) {
-      addEvent(item.productId, payload, session);
-    }
-  } else {
+  }
+
+  if (totalEvents === 0) {
     return res.sendStatus(400);
   }
   console.info(session, events);
@@ -70,8 +81,9 @@ app.post("/:session/v1/events", (req, res) => {
 
 app.get("/test/events", (req, res) => {
   const productId = req.query.productId;
+  const eventType = req.query.eventType;
   const session = req.query.session;
-  const namespacedProductId = `${session}-${productId}`;
+  const namespacedProductId = `${session}-${eventType}-${productId}`;
   console.info("get events", namespacedProductId, events[namespacedProductId]);
   res.json(events[namespacedProductId] || []);
 });

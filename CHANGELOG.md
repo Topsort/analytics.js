@@ -11,6 +11,9 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 ### Changed
 - Remove usages of `data-ts-auction` as that only works when using API v1
 
+### Refactor
+- Use [Events API v2](https://docs.topsort.com/reference/reportevents-2)
+
 ## Version 1.0.6 (2023-07-13)
 
 ### Fixed

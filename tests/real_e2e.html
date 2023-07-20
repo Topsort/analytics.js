@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script>
+      window.TS = {
+        token: "REPLACE WITH A STAGING TOKEN",
+        url: "https://ts-ohio.api.staging.topsort.ai",
+      };
+    </script>
+    <script src="../dist/ts.js"></script>
+  </head>
+  <body>
+    <!-- Promoted Product -->
+    <div
+      class="product"
+      data-ts-resolved-bid="WyJwcm9kLXByb21vdGVkIiwgIjRiMTA2ZWI4LThiMmUtNDRlOS04YmYzLWM4NmZiYzc3MDcwNSIsICJsaXN0aW5nIiwgIiIsICIiXQ=="
+    >
+      <a href="#">Promoted Product</a>
+    </div>
+
+    <!-- Organic Product -->
+    <div class="product" data-ts-product="prod-organic">
+      <a href="#">Organic Product</a>
+    </div>
+
+    <!-- Purchase -->
+    <div
+      class="purchase"
+      data-ts-action="purchase"
+      data-ts-items='[{"product":"prod-purchase","quantity":1,"price":200}]'
+    >
+      Thanks for your purchase
+    </div>
+  </body>
+</html>

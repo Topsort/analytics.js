@@ -8,6 +8,9 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+### Changed
+- Remove usages of `data-ts-auction` as that only works when using API v1
+
 ## Version 1.0.6 (2023-07-13)
 
 ### Fixed

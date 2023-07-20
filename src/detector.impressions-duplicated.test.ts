@@ -18,7 +18,7 @@ test("check impresssions", async () => {
       type: "Impression",
       page: "/",
       product: "product-id-imp-1",
-      auction: undefined,
+      bid: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
     },

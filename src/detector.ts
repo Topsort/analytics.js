@@ -73,7 +73,6 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
         session,
         id: event.id,
         productId: event.product,
-        auctionId: event.auction,
         resolvedBidId: event.bid,
         placement,
         occurredAt: t,
@@ -87,7 +86,6 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           {
             id: event.id,
             productId: event.product,
-            auctionId: event.auction,
             resolvedBidId: event.bid,
             placement,
           },
@@ -144,7 +142,6 @@ interface Purchase {
 interface ProductEvent {
   type: EventType;
   product?: string;
-  auction?: string;
   bid?: string;
   t: number;
   page: string;
@@ -175,9 +172,7 @@ function logEvent(info: ProductEvent, node: Node) {
 }
 
 function getId(event: ProductEvent): string {
-  return [event.page, event.type, event.product, event.auction, event.bid].join(
-    "-"
-  );
+  return [event.page, event.type, event.product, event.bid].join("-");
 }
 
 function getPage(): string {
@@ -190,12 +185,10 @@ function getPage(): string {
 
 function getEvent(type: EventType, node: HTMLElement): ProductEvent {
   const product = node.dataset.tsProduct;
-  const auction = node.dataset.tsAuction;
   const bid = node.dataset.tsResolvedBid;
   const event: ProductEvent = {
     type,
     product,
-    auction,
     bid,
     t: Date.now(),
     page: getPage(),
@@ -240,7 +233,7 @@ const intersectionObserver = !!window.IntersectionObserver
   : undefined;
 
 const PRODUCT_SELECTOR =
-  "[data-ts-product],[data-ts-auction],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";
+  "[data-ts-product],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";
 
 function addClickHandler(node: HTMLElement) {
   const clickables = node.querySelectorAll("[data-ts-clickable]");
@@ -324,7 +317,6 @@ function start() {
     subtree: true,
     attributeFilter: [
       "data-ts-product",
-      "data-ts-auction",
       "data-ts-action",
       "data-ts-items",
       "data-ts-resolved-bid",

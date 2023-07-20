@@ -4,13 +4,13 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 function Product({
   productId,
-  auctionId,
+  resolvedBidId,
 }: React.HTMLProps<HTMLDivElement> & {
   productId: string;
-  auctionId?: string;
+  resolvedBidId?: string;
 }) {
   return (
-    <div data-ts-product={productId} data-ts-auction={auctionId}>
+    <div data-ts-product={productId} data-ts-resolved-bid={resolvedBidId}>
       {productId}
     </div>
   );
@@ -20,20 +20,20 @@ function Page({ idx }: { idx: number }) {
   const products = [
     {
       productId: `p-r-${3 * (idx - 1) + 1}`,
-      auctionId: idx === 1 ? "a-1" : undefined,
+      resolvedBidId: idx === 1 ? "a-1" : undefined,
     },
     {
       productId: `p-r-${3 * (idx - 1) + 2}`,
-      auctionId: idx === 1 ? "a-1" : undefined,
+      resolvedBidId: idx === 1 ? "a-1" : undefined,
     },
-    { productId: `p-r-${3 * (idx - 1) + 3}`, auctionId: undefined },
+    { productId: `p-r-${3 * (idx - 1) + 3}`, resolvedBidId: undefined },
   ];
   return (
     <div>
       {products.map((p) => (
         <Product
           productId={p.productId}
-          auctionId={p.auctionId}
+          resolvedBidId={p.resolvedBidId}
           key={p.productId}
         />
       ))}

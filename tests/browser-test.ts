@@ -27,7 +27,7 @@ interface Placement {
 interface Impression {
   placement?: Placement;
   productId?: string;
-  auctionId?: string;
+  resolvedBidId?: string;
   id?: string;
 }
 
@@ -35,7 +35,7 @@ interface ProductEvent {
   eventType?: string;
   placement?: Placement;
   productId?: string;
-  auctionId?: string | null;
+  resolvedBidId?: string | null;
   impressions?: Impression[];
   items?: Purchase[];
 }
@@ -119,7 +119,7 @@ async function runTests() {
   // Add new product
   const newProduct = document.createElement("div");
   newProduct.dataset.tsProduct = "product-id-dyn-impression-1";
-  newProduct.dataset.tsAuction = "27785055-1d99-3b4e-94b0-5fc5cf60af3f";
+  newProduct.dataset.tsResolvedBid = "27785055-1d99-3b4e-94b0-5fc5cf60af3f";
   const container = document.getElementById("vanilla-js");
   container?.appendChild(newProduct);
 
@@ -127,7 +127,7 @@ async function runTests() {
   const oldProduct = document.getElementById("old-product");
   if (oldProduct) {
     oldProduct.dataset.tsProduct = "product-id-attr-impression-2";
-    oldProduct.dataset.tsAuction = "27785055-2345-6789-94b0-5fc5cf60af3f";
+    oldProduct.dataset.tsResolvedBid = "27785055-2345-6789-94b0-5fc5cf60af3f";
   }
 
   // Make product visible
@@ -167,7 +167,7 @@ async function checkTests() {
       impressions: [
         {
           productId: "product-id-impression-1",
-          auctionId: "17785055-9d99-4b4e-9fb0-5fc4cff0af3f",
+          resolvedBidId: "17785055-9d99-4b4e-9fb0-5fc4cff0af3f",
           placement: {
             page: "/test.html",
           },
@@ -205,7 +205,7 @@ async function checkTests() {
       impressions: [
         {
           productId: "product-id-dyn-impression-1",
-          auctionId: "27785055-1d99-3b4e-94b0-5fc5cf60af3f",
+          resolvedBidId: "27785055-1d99-3b4e-94b0-5fc5cf60af3f",
         },
       ],
     })
@@ -218,7 +218,7 @@ async function checkTests() {
       impressions: [
         {
           productId: "product-id-attr-impression-2",
-          auctionId: "27785055-2345-6789-94b0-5fc5cf60af3f",
+          resolvedBidId: "27785055-2345-6789-94b0-5fc5cf60af3f",
         },
       ],
     })
@@ -227,9 +227,9 @@ async function checkTests() {
   await setTestResult(
     "test-click",
     checkEventExists("product-id-click-1", {
-      eventType: "ClickEvent",
+      eventType: "Click",
       productId: "product-id-click-1",
-      auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d",
+      resolvedBidId: "dc7d20e0-c56f-4a2f-9359-cfb363e3ba5d",
       placement: {
         page: "/test.html",
       },
@@ -239,9 +239,9 @@ async function checkTests() {
   await setTestResult(
     "test-click-area",
     checkEventExists("product-id-click-2", {
-      eventType: "ClickEvent",
+      eventType: "Click",
       productId: "product-id-click-2",
-      auctionId: "dc7d20e0-c56f-4a2f-9359-cfb363e30000",
+      resolvedBidId: "dc7d20e0-c56f-4a2f-9359-cfb363e30000",
       placement: {
         page: "/test.html",
       },

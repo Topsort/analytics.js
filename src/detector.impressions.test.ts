@@ -8,7 +8,7 @@ test("check impresssions", async () => {
   });
   document.body.innerHTML = `
     <div data-ts-product="product-id-imp-1"></div>
-    <div data-ts-product="product-id-imp-2" data-ts-auction="1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
+    <div data-ts-product="product-id-imp-2" data-ts-resolved-bid="1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
   `;
   await import("./detector");
 
@@ -18,7 +18,7 @@ test("check impresssions", async () => {
       type: "Impression",
       page: "/",
       product: "product-id-imp-1",
-      auction: undefined,
+      bid: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
     },
@@ -26,7 +26,7 @@ test("check impresssions", async () => {
       type: "Impression",
       page: "/",
       product: "product-id-imp-2",
-      auction: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
+      bid: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
       uid,
     },

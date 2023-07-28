@@ -13,9 +13,9 @@
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
     "prepublishOnly": "npm run build && node update-version.js",
-    "build": "webpack",
+    "build": "vite build",
     "test": "jest",
-    "test:e2e": "webpack && webpack -c webpack.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
+    "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
     "lint:ci": "npm run lint -- --format=compact",
@@ -30,6 +30,7 @@
     "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.54.0",
+    "@vitejs/plugin-react": "^4.0.3",
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-jest": "^27.2.2",
@@ -46,7 +47,7 @@
     "ts-jest": "^27.1.4",
     "ts-loader": "^9.4.2",
     "typescript": "^4.8.4",
-    "webpack": "^5.86.0",
-    "webpack-cli": "^5.0.1"
+    "vite": "^4.4.7",
+    "vite-plugin-html": "^3.2.0"
   }
 }

@@ -1,6 +1,6 @@
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+/** @type {import('jest').Config} */
+export default {
   preset: "ts-jest",
   testEnvironment: "jsdom",
-  testPathIgnorePatterns: ["<rootDir>/dist/", "<rootDir>/node_modules/"],
+  testPathIgnorePatterns: ["<rootDir>/dist/"],
 };

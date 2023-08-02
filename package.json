@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "JS library to automatically report events to Topsort's Analytics",
   "main": "dist/ts.js",
+  "type": "module",
   "keywords": [
     "ads",
     "sponsored listings",
@@ -10,12 +11,27 @@
     "analytics",
     "topsort"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/ts.jsm",
+      "require": "./dist/ts.js"
+    }
+  },
+  "module": "./dist/ts.js",
+  "files": [
+    "dist/ts.js",
+    "dist/ts.jsm",
+    "dist/*.d.ts",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
     "prepublishOnly": "npm run build && node update-version.js",
-    "build": "vite build",
+    "build": "vite build && tsc --emitDeclarationOnly -p tsconfig.types.json",
     "test": "jest",
-    "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && cp dist/mocks/api-server.{,m}js && node dist/mocks/api-server.mjs",
+    "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && node dist/mocks/api-server.js",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "npm run lint -- --fix",
     "lint:ci": "npm run lint -- --format=compact",

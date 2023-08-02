@@ -7,8 +7,9 @@ export default defineConfig({
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, "src/detector.ts"),
       name: "ts",
-      // the proper extensions will be added
-      fileName: "ts",
+      fileName: (format) =>
+        `ts.${format === "es" ? "mjs" : format === "umd" ? "js" : "js"}`,
+      formats: ["es", "umd"],
     },
     emptyOutDir: false,
   },

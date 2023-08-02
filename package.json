@@ -13,14 +13,14 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/ts.js",
-      "require": "./dist/ts.umd.cjs"
+      "import": "./dist/ts.jsm",
+      "require": "./dist/ts.js"
     }
   },
   "module": "./dist/ts.js",
   "files": [
     "dist/ts.js",
-    "dist/ts.umd.cjs",
+    "dist/ts.jsm",
     "dist/*.d.ts",
     "package.json",
     "README.md",

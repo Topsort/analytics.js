@@ -32,12 +32,10 @@
   },
   "include": [
     "src/**/*.ts",
-    "mocks/**/*.ts",
-    "tests/**/*.ts",
-    "tests/**/*.tsx",
     "@types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/**/*.test.ts"
   ]
 }

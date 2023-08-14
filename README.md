@@ -3,8 +3,8 @@
 ![license](https://img.shields.io/github/license/Topsort/analytics.js)
 ![GitHub Repo stars](https://img.shields.io/github/stars/topsort/analytics.js?style=social)
 
-
 # Topsort analytics.js
+
 Topsort's JS analytics event library
 
 Use this to send clicks and impressions to the Topsort API.
@@ -33,8 +33,22 @@ npm install @topsort/analytics.js --save
 
 ### Add markup to your products
 
+Either mix quotes (single/double) or escape certain characters inside your values. In javascript:
+
+```js
+const newvalue = currentvalue.replace('"', "&quot;").replace("'", "&apos;"); // etc.
+```
+
+Pass said values to your html:
+
 ```html
-<div class="product" data-ts-product="<productId>" data-ts-resolved-bid="<resolvedBidId>">...</div>
+<div
+  class="product"
+  data-ts-product="<productId>"
+  data-ts-resolved-bid="<resolvedBidId>"
+>
+  ...
+</div>
 ```
 
 Additionally, in case not all the container is clickable (i.e., does not produce an action or does not take you to the product page) or parts of it lead you to a non-related product page, make sure to use the `data-ts-clickable` attribute to indicate what portions of the product should count as a conversion.
@@ -49,7 +63,19 @@ Additionally, in case not all the container is clickable (i.e., does not produce
 </div>
 ```
 
+Finally, adding further information to purchases can be made by passing the `ts-data-items` JSON array:
+
+```html
+<div
+  data-ts-action="purchase"
+  data-ts-items='[{"product": "product-id-purchase-1", "quantity":1, "price": 2399}, {"product": "product-id-purchase-2", "quantity": 2, "price": 399}]'
+>
+  My purchase
+</div>
+```
+
 # E2E tests
+
 Execute `npm run test:e2e`, at the end it will show you the url you need to visit to test the library.
 
 Ideally you would check the library both in desktop and mobile browsers. For that you need to be connected to the same network.

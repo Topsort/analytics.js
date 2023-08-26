@@ -10,6 +10,12 @@ on:
     branches:
       - main
 
+env:
+  lockfile: pnpm-lock.yaml
+  node_version: "18"
+  pnpm_version: "8"
+
+
 # This is to avoid running multiple actions when a PR is updated repeatedly. See
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
@@ -18,52 +24,54 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v2
+        name: Install PNPM
+        id: pnpm-install
         with:
-          node-version: "16"
+          version: ${{ env.pnpm_version }}
 
-      - name: Cache node modules
-        id: cache-node
-        uses: actions/cache@v3.3.1
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: ${{ env.node_version }}
+          cache: pnpm
+          cache-dependency-path: ${{ env.lockfile }}
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Lint
-        run: npm run lint:ci
+        run: pnpm run lint:ci
 
       - name: Types
-        run: npm run types:check
+        run: pnpm run types:check
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v2
+        name: Install PNPM
+        id: pnpm-install
         with:
-          node-version: "16"
+          version: ${{ env.pnpm_version }}
 
-      - name: Cache node modules
-        id: cache-node
-        uses: actions/cache@v3.3.1
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: ${{ env.node_version }}
+          cache: pnpm
+          cache-dependency-path: ${{ env.lockfile }}
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Tests
-        run: npm run test
+        run: pnpm run test

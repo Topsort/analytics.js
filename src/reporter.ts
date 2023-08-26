@@ -1,4 +1,4 @@
-import { version } from "./version";
+import { version } from "../package.json";
 import type { TopsortEvent } from "./events";
 
 interface Config {

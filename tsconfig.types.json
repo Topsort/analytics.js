@@ -16,6 +16,7 @@
     // Required for tslib to emit tree-shakeable code
     "module": "es2020",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "sourceMap": true,
     "declaration": true,
     "declarationMap": false,

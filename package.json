@@ -33,13 +33,13 @@
   ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
-    "prepublishOnly": "npm run build && node update-version.js",
+    "prepublishOnly": "pnpm run build && node update-version.js",
     "build": "vite build && tsc --emitDeclarationOnly -p tsconfig.types.json",
     "test": "jest",
     "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && node dist/mocks/api-server.js",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
-    "lint:fix": "npm run lint -- --fix",
-    "lint:ci": "npm run lint -- --format=compact",
+    "lint:fix": "pnpm run lint -- --fix",
+    "lint:ci": "pnpm run lint -- --format=compact",
     "types:check": "tsc"
   },
   "author": "Topsort",

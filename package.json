@@ -19,11 +19,13 @@
   "exports": {
     ".": {
       "import": "./dist/ts.mjs",
-      "require": "./dist/ts.js"
+      "require": "./dist/ts.js",
+      "types": "./dist/src/events.d.ts"
     }
   },
-  "module": "./dist/ts.js",
+  "module": "./dist/ts.mjs",
   "files": [
+    "dist/src",
     "dist/ts.js",
     "dist/ts.mjs",
     "dist/*.d.ts",

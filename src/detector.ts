@@ -224,23 +224,23 @@ function interactionHandler(event: Event): void {
 
 const intersectionObserver = !!window.IntersectionObserver
   ? new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          const node = entry.target;
-          if (node instanceof HTMLElement) {
-            logEvent(getEvent("Impression", node), node);
-            if (intersectionObserver) {
-              intersectionObserver.unobserve(node);
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const node = entry.target;
+            if (node instanceof HTMLElement) {
+              logEvent(getEvent("Impression", node), node);
+              if (intersectionObserver) {
+                intersectionObserver.unobserve(node);
+              }
             }
           }
         }
-      }
-    },
-    {
-      threshold: INTERSECTION_THRESHOLD,
-    },
-  )
+      },
+      {
+        threshold: INTERSECTION_THRESHOLD,
+      },
+    )
   : undefined;
 
 const PRODUCT_SELECTOR =

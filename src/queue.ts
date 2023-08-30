@@ -65,7 +65,7 @@ function getStore(): Store<RetryableEntry> {
     if (r[0]?.x === id) {
       return new LocalStorageStore<RetryableEntry>(STORAGE_KEY);
     }
-  } catch (error) { }
+  } catch (error) {}
   return new MemoryStore<RetryableEntry>();
 }
 

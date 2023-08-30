@@ -35,7 +35,7 @@ interface RetryableEntry {
 }
 
 export type Processor<T extends Entry> = (
-  data: T[]
+  data: T[],
 ) => Promise<ProcessorResult>;
 
 function expBackoff(startTime: number, retries: number): number {
@@ -62,10 +62,10 @@ function getStore(): Store<RetryableEntry> {
     const id = "3";
     localStore.set([{ x: id }]);
     const r = localStore.get();
-    if (r[0].x === id) {
+    if (r[0]?.x === id) {
       return new LocalStorageStore<RetryableEntry>(STORAGE_KEY);
     }
-  } catch (error) {}
+  } catch (error) { }
   return new MemoryStore<RetryableEntry>();
 }
 
@@ -105,8 +105,9 @@ export class Queue<T extends Entry> {
       i--
     ) {
       const retryableEntry = entries[i];
-      const entry = retryableEntry.e;
+      const entry = retryableEntry?.e;
       if (
+        entry &&
         !this._processing.has(entry.id) &&
         expBackoff(entry.t, retryableEntry.r) <= Date.now()
       ) {

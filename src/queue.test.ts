@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { Entry, ProcessorResult, Queue } from "./queue";
 
 let processedEvents: Entry[] = [];
@@ -34,22 +35,22 @@ function now(): number {
 
 async function flushPromises(timeMs?: number): Promise<void> {
   const p = new Promise((resolve) => setTimeout(() => resolve("done"), 0));
-  jest.runAllTicks();
+  vi.runAllTicks();
   if (timeMs) {
-    jest.advanceTimersByTime(timeMs);
+    vi.advanceTimersByTime(timeMs);
   } else {
-    jest.runAllTimers();
+    vi.runAllTimers();
   }
   await p;
 }
 
 beforeEach(() => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   processedEvents = [];
 });
 
 afterEach(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
   (new Queue<Entry>(processor) as any)._store.set([]);
 });
 

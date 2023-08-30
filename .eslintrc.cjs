@@ -2,11 +2,10 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    "jest/globals": true,
   },
   extends: [
     "plugin:@typescript-eslint/recommended",
-    "plugin:jest/recommended",
+    "plugin:vitest/recommended",
     "plugin:prettier/recommended",
   ],
   parser: "@typescript-eslint/parser",
@@ -14,6 +13,9 @@ module.exports = {
     ecmaVersion: 13,
     sourceType: "module",
   },
+  plugins: [
+    "vitest"
+  ],
   rules: {
     "@typescript-eslint/no-explicit-any": "off",
   },

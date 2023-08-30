@@ -1,44 +1,37 @@
 {
   "compilerOptions": {
     "lib": [
-      "es2020",
+      "ESNext",
       "dom"
     ],
-    "target": "es2015",
-    "strict": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    //"exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "dist",
-    // Required for tslib to emit tree-shakeable code
+    "types": [
+      "node"
+    ],
     "module": "es2020",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": false,
-    "declarationDir": "dist",
-    "jsx": "react",
+    "outDir": "dist",
+    "removeComments": true,
+    "target": "ES6",
+    "baseUrl": "./",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "importHelpers": true,
-    "alwaysStrict": false,
-    "typeRoots": [
-      "@types",
-      "node_modules/@types"
-    ]
+    "moduleResolution": "node",
+    "paths": {},
+    "sourceMap": false,
+    "alwaysStrict": true,
+    "allowUnreachableCode": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "jsx": "react"
   },
   "include": [
-    "src/**/*.ts",
-    "mocks/**/*.ts",
-    "tests/**/*.ts",
-    "tests/**/*.tsx",
-    "@types/**/*.ts"
+    "./**/*.ts",
+    "./**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules/**/*"
   ]
 }

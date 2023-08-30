@@ -1,23 +1,69 @@
+import { afterAll, afterEach, beforeAll, expect, test } from "vitest";
 import { reportEvent } from "./reporter";
 import type { TopsortEvent } from "./events";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 
-import "isomorphic-fetch";
-import nock from "nock";
+const server = setupServer(
+  rest.post("https://api.topsort.com/v2/events", (_, res, ctx) => {
+    return res(ctx.json({}), ctx.status(200));
+  }),
+
+  rest.post("https://error.api.topsort.com/v2/events", (_, res) => {
+    return res.networkError("Failed to connect");
+  }),
+);
+
+beforeAll(() => server.listen());
+afterAll(() => server.close());
+afterEach(() => server.resetHandlers());
+
+function returnStatus(
+  status: number,
+  url = "https://api.topsort.com/v2/events",
+): void {
+  return server.use(
+    rest.post(url, (_, res, ctx) => {
+      return res(ctx.json({}), ctx.status(status));
+    }),
+  );
+}
 
 test("success", async () => {
-  nock("https://api.topsort.com").post("/v2/events").reply(200, {});
   await expect(
-    reportEvent({} as TopsortEvent, { token: "token" })
+    reportEvent({} as TopsortEvent, { token: "token" }),
   ).resolves.toEqual({
     ok: true,
     retry: false,
   });
 });
 
-test("permanent error", async () => {
-  nock("https://api.topsort.com").post("/v2/events").reply(400, {});
+test("network error", async () => {
   await expect(
-    reportEvent({} as TopsortEvent, { token: "token" })
+    reportEvent({} as TopsortEvent, {
+      token: "token",
+      url: "https://error.api.topsort.com/",
+    }),
+  ).resolves.toEqual({
+    ok: false,
+    retry: true,
+  });
+});
+
+test("permanent error", async () => {
+  returnStatus(400);
+  await expect(
+    reportEvent({} as TopsortEvent, { token: "token" }),
+  ).resolves.toEqual({
+    ok: false,
+    retry: false,
+  });
+});
+
+test("authentication error", async () => {
+  returnStatus(401);
+  await expect(
+    reportEvent({} as TopsortEvent, { token: "token" }),
   ).resolves.toEqual({
     ok: false,
     retry: false,
@@ -25,19 +71,19 @@ test("permanent error", async () => {
 });
 
 test("retryable error", async () => {
-  nock("https://api.topsort.com").post("/v2/events").reply(429, {});
+  returnStatus(429);
   await expect(
-    reportEvent({} as TopsortEvent, { token: "token" })
+    reportEvent({} as TopsortEvent, { token: "token" }),
   ).resolves.toEqual({
     ok: false,
     retry: true,
   });
 });
 
-test("unexpected error", async () => {
-  nock("https://api.topsort.com").post("/v1/events").reply(200, {});
+test("server error", async () => {
+  returnStatus(500);
   await expect(
-    reportEvent({} as TopsortEvent, { token: "token" })
+    reportEvent({} as TopsortEvent, { token: "token" }),
   ).resolves.toEqual({
     ok: false,
     retry: true,
@@ -45,11 +91,11 @@ test("unexpected error", async () => {
 });
 
 test("custom url", async () => {
-  nock("https://demo.api.topsort.com").post("/v2/events").reply(200, {});
+  returnStatus(200, "https://demo.api.topsort.com/v2/events");
   await expect(
     reportEvent({} as TopsortEvent, {
       token: "token",
       url: "https://demo.api.topsort.com",
-    })
+    }),
   ).resolves.toEqual({ ok: true, retry: false });
 });

@@ -32,13 +32,13 @@ function addEvent(
   productId: string,
   eventType: string,
   event: any,
-  session: string
+  session: string,
 ): void {
   const namespacedProductId = `${session}-${eventType}-${productId}`;
   if (!events[namespacedProductId]) {
     events[namespacedProductId] = [];
   }
-  events[namespacedProductId].push(event);
+  events[namespacedProductId]?.push(event);
 }
 
 function getNetworkIp(): string {
@@ -89,5 +89,5 @@ app.get("/test/events", (req, res) => {
 });
 
 app.listen(PORT, () =>
-  console.log(`Visit http://${getNetworkIp()}:${PORT}/test.html`)
+  console.log(`Visit http://${getNetworkIp()}:${PORT}/test.html`),
 );

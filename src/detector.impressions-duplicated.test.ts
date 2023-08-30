@@ -1,3 +1,5 @@
+import { expect, test } from "vitest";
+
 test("check impresssions", async () => {
   window.TS = {
     token: "token",

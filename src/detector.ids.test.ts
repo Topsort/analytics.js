@@ -1,9 +1,11 @@
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
 describe("check ids api", () => {
   beforeEach(async () => {
     window.TS = {
       token: "token",
     };
-    jest.resetModules();
+    vi.resetModules();
     await import("./detector");
   });
 
@@ -21,11 +23,11 @@ describe("check ids api", () => {
 
   test("set custom id", () => {
     window.TS.setUserId?.("customId");
-    expect(window.TS.getUserId?.()).toEqual("customId");
+    expect(window.TS.getUserId?.()).toBe("customId");
   });
 
   test("reads id from cookie correctly", () => {
     document.cookie = "foo=bar; tsuid=customId";
-    expect(window.TS.getUserId?.()).toEqual("customId");
+    expect(window.TS.getUserId?.()).toBe("customId");
   });
 });

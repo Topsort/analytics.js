@@ -133,7 +133,7 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
         })
         .catch(() => {
           r.done.add(entry.id);
-        })
+        }),
     );
   }
   await Promise.all(promises);
@@ -224,23 +224,23 @@ function interactionHandler(event: Event): void {
 
 const intersectionObserver = !!window.IntersectionObserver
   ? new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const node = entry.target;
-            if (node instanceof HTMLElement) {
-              logEvent(getEvent("Impression", node), node);
-              if (intersectionObserver) {
-                intersectionObserver.unobserve(node);
-              }
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const node = entry.target;
+          if (node instanceof HTMLElement) {
+            logEvent(getEvent("Impression", node), node);
+            if (intersectionObserver) {
+              intersectionObserver.unobserve(node);
             }
           }
         }
-      },
-      {
-        threshold: INTERSECTION_THRESHOLD,
       }
-    )
+    },
+    {
+      threshold: INTERSECTION_THRESHOLD,
+    },
+  )
   : undefined;
 
 const PRODUCT_SELECTOR =
@@ -288,7 +288,7 @@ function mutationCallback(mutationsList: MutationRecord[]) {
       const newParents = new Set<HTMLElement>();
       for (let i = 0; i < mutation.addedNodes.length; i++) {
         const newNode = mutation.addedNodes[i];
-        if (newNode.nodeType === Node.ELEMENT_NODE) {
+        if (newNode?.nodeType === Node.ELEMENT_NODE) {
           const parent = newNode.parentElement;
           if (parent && !newParents.has(parent)) {
             newParents.add(parent);

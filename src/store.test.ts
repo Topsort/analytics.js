@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { LocalStorageStore, MemoryStore } from "./store";
 
 describe("LocalStorageStore", () => {

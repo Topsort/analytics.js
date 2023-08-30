@@ -10,6 +10,8 @@ const eventsCount: Record<string, number> = {};
 function recordEvent(event: any) {
   const d = event.detail;
   const k = `${d.type}-${d.product}`;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   eventsCount[k] = eventsCount[k] === undefined ? 1 : eventsCount[k] + 1;
 }
 window.addEventListener("topsort", recordEvent);
@@ -65,11 +67,11 @@ function match(event: any, productEvent: ProductEvent): boolean {
 async function checkEventExists(
   productId: string,
   eventType: string,
-  event: ProductEvent
+  event: ProductEvent,
 ): Promise<boolean> {
   const testId = window.testId;
   const r = await fetch(
-    `/test/events?productId=${productId}&eventType=${eventType}&session=${testId}`
+    `/test/events?productId=${productId}&eventType=${eventType}&session=${testId}`,
   );
   const data = await r.json();
   const result = data.some((e: any) => match(e, event));
@@ -86,7 +88,7 @@ function checkNoErrors(): boolean {
 function checkEvents(
   eventType: string,
   productId: string,
-  expected: number
+  expected: number,
 ): boolean {
   const k = `${eventType}-${productId}`;
   if (eventsCount[k] !== expected) {
@@ -98,7 +100,7 @@ function checkEvents(
 
 async function setTestResult(
   testId: string,
-  ok: boolean | Promise<boolean>
+  ok: boolean | Promise<boolean>,
 ): Promise<void> {
   const result = (await ok) ? "ok" : "fail";
   const el = document.getElementById(testId);
@@ -177,7 +179,7 @@ async function checkTests() {
       placement: {
         path: "/test.html",
       },
-    })
+    }),
   );
 
   await setTestResult(
@@ -187,14 +189,14 @@ async function checkTests() {
       placement: {
         path: "/test.html",
       },
-    })
+    }),
   );
 
   await setTestResult(
     "test-hidden-impression-twice",
     Promise.resolve(
-      checkEvents("Impression", "product-id-impression-hidden", 1)
-    )
+      checkEvents("Impression", "product-id-impression-hidden", 1),
+    ),
   );
 
   await setTestResult(
@@ -202,7 +204,7 @@ async function checkTests() {
     checkEventExists("product-id-dyn-impression-1", "impression", {
       entity: { id: "product-id-dyn-impression-1", type: "product" },
       resolvedBidId: "27785055-1d99-3b4e-94b0-5fc5cf60af3f",
-    })
+    }),
   );
 
   await setTestResult(
@@ -210,7 +212,7 @@ async function checkTests() {
     checkEventExists("product-id-attr-impression-2", "impression", {
       entity: { id: "product-id-attr-impression-2", type: "product" },
       resolvedBidId: "27785055-2345-6789-94b0-5fc5cf60af3f",
-    })
+    }),
   );
 
   await setTestResult(
@@ -221,7 +223,7 @@ async function checkTests() {
       placement: {
         path: "/test.html",
       },
-    })
+    }),
   );
 
   await setTestResult(
@@ -232,7 +234,7 @@ async function checkTests() {
       placement: {
         path: "/test.html",
       },
-    })
+    }),
   );
 
   await setTestResult(
@@ -242,7 +244,7 @@ async function checkTests() {
         { productId: "product-id-purchase-1", quantity: 1, unitPrice: 2399 },
         { productId: "product-id-purchase-2", quantity: 2, unitPrice: 399 },
       ],
-    })
+    }),
   );
 
   await setTestResult(
@@ -252,7 +254,7 @@ async function checkTests() {
         id: "p-r-6",
         type: "product",
       },
-    })
+    }),
   );
 
   await setTestResult(
@@ -262,7 +264,7 @@ async function checkTests() {
       placement: {
         path: "/other-test.html",
       },
-    })
+    }),
   );
 
   await setTestResult("test-no-errors", checkNoErrors());

@@ -133,7 +133,7 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
         })
         .catch(() => {
           r.done.add(entry.id);
-        })
+        }),
     );
   }
   await Promise.all(promises);
@@ -239,7 +239,7 @@ const intersectionObserver = !!window.IntersectionObserver
       },
       {
         threshold: INTERSECTION_THRESHOLD,
-      }
+      },
     )
   : undefined;
 
@@ -288,7 +288,7 @@ function mutationCallback(mutationsList: MutationRecord[]) {
       const newParents = new Set<HTMLElement>();
       for (let i = 0; i < mutation.addedNodes.length; i++) {
         const newNode = mutation.addedNodes[i];
-        if (newNode.nodeType === Node.ELEMENT_NODE) {
+        if (newNode?.nodeType === Node.ELEMENT_NODE) {
           const parent = newNode.parentElement;
           if (parent && !newParents.has(parent)) {
             newParents.add(parent);

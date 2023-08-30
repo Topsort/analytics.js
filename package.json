@@ -36,7 +36,7 @@
     "build": "vite build",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "pnpm run lint -- --fix",
-    "lint:ci": "pnpm run lint -- --format=compact",
+    "lint:ci": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "test": "vitest run --coverage",
     "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && node dist/mocks/api-server.js",
     "types:check": "tsc"

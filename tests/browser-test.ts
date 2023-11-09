@@ -42,6 +42,7 @@ interface ProductEvent {
   eventType?: string;
   placement?: Placement;
   entity?: Entity;
+  additionalAttribution?: Entity;
   resolvedBidId?: string | null;
   impressions?: Impression[];
   items?: Purchase[];
@@ -123,6 +124,12 @@ async function runTests() {
   // Click on product area
   const productArea = document.getElementById("click-area");
   productArea?.click();
+
+  // Click on banner and product
+  const banner = document.getElementById("banner");
+  banner?.click();
+  const bannerProduct = document.getElementById("banner-product");
+  bannerProduct?.click();
 
   // Add new product
   const newProduct = document.createElement("div");
@@ -264,6 +271,20 @@ async function checkTests() {
       placement: {
         path: "/other-test.html",
       },
+    }),
+  );
+
+  await setTestResult(
+    "test-banner-products",
+    checkEventExists("additional-product-banner", "click", {
+      additionalAttribution: {
+        id: "additional-product-banner",
+        type: "product",
+      },
+      placement: {
+        path: "/test.html",
+      },
+      resolvedBidId: "17785055-1111-4b4e-9fb0-5fc4cff0af3f",
     }),
   );
 

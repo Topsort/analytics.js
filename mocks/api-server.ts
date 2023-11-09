@@ -58,11 +58,21 @@ app.post("/:session/v2/events", (req, res) => {
   const payload = req.body;
   let totalEvents = 0;
   for (const event of payload.impressions ?? []) {
-    addEvent(event.entity.id, "impression", event, session);
+    addEvent(
+      event.entity?.id ?? event.additionalAttribution?.id,
+      "impression",
+      event,
+      session,
+    );
     totalEvents++;
   }
   for (const event of payload.clicks ?? []) {
-    addEvent(event.entity.id, "click", event, session);
+    addEvent(
+      event.entity?.id ?? event.additionalAttribution?.id,
+      "click",
+      event,
+      session,
+    );
     totalEvents++;
   }
   for (const event of payload.purchases ?? []) {

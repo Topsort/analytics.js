@@ -39,13 +39,21 @@ Either mix quotes (single/double) or escape certain characters inside your value
 const newvalue = currentvalue.replace('"', "&quot;").replace("'", "&apos;"); // etc.
 ```
 
-Pass said values to your html:
+Add the following markup to promoted products: 
+```html
+<div
+  class="product"
+  data-ts-resolved-bid="<resolvedBidId>"
+>
+  ...
+</div>
+```
 
+and the following for organic products (which is optional)
 ```html
 <div
   class="product"
   data-ts-product="<productId>"
-  data-ts-resolved-bid="<resolvedBidId>"
 >
   ...
 </div>
@@ -63,7 +71,7 @@ Additionally, in case not all the container is clickable (i.e., does not produce
 </div>
 ```
 
-Finally, adding further information to purchases can be made by passing the `ts-data-items` JSON array:
+Adding further information to purchases can be made by passing the `ts-data-items` JSON array:
 
 ```html
 <div
@@ -74,6 +82,17 @@ Finally, adding further information to purchases can be made by passing the `ts-
 </div>
 ```
 
+Finally, in case you are using banners and want to have further control on the attributable products you need to add the following markup in the banner's destination page.
+
+```html
+<div
+  class="product"
+  data-ts-product="<productId>"
+  data-ts-resolved-bid="inherit"
+>
+  ...
+</div>
+```
 # E2E tests
 
 Execute `npm run test:e2e`, at the end it will show you the url you need to visit to test the library.

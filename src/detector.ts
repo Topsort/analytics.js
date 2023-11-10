@@ -1,11 +1,13 @@
 import { TopsortEvent, Entity } from "./events";
 import { ProcessorResult, Queue } from "./queue";
 import { reportEvent } from "./reporter";
+import { BidStore } from "./store";
 
 const MAX_EVENTS_SIZE = 2500;
 // See https://support.google.com/admanager/answer/4524488?hl=en
 const INTERSECTION_THRESHOLD = 0.5;
 let seenEvents = new Set<string>();
+const bidStore = new BidStore("ts-b");
 
 /**
  * Generate an id.
@@ -71,6 +73,13 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
       id: event.product,
     };
   }
+  let additionalAttribution: Entity | undefined = undefined;
+  if (event.additionalProduct) {
+    additionalAttribution = {
+      type: "product",
+      id: event.additionalProduct,
+    };
+  }
   const t = new Date(event.t).toISOString();
   switch (eventType) {
     case "Click":
@@ -79,6 +88,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           {
             resolvedBidId: event.bid,
             entity,
+            additionalAttribution,
             placement,
             occurredAt: t,
             opaqueUserId: event.uid,
@@ -92,6 +102,7 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           {
             resolvedBidId: event.bid,
             entity,
+            additionalAttribution,
             placement,
             occurredAt: t,
             opaqueUserId: event.uid,
@@ -153,6 +164,7 @@ interface Purchase {
 interface ProductEvent {
   type: EventType;
   product?: string;
+  additionalProduct?: string;
   bid?: string;
   t: number;
   page: string;
@@ -183,7 +195,12 @@ function logEvent(info: ProductEvent, node: Node) {
 }
 
 function getId(event: ProductEvent): string {
-  return [event.page, event.type, event.product, event.bid].join("-");
+  return [
+    event.page,
+    event.type,
+    event.product ?? event.additionalProduct,
+    event.bid,
+  ].join("-");
 }
 
 function getPage(): string {
@@ -195,11 +212,22 @@ function getPage(): string {
 }
 
 function getEvent(type: EventType, node: HTMLElement): ProductEvent {
-  const product = node.dataset.tsProduct;
-  const bid = node.dataset.tsResolvedBid;
+  let product = node.dataset.tsProduct;
+  let bid = node.dataset.tsResolvedBid;
+  let additionalProduct: string | undefined = undefined;
+  if (
+    bid == "inherit" &&
+    product &&
+    (type == "Click" || type == "Impression")
+  ) {
+    bid = bidStore.get();
+    additionalProduct = product;
+    product = undefined;
+  }
   const event: ProductEvent = {
     type,
     product,
+    additionalProduct,
     bid,
     t: Date.now(),
     page: getPage(),
@@ -218,7 +246,11 @@ function interactionHandler(event: Event): void {
   }
   const container = event.currentTarget.closest(PRODUCT_SELECTOR);
   if (container && container instanceof HTMLElement) {
-    logEvent(getEvent("Click", container), container);
+    const interactionEvent = getEvent("Click", container);
+    logEvent(interactionEvent, container);
+    if (interactionEvent.bid) {
+      bidStore.set(interactionEvent.bid);
+    }
   }
 }
 

@@ -10,6 +10,7 @@ export interface Entity {
 interface Impression {
   resolvedBidId?: string;
   entity?: Entity;
+  additionalAttribution?: Entity;
   placement: Placement;
   occurredAt: string;
   opaqueUserId: string;
@@ -19,6 +20,7 @@ interface Impression {
 interface Click {
   resolvedBidId?: string;
   entity?: Entity;
+  additionalAttribution?: Entity;
   placement: Placement;
   occurredAt: string;
   opaqueUserId: string;

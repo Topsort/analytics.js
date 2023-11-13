@@ -1,12 +1,7 @@
 {
   "compilerOptions": {
-    "lib": [
-      "ESNext",
-      "dom"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["ESNext", "dom"],
+    "types": ["node"],
     "module": "es2020",
     "outDir": "dist",
     "removeComments": true,
@@ -27,11 +22,6 @@
     "noUnusedParameters": true,
     "jsx": "react"
   },
-  "include": [
-    "./**/*.ts",
-    "./**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules/**/*"
-  ]
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "exclude": ["node_modules/**/*"]
 }

@@ -13,9 +13,7 @@ module.exports = {
     ecmaVersion: 13,
     sourceType: "module",
   },
-  plugins: [
-    "vitest"
-  ],
+  plugins: ["vitest"],
   rules: {
     "@typescript-eslint/no-explicit-any": "off",
   },

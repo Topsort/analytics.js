@@ -28,7 +28,7 @@ npm install @topsort/analytics.js --save
     url: "https://api.topsort.com", // change this if you want to test against the staging environment
   };
 </script>
-<script src="https://unpkg.com/@topsort/analytics.js@2.1.0/dist/ts.js"></script>
+<script src="https://unpkg.com/@topsort/analytics.js@2.2.0/dist/ts.js"></script>
 ```
 
 ### Add markup to your products
@@ -39,24 +39,16 @@ Either mix quotes (single/double) or escape certain characters inside your value
 const newvalue = currentvalue.replace('"', "&quot;").replace("'", "&apos;"); // etc.
 ```
 
-Add the following markup to promoted products: 
+Add the following markup to promoted products:
+
 ```html
-<div
-  class="product"
-  data-ts-resolved-bid="<resolvedBidId>"
->
-  ...
-</div>
+<div class="product" data-ts-resolved-bid="<resolvedBidId>">...</div>
 ```
 
 and the following for organic products (which is optional)
+
 ```html
-<div
-  class="product"
-  data-ts-product="<productId>"
->
-  ...
-</div>
+<div class="product" data-ts-product="<productId>">...</div>
 ```
 
 Additionally, in case not all the container is clickable (i.e., does not produce an action or does not take you to the product page) or parts of it lead you to a non-related product page, make sure to use the `data-ts-clickable` attribute to indicate what portions of the product should count as a conversion.
@@ -93,6 +85,7 @@ Finally, in case you are using banners and want to have further control on the a
   ...
 </div>
 ```
+
 # E2E tests
 
 Execute `npm run test:e2e`, at the end it will show you the url you need to visit to test the library.

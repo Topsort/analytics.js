@@ -6,6 +6,17 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 2.2.0 (2023-11-13)
+
+### Added
+
+- support passing `additionalAttribution`
+
+### Refactor
+
+- Stop publishing to codebuild/s3
+- Update dependencies
+
 ## Version 2.1.0 (2023-08-30)
 
 ### Added

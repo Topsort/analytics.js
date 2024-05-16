@@ -13,7 +13,7 @@ on:
 env:
   lockfile: pnpm-lock.yaml
   node_version: "18"
-  pnpm_version: "8"
+  pnpm_version: "9"
 
 # This is to avoid running multiple actions when a PR is updated repeatedly. See
 # https://docs.github.com/en/actions/using-jobs/using-concurrency

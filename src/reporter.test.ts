@@ -1,16 +1,16 @@
 import { afterAll, afterEach, beforeAll, expect, test } from "vitest";
 import { reportEvent } from "./reporter";
 import type { TopsortEvent } from "./events";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
 const server = setupServer(
-  rest.post("https://api.topsort.com/v2/events", (_, res, ctx) => {
-    return res(ctx.json({}), ctx.status(200));
+  http.post("https://api.topsort.com/v2/events", () => {
+    return HttpResponse.json({}, { status: 200 });
   }),
 
-  rest.post("https://error.api.topsort.com/v2/events", (_, res) => {
-    return res.networkError("Failed to connect");
+  http.post("https://error.api.topsort.com/v2/events", () => {
+    return HttpResponse.error();
   }),
 );
 
@@ -23,8 +23,8 @@ function returnStatus(
   url = "https://api.topsort.com/v2/events",
 ): void {
   return server.use(
-    rest.post(url, (_, res, ctx) => {
-      return res(ctx.json({}), ctx.status(status));
+    http.post(url, () => {
+      return HttpResponse.json({}, { status: status });
     }),
   );
 }
@@ -42,7 +42,7 @@ test("network error", async () => {
   await expect(
     reportEvent({} as TopsortEvent, {
       token: "token",
-      url: "https://error.api.topsort.com/",
+      url: "https://error.api.topsort.com",
     }),
   ).resolves.toEqual({
     ok: false,

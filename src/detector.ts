@@ -208,7 +208,7 @@ function getPage(): string {
   const hash = location.hash;
   // This is to support HashRouter from either ReactRouter or VueRouter.
   if (hash[1] === "/") return hash;
-  return location.pathname;
+  return `${location.pathname}${location.search}`;
 }
 
 function getEvent(type: EventType, node: HTMLElement): ProductEvent {

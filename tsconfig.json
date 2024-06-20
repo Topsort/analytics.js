@@ -8,7 +8,7 @@
     "target": "ES6",
     "baseUrl": "./",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "paths": {},
     "sourceMap": false,
     "alwaysStrict": true,

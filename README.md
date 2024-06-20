@@ -28,7 +28,7 @@ npm install @topsort/analytics.js --save
     url: "https://api.topsort.com",
   };
 </script>
-<script src="https://unpkg.com/@topsort/analytics.js@2.2.0/dist/ts.js"></script>
+<script src="https://unpkg.com/@topsort/analytics.js@2.3.1/dist/ts.js"></script>
 ```
 
 ### Add markup to your products
@@ -85,6 +85,14 @@ Finally, in case you are using banners and want to have further control on the a
   ...
 </div>
 ```
+
+# Troubleshooting
+
+## I see `Uncaught Error: Mismatched anonymous define() module` in the browser console
+
+You are most likely running into issues with how the library is loaded. This is a common issue with RequireJS and other AMD loaders. The library is not AMD compatible, so you need to load it as a global script.
+
+Another approach is to use the ESM version of the library, which you can either import directly should you import the library as part of your distribution; or use the published version called `ts.mjs`: `https://unpkg.com/@topsort/analytics.js@2.3.1/dist/ts.mjs`.
 
 # E2E tests
 

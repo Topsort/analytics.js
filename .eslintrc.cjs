@@ -3,11 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:vitest/recommended",
-    "plugin:prettier/recommended",
-  ],
+  extends: ["plugin:@typescript-eslint/recommended", "plugin:vitest/recommended"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 13,

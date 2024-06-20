@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 
 function Product({
   productId,
@@ -31,11 +31,7 @@ function Page({ idx }: { idx: number }) {
   return (
     <div>
       {products.map((p) => (
-        <Product
-          productId={p.productId}
-          resolvedBidId={p.resolvedBidId}
-          key={p.productId}
-        />
+        <Product productId={p.productId} resolvedBidId={p.resolvedBidId} key={p.productId} />
       ))}
     </div>
   );
@@ -63,10 +59,7 @@ function App() {
         Other Test
       </Link>
       <Routes>
-        <Route
-          path="/other-test.html"
-          element={<InfinitePages key="other" />}
-        />
+        <Route path="/other-test.html" element={<InfinitePages key="other" />} />
         <Route path="/test.html" element={<InfinitePages key="test" />} />
       </Routes>
     </BrowserRouter>

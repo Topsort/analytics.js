@@ -5,12 +5,10 @@
     "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    //"exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "dist",
-    // Required for tslib to emit tree-shakeable code
     "module": "es2020",
     "moduleResolution": "node",
     "resolveJsonModule": true,

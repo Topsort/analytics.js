@@ -1,5 +1,5 @@
-import * as path from "path";
 import * as os from "os";
+import * as path from "path";
 import * as url from "url";
 
 import express from "express";
@@ -28,12 +28,7 @@ app.use(express.json());
 
 const events: Record<string, any[]> = {};
 
-function addEvent(
-  productId: string,
-  eventType: string,
-  event: any,
-  session: string,
-): void {
+function addEvent(productId: string, eventType: string, event: any, session: string): void {
   const namespacedProductId = `${session}-${eventType}-${productId}`;
   if (!events[namespacedProductId]) {
     events[namespacedProductId] = [];
@@ -58,21 +53,11 @@ app.post("/:session/v2/events", (req, res) => {
   const payload = req.body;
   let totalEvents = 0;
   for (const event of payload.impressions ?? []) {
-    addEvent(
-      event.entity?.id ?? event.additionalAttribution?.id,
-      "impression",
-      event,
-      session,
-    );
+    addEvent(event.entity?.id ?? event.additionalAttribution?.id, "impression", event, session);
     totalEvents++;
   }
   for (const event of payload.clicks ?? []) {
-    addEvent(
-      event.entity?.id ?? event.additionalAttribution?.id,
-      "click",
-      event,
-      session,
-    );
+    addEvent(event.entity?.id ?? event.additionalAttribution?.id, "click", event, session);
     totalEvents++;
   }
   for (const event of payload.purchases ?? []) {
@@ -98,6 +83,4 @@ app.get("/test/events", (req, res) => {
   res.json(events[namespacedProductId] || []);
 });
 
-app.listen(PORT, () =>
-  console.log(`Visit http://${getNetworkIp()}:${PORT}/test.html`),
-);
+app.listen(PORT, () => console.log(`Visit http://${getNetworkIp()}:${PORT}/test.html`));

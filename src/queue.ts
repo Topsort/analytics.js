@@ -1,4 +1,4 @@
-import { type Store, MemoryStore, LocalStorageStore } from "./store";
+import { LocalStorageStore, MemoryStore, type Store } from "./store";
 
 const STORAGE_TEST_KEY = "ts-t";
 const STORAGE_KEY = "ts-q";
@@ -34,9 +34,7 @@ interface RetryableEntry {
   p: number;
 }
 
-export type Processor<T extends Entry> = (
-  data: T[],
-) => Promise<ProcessorResult>;
+export type Processor<T extends Entry> = (data: T[]) => Promise<ProcessorResult>;
 
 function expBackoff(startTime: number, retries: number): number {
   if (retries > 0) {
@@ -99,11 +97,7 @@ export class Queue<T extends Entry> {
       return;
     }
     const chunk: T[] = [];
-    for (
-      let i = entries.length - 1;
-      i >= 0 && chunk.length < MAX_PROCESSING_SIZE;
-      i--
-    ) {
+    for (let i = entries.length - 1; i >= 0 && chunk.length < MAX_PROCESSING_SIZE; i--) {
       const retryableEntry = entries[i];
       const entry = retryableEntry?.e;
       if (
@@ -159,10 +153,7 @@ export class Queue<T extends Entry> {
     if (!entries.length) {
       return;
     }
-    if (
-      entries.some((e) => e.p === PRIORITY_MAX) ||
-      this._store instanceof MemoryStore
-    ) {
+    if (entries.some((e) => e.p === PRIORITY_MAX) || this._store instanceof MemoryStore) {
       this._processNow(entries);
     } else {
       this._scheduleProcessing();

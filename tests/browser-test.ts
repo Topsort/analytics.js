@@ -86,11 +86,7 @@ function checkNoErrors(): boolean {
   return errors.length === 0;
 }
 
-function checkEvents(
-  eventType: string,
-  productId: string,
-  expected: number,
-): boolean {
+function checkEvents(eventType: string, productId: string, expected: number): boolean {
   const k = `${eventType}-${productId}`;
   if (eventsCount[k] !== expected) {
     console.info(`Found ${eventsCount[k]} events but wanted ${expected}`);
@@ -99,10 +95,7 @@ function checkEvents(
   return true;
 }
 
-async function setTestResult(
-  testId: string,
-  ok: boolean | Promise<boolean>,
-): Promise<void> {
+async function setTestResult(testId: string, ok: boolean | Promise<boolean>): Promise<void> {
   const result = (await ok) ? "ok" : "fail";
   const el = document.getElementById(testId);
   if (!el) {
@@ -201,9 +194,7 @@ async function checkTests() {
 
   await setTestResult(
     "test-hidden-impression-twice",
-    Promise.resolve(
-      checkEvents("Impression", "product-id-impression-hidden", 1),
-    ),
+    Promise.resolve(checkEvents("Impression", "product-id-impression-hidden", 1)),
   );
 
   await setTestResult(

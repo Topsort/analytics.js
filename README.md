@@ -24,7 +24,7 @@ npm install @topsort/analytics.js --save
 ```html
 <script>
   window.TS = {
-    token: "<YOUR-TOPSORT.JS-TOKEN>", // This token is provided by Topsort and you'll have one for each of your environments
+    token: "<YOUR-TOPSORT.JS-TOKEN>", // Generate a token for each environment in the Topsort Auction Manager
     url: "https://api.topsort.com",
   };
 </script>

@@ -24,8 +24,8 @@ npm install @topsort/analytics.js --save
 ```html
 <script>
   window.TS = {
-    token: "<YOUR-TOPSORT.JS-TOKEN>",
-    url: "https://api.topsort.com", // change this if you want to test against the staging environment
+    token: "<YOUR-TOPSORT.JS-TOKEN>", // Generate a token for each environment in the Topsort Auction Manager
+    url: "https://api.topsort.com",
   };
 </script>
 <script src="https://unpkg.com/@topsort/analytics.js@2.3.1/dist/ts.js"></script>

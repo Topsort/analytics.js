@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import type { UserConfig } from "vite";
-import type { UserConfig as VitestConfig } from "vitest";
 import dts from "vite-plugin-dts";
+import type { UserConfig as VitestConfig } from "vitest";
 
 export default {
   root: ".",
@@ -10,8 +10,7 @@ export default {
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, "src/detector.ts"),
       name: "ts",
-      fileName: (format) =>
-        `ts.${format === "es" ? "mjs" : format === "umd" ? "js" : "js"}`,
+      fileName: (format) => `ts.${format === "es" ? "mjs" : format === "umd" ? "js" : "js"}`,
       formats: ["es", "umd"],
     },
     emptyOutDir: true,

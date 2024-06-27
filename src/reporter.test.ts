@@ -1,8 +1,8 @@
-import { afterAll, afterEach, beforeAll, expect, test } from "vitest";
-import { reportEvent } from "./reporter";
-import type { TopsortEvent } from "./events";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { afterAll, afterEach, beforeAll, expect, test } from "vitest";
+import type { TopsortEvent } from "./events";
+import { reportEvent } from "./reporter";
 
 const server = setupServer(
   http.post("https://api.topsort.com/v2/events", () => {
@@ -18,10 +18,7 @@ beforeAll(() => server.listen());
 afterAll(() => server.close());
 afterEach(() => server.resetHandlers());
 
-function returnStatus(
-  status: number,
-  url = "https://api.topsort.com/v2/events",
-): void {
+function returnStatus(status: number, url = "https://api.topsort.com/v2/events"): void {
   return server.use(
     http.post(url, () => {
       return HttpResponse.json({}, { status: status });
@@ -30,9 +27,7 @@ function returnStatus(
 }
 
 test("success", async () => {
-  await expect(
-    reportEvent({} as TopsortEvent, { token: "token" }),
-  ).resolves.toEqual({
+  await expect(reportEvent({} as TopsortEvent, { token: "token" })).resolves.toEqual({
     ok: true,
     retry: false,
   });
@@ -52,9 +47,7 @@ test("network error", async () => {
 
 test("permanent error", async () => {
   returnStatus(400);
-  await expect(
-    reportEvent({} as TopsortEvent, { token: "token" }),
-  ).resolves.toEqual({
+  await expect(reportEvent({} as TopsortEvent, { token: "token" })).resolves.toEqual({
     ok: false,
     retry: false,
   });
@@ -62,9 +55,7 @@ test("permanent error", async () => {
 
 test("authentication error", async () => {
   returnStatus(401);
-  await expect(
-    reportEvent({} as TopsortEvent, { token: "token" }),
-  ).resolves.toEqual({
+  await expect(reportEvent({} as TopsortEvent, { token: "token" })).resolves.toEqual({
     ok: false,
     retry: false,
   });
@@ -72,9 +63,7 @@ test("authentication error", async () => {
 
 test("retryable error", async () => {
   returnStatus(429);
-  await expect(
-    reportEvent({} as TopsortEvent, { token: "token" }),
-  ).resolves.toEqual({
+  await expect(reportEvent({} as TopsortEvent, { token: "token" })).resolves.toEqual({
     ok: false,
     retry: true,
   });
@@ -82,9 +71,7 @@ test("retryable error", async () => {
 
 test("server error", async () => {
   returnStatus(500);
-  await expect(
-    reportEvent({} as TopsortEvent, { token: "token" }),
-  ).resolves.toEqual({
+  await expect(reportEvent({} as TopsortEvent, { token: "token" })).resolves.toEqual({
     ok: false,
     retry: true,
   });

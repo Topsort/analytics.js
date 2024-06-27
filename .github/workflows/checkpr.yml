@@ -75,3 +75,16 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage/clover.xml
+
+  format:
+    name: Biome Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: Run Biome
+        run: biome ci --reporter=github

@@ -1,4 +1,5 @@
 import { type Config, Entity, TopsortEvent, reportEvent } from "@topsort/sdk";
+import { version } from "../package.json";
 import { ProcessorResult, Queue } from "./queue";
 import { BidStore } from "./store";
 
@@ -134,16 +135,14 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
   const config: Config = {
     apiKey: window.TS.token,
     host: window.TS.url,
+    userAgent: `ts.js/${version}`,
   };
   for (const entry of data) {
     promises.push(
       reportEvent(config, getApiPayload(entry))
         .then((result) => {
-          if (result.ok) {
-            r.done.add(entry.id);
-          } else {
-            r.retry.add(entry.id);
-          }
+          const q = result.retry ? r.retry : r.done;
+          q.add(entry.id);
         })
         .catch(() => {
           r.done.add(entry.id);

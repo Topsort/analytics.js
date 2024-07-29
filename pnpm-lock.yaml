@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@topsort/sdk':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.8.2
@@ -536,8 +536,8 @@ packages:
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
 
-  '@topsort/sdk@0.1.0':
-    resolution: {integrity: sha512-s/yJTDMEFV+wTadfbLH0YP6rt4BSBNlR9dkmsubZ/ijVuPSp14yB9JVd6HdicGooout40xPkJjfQ1WvTibP8ug==}
+  '@topsort/sdk@0.2.0':
+    resolution: {integrity: sha512-NaiwGmoFWyawgjJJmM1pWqyBWy9tonOsYIz1jxQOqsT6mMOzAmqNj/cxuakcLY0R9txND/Hl1AersltprNoyAA==}
 
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
@@ -2455,7 +2455,7 @@ snapshots:
 
   '@sinclair/typebox@0.27.8': {}
 
-  '@topsort/sdk@0.1.0': {}
+  '@topsort/sdk@0.2.0': {}
 
   '@types/argparse@1.0.38': {}
 

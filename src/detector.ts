@@ -1,6 +1,6 @@
-import { Entity, TopsortEvent } from "./events";
+import { type Config, Entity, TopsortEvent, reportEvent } from "@topsort/sdk";
+import { version } from "../package.json";
 import { ProcessorResult, Queue } from "./queue";
-import { reportEvent } from "./reporter";
 import { BidStore } from "./store";
 
 const MAX_EVENTS_SIZE = 2500;
@@ -132,9 +132,14 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
     retry: new Set(),
   };
   const promises = [];
+  const config: Config = {
+    apiKey: window.TS.token,
+    host: window.TS.url,
+    userAgent: `ts.js/${version}`,
+  };
   for (const entry of data) {
     promises.push(
-      reportEvent(getApiPayload(entry), window.TS)
+      reportEvent(config, getApiPayload(entry))
         .then((result) => {
           const q = result.retry ? r.retry : r.done;
           q.add(entry.id);

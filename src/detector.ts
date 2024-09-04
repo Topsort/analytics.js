@@ -192,7 +192,10 @@ function logEvent(info: ProductEvent, node: Node) {
 }
 
 function getId(event: ProductEvent): string {
-  return [event.page, event.type, event.product ?? event.additionalProduct, event.bid].join("-");
+  const items = JSON.stringify(event.items || []);
+  return [event.page, event.type, event.product ?? event.additionalProduct, event.bid, items].join(
+    "-",
+  );
 }
 
 function getPage(): string {

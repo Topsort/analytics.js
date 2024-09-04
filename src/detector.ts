@@ -1,6 +1,7 @@
 import { type Config, Entity, TopsortEvent, reportEvent } from "@topsort/sdk";
 import { version } from "../package.json";
 import { ProcessorResult, Queue } from "./queue";
+import { truncateSet } from "./set";
 import { BidStore } from "./store";
 
 const MAX_EVENTS_SIZE = 2500;
@@ -181,13 +182,7 @@ function logEvent(info: ProductEvent, node: Node) {
     return;
   }
   seenEvents.add(id);
-  if (seenEvents.size > MAX_EVENTS_SIZE) {
-    const iterator = seenEvents.values();
-    for (let i = 0; i < seenEvents.size - MAX_EVENTS_SIZE; --i) {
-      iterator.next();
-    }
-    seenEvents = new Set(iterator);
-  }
+  seenEvents = truncateSet(seenEvents, MAX_EVENTS_SIZE);
   queue.append(info);
 
   // Raise a custom event, so that clients can trigger their own logic.

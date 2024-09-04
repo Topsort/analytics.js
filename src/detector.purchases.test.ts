@@ -32,9 +32,7 @@ test("check purchase", async () => {
       product: undefined,
       bid: undefined,
       id: expect.stringMatching(/[\d.a-zA-Z-]+/),
-      items: [
-        { product: "product-id-purchase-after", price: "2199", quantity: 1 },
-      ],
+      items: [{ product: "product-id-purchase-after", price: "2199", quantity: 1 }],
     },
   ]);
 });

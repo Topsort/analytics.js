@@ -11,6 +11,8 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 ### Fixed
 - Fix truncation of `seenEvents`
   ([#282](https://github.com/Topsort/analytics.js/pull/282))
+- Fix id of purchase events
+  ([#283](https://github.com/Topsort/analytics.js/pull/283))
 
 ## Version 2.3.1 (2024-04-11)
 

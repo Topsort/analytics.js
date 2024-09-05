@@ -1,4 +1,9 @@
-import { type Config, Entity, TopsortEvent, reportEvent } from "@topsort/sdk";
+import {
+  TopsortClient,
+  type Config,
+  Entity,
+  Event as TopsortEvent,
+} from "@topsort/sdk";
 import { version } from "../package.json";
 import { ProcessorResult, Queue } from "./queue";
 import { truncateSet } from "./set";
@@ -17,7 +22,10 @@ const bidStore = new BidStore("ts-b");
  * just be a random number;
  */
 function generateId(): string {
-  return window.URL.createObjectURL?.(new Blob()).split("/").pop() || Math.random() + "";
+  return (
+    window.URL.createObjectURL?.(new Blob()).split("/").pop() ||
+    Math.random() + ""
+  );
 }
 
 let globalUserId: string | undefined;
@@ -138,16 +146,18 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
     host: window.TS.url,
     userAgent: `ts.js/${version}`,
   };
+  const topsortClient = new TopsortClient(config);
   for (const entry of data) {
     promises.push(
-      reportEvent(config, getApiPayload(entry))
+      topsortClient
+        .reportEvent(getApiPayload(entry))
         .then((result) => {
           const q = result.retry ? r.retry : r.done;
           q.add(entry.id);
         })
         .catch(() => {
           r.done.add(entry.id);
-        }),
+        })
     );
   }
   await Promise.all(promises);
@@ -193,9 +203,13 @@ function logEvent(info: ProductEvent, node: Node) {
 
 function getId(event: ProductEvent): string {
   const items = JSON.stringify(event.items || []);
-  return [event.page, event.type, event.product ?? event.additionalProduct, event.bid, items].join(
-    "-",
-  );
+  return [
+    event.page,
+    event.type,
+    event.product ?? event.additionalProduct,
+    event.bid,
+    items,
+  ].join("-");
 }
 
 function getPage(): string {
@@ -210,7 +224,11 @@ function getEvent(type: EventType, node: HTMLElement): ProductEvent {
   let product = node.dataset.tsProduct;
   let bid = node.dataset.tsResolvedBid;
   let additionalProduct: string | undefined = undefined;
-  if (bid == "inherit" && product && (type == "Click" || type == "Impression")) {
+  if (
+    bid == "inherit" &&
+    product &&
+    (type == "Click" || type == "Impression")
+  ) {
     bid = bidStore.get();
     additionalProduct = product;
     product = undefined;
@@ -262,7 +280,7 @@ const intersectionObserver = !!window.IntersectionObserver
       },
       {
         threshold: INTERSECTION_THRESHOLD,
-      },
+      }
     )
   : undefined;
 
@@ -341,13 +359,20 @@ function start() {
   }
   checkChildren(document);
   const MutationObserverImpl =
-    window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+    window.MutationObserver ||
+    window.WebKitMutationObserver ||
+    window.MozMutationObserver;
   const mutationObserver = new MutationObserverImpl(mutationCallback);
   mutationObserver.observe(document, {
     attributes: true,
     childList: true,
     subtree: true,
-    attributeFilter: ["data-ts-product", "data-ts-action", "data-ts-items", "data-ts-resolved-bid"],
+    attributeFilter: [
+      "data-ts-product",
+      "data-ts-action",
+      "data-ts-items",
+      "data-ts-resolved-bid",
+    ],
   });
 }
 

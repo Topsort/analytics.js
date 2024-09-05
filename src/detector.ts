@@ -1,4 +1,4 @@
-import { type Config, Entity, TopsortEvent, reportEvent } from "@topsort/sdk";
+import { type Config, Entity, TopsortClient, Event as TopsortEvent } from "@topsort/sdk";
 import { version } from "../package.json";
 import { ProcessorResult, Queue } from "./queue";
 import { truncateSet } from "./set";
@@ -138,9 +138,11 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
     host: window.TS.url,
     userAgent: `ts.js/${version}`,
   };
+  const topsortClient = new TopsortClient(config);
   for (const entry of data) {
     promises.push(
-      reportEvent(config, getApiPayload(entry))
+      topsortClient
+        .reportEvent(getApiPayload(entry))
         .then((result) => {
           const q = result.retry ? r.retry : r.done;
           q.add(entry.id);

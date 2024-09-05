@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@topsort/sdk':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.3.1
+        version: 0.3.1
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.8.3
@@ -536,8 +536,8 @@ packages:
   '@rushstack/ts-command-line@4.19.1':
     resolution: {integrity: sha512-J7H768dgcpG60d7skZ5uSSwyCZs/S2HrWP1Ds8d1qYAyaaeJmpmmLr9BVw97RjFzmQPOYnoXcKA4GkqDCkduQg==}
 
-  '@topsort/sdk@0.2.0':
-    resolution: {integrity: sha512-NaiwGmoFWyawgjJJmM1pWqyBWy9tonOsYIz1jxQOqsT6mMOzAmqNj/cxuakcLY0R9txND/Hl1AersltprNoyAA==}
+  '@topsort/sdk@0.3.1':
+    resolution: {integrity: sha512-rXL2QlNtX+W6cwR/GGTsLCGpPyBWAltYaStMVMrTCVKnr90HmWc7bhDv6rZjf0A0OwCDLC2jNkagBDvk9N0hoQ==}
 
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
@@ -2487,7 +2487,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@topsort/sdk@0.2.0': {}
+  '@topsort/sdk@0.3.1': {}
 
   '@types/argparse@1.0.38': {}
 

@@ -6,13 +6,22 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
-## Unreleased
+## Version 2.4.0 (2024-09-05)
+
+### Added
+
+- Adds the use of @topsort/sdk for reporting events by @barbmarcio in ([#275](https://github.com/Topsort/analytics.js/pull/275))
 
 ### Fixed
+
 - Fix truncation of `seenEvents`
   ([#282](https://github.com/Topsort/analytics.js/pull/282))
 - Fix id of purchase events
   ([#283](https://github.com/Topsort/analytics.js/pull/283))
+
+### Dependencies
+
+chore(deps): Bump @topsort/sdk from 0.2.0 to 0.3.1 by @barbmarcio in ([#285](https://github.com/Topsort/analytics.js/pull/285))
 
 ## Version 2.3.1 (2024-04-11)
 

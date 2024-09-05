@@ -1,6 +1,6 @@
 {
   "name": "@topsort/analytics.js",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "JS library to automatically report events to Topsort's Analytics",
   "main": "dist/ts.js",
   "type": "module",

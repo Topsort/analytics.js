@@ -34,3 +34,19 @@ test("check impresssions", async () => {
     },
   ]);
 });
+
+test("don\'t consider empty attributes", async () => {
+  window.TS = {
+    token: "token",
+  };
+  const events: any[] = [];
+  window.addEventListener("topsort", (e) => {
+    events.push((e as any).detail);
+  });
+  document.body.innerHTML = `
+    <div data-ts-resolved-bid=""></div>
+  `;
+  await import("./detector");
+
+  expect(events).toMatchObject([]);
+});

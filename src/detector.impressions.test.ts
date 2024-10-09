@@ -35,7 +35,7 @@ test("check impresssions", async () => {
   ]);
 });
 
-test("don\'t consider empty attributes", async () => {
+test("don't consider empty attributes", async () => {
   window.TS = {
     token: "token",
   };

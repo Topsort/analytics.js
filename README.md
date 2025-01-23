@@ -86,10 +86,10 @@ Finally, in case you are using banners and want to have further control on the a
 </div>
 ```
 
-### Overriding default opaqueUserId behavior
+### Overriding default User ID behavior
 
-If you want to pass your own `opaqueUserId` to the library, you can do so by overiding the `getUserID()` function which is
-responsible for retrieving a unique identifier for the user. It should additionally set a new value if none is found. This function should return a string with the `opaqueUserId` passed in the events.
+If you want to pass your own User ID when sending events, you can do so by overiding the `getUserID()` function which is
+responsible for retrieving a unique identifier for the user. It should additionally set a new value if none is found. This function should return a string with the User ID (as a string) passed in the events.
 
 ```javascript
 window.TS = {

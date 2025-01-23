@@ -215,7 +215,7 @@ function getEvent(type: EventType, node: HTMLElement): ProductEvent {
   let product = node.dataset.tsProduct;
   let bid = node.dataset.tsResolvedBid;
   let additionalProduct: string | undefined = undefined;
-  if (bid == "inherit" && product && (type == "Click" || type == "Impression")) {
+  if (bid === "inherit" && product && (type === "Click" || type === "Impression")) {
     bid = bidStore.get();
     additionalProduct = product;
     product = undefined;
@@ -228,7 +228,7 @@ function getEvent(type: EventType, node: HTMLElement): ProductEvent {
     t: Date.now(),
     page: getPage(),
     id: generateId(),
-    uid: window.TS.getUserId() || getUserId(),
+    uid: window.TS.getUserId() ?? getUserId(),
   };
   if (type === "Purchase") {
     event.items = JSON.parse(node.dataset.tsItems || "[]");

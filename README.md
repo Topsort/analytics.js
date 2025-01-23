@@ -86,6 +86,23 @@ Finally, in case you are using banners and want to have further control on the a
 </div>
 ```
 
+### Overriding default opaqueUserId behavior
+
+If you want to pass your own `opaqueUserId` to the library, you can do so by overiding the `getUserID()` function which is
+responsible for retrieving a unique identifier for the user. It should additionally set a new value if none is found. This function should return a string with the `opaqueUserId` passed in the events.
+
+```javascript
+window.TS = {
+	token: "<YOUR-TOPSORT.JS-TOKEN>",
+	getUserId() {
+		// globalUserId is the user id you would like to pass to the analytics
+		// generateAndStoreUserId is a function that generates a new user id and stores it in a cookie/local storage
+		return globalUserId ?? generateAndStoreUserId();
+	},
+};
+```
+
+```html
 # Troubleshooting
 
 ## I see `Uncaught Error: Mismatched anonymous define() module` in the browser console

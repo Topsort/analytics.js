@@ -1,6 +1,6 @@
-import { type Config, Entity, TopsortClient, Event as TopsortEvent } from "@topsort/sdk";
+import { type Config, type Entity, TopsortClient, type Event as TopsortEvent } from "@topsort/sdk";
 import { version } from "../package.json";
-import { ProcessorResult, Queue } from "./queue";
+import { type ProcessorResult, Queue } from "./queue";
 import { truncateSet } from "./set";
 import { BidStore } from "./store";
 
@@ -17,7 +17,7 @@ const bidStore = new BidStore("ts-b");
  * just be a random number;
  */
 function generateId(): string {
-  return window.URL.createObjectURL?.(new Blob()).split("/").pop() || Math.random() + "";
+  return window.URL.createObjectURL?.(new Blob()).split("/").pop() || `${Math.random()}`;
 }
 
 let globalUserId: string | undefined;
@@ -39,7 +39,7 @@ function getUserId(): string {
 function setUserIdCookie(id: string): void {
   const cookieName = window.TS.cookieName || "tsuid";
   globalUserId = id;
-  document.cookie = cookieName + "=" + id + ";max-age=31536000";
+  document.cookie = `${cookieName}=${id};max-age=31536000`;
 }
 
 function resetUserId(): string {
@@ -49,13 +49,15 @@ function resetUserId(): string {
 }
 
 window.TS.setUserId = setUserIdCookie;
-window.TS.getUserId = getUserId;
+if (typeof window.TS.getUserId !== "function") {
+  window.TS.getUserId = getUserId;
+}
 window.TS.resetUserId = resetUserId;
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {
   const cookieName = window.TS.cookieName || "tsuid";
-  const regex = new RegExp("(^|;)\\s*" + cookieName + "\\s*=\\s*([^;]+)");
+  const regex = new RegExp(`(^|;)\\s*${cookieName}\\s*=\\s*([^;]+)`);
   return regex.exec(document.cookie)?.pop();
 }
 
@@ -226,7 +228,7 @@ function getEvent(type: EventType, node: HTMLElement): ProductEvent {
     t: Date.now(),
     page: getPage(),
     id: generateId(),
-    uid: getUserId(),
+    uid: window.TS.getUserId() || getUserId(),
   };
   if (type === "Purchase") {
     event.items = JSON.parse(node.dataset.tsItems || "[]");

@@ -4,7 +4,6 @@ test("support custom getUserId function", async () => {
   window.TS = {
     token: "token",
     getUserId: () => {
-      console.log("foo");
       return "custom-user-id";
     },
   };

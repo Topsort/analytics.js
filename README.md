@@ -68,7 +68,7 @@ Adding further information to purchases can be made by passing the `ts-data-item
 ```html
 <div
   data-ts-action="purchase"
-  data-ts-items='[{"product": "product-id-purchase-1", "quantity":1, "price": 2399}, {"product": "product-id-purchase-2", "quantity": 2, "price": 399}]'
+  data-ts-items='[{"product": "product-id-purchase-1", "quantity":1, "price": 2399}, {"product": "product-id-purchase-2", "quantity": 2, "price": 399, "vendorId": "example-vendor"}]'
 >
   My purchase
 </div>

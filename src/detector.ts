@@ -164,6 +164,7 @@ interface Purchase {
   product: string;
   quantity: number;
   price: number;
+  vendorId?: string;
 }
 
 interface ProductEvent {

@@ -1,8 +1,9 @@
+# Topsort Analytics.js Tutorial
+
 ![version](https://img.shields.io/npm/v/@topsort/analytics.js)
 ![downloads](https://img.shields.io/npm/dw/@topsort/analytics.js)
 ![license](https://img.shields.io/github/license/Topsort/analytics.js)
 ![GitHub Repo stars](https://img.shields.io/github/stars/topsort/analytics.js?style=social)
-# Topsort Analytics.js Tutorial
 
 This tutorial will guide you through the process of integrating Topsort's Analytics.js library into your website to track events like impressions, clicks, and purchases.
 
@@ -44,8 +45,8 @@ The library will automatically start listening for DOM changes and user interact
 
 The configuration is done via the global `window.TS` object.
 
-*   `token`: **(Required)** This is your unique Topsort.js token. You can generate a token for each of your environments (e.g., development, production) in the Topsort Auction Manager.
-*   `url`: **(Optional)** The URL of the Topsort API. Defaults to `https://api.topsort.com`.
+* `token`: **(Required)** This is your unique Topsort.js token. You can generate a token for each of your environments (e.g., development, production) in the Topsort Auction Manager.
+* `url`: **(Optional)** The URL of the Topsort API. Defaults to `https://api.topsort.com`.
 
 ## 4. Tracking Impressions
 
@@ -66,7 +67,7 @@ If you want more granular control over what constitutes a clickable area, you ca
 ```html
 <div class="product" data-ts-resolved-bid="<resolvedBidId>">
   <div data-ts-clickable>
-    <img src="https://example.com/product.png" alt="Product Image">
+    <img src="https://cdn.marketplace.com/product.png" alt="Product Image">
     <span>Product Title</span>
   </div>
   <span>Help</span>
@@ -79,10 +80,10 @@ To track purchases, you need to add the `data-ts-action="purchase"` attribute to
 
 You also need to provide the details of the purchased items using the `data-ts-items` attribute. This attribute should contain a JSON string representing an array of purchased items. Each item object can have the following properties:
 
-*   `product_id`: The ID of the product.
-*   `quantity`: The quantity of the product purchased.
-*   `price`: The price of the product.
-*   `vendorId`: (Optional) The ID of the vendor.
+* `product_id`: The ID of the product.
+* `quantity`: The quantity of the product purchased.
+* `price`: The price of the product.
+* `vendorId`: (Optional) The ID of the vendor.
 
 ```html
 <button

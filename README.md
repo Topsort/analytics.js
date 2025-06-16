@@ -119,13 +119,12 @@ Your custom `getUserId` function should return the user's ID as a string. You ar
 window.TS = {
   token: "<YOUR-TOPSORT.JS-TOKEN>",
   getUserId() {
-    // Example: Get user ID from your application's state
-    // and generate a new one if it doesn't exist.
-    let userId = window.myApp.getUserId();
-    if (!userId) {
-      userId = generateAndStoreMyAppUserId();
-    }
-    return userId;
+    token: "<YOUR-TOPSORT.JS-TOKEN>",
+    getUserId() {
+      // globalUserId is the user id you would like to pass to the analytics
+      // generateAndStoreUserId is a function that generates a new user id and stores it in a cookie/local storage
+      return globalUserId ?? generateAndStoreUserId();
+    },
   },
 };
 ```

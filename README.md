@@ -1,118 +1,167 @@
+# Topsort Analytics.js Tutorial
+
 ![version](https://img.shields.io/npm/v/@topsort/analytics.js)
 ![downloads](https://img.shields.io/npm/dw/@topsort/analytics.js)
 ![license](https://img.shields.io/github/license/Topsort/analytics.js)
 ![GitHub Repo stars](https://img.shields.io/github/stars/topsort/analytics.js?style=social)
 
-# Topsort analytics.js
+This tutorial will guide you through the process of integrating Topsort's Analytics.js library into your website to track events like impressions, clicks, and purchases.
 
-Topsort's JS analytics event library
+## 1. Introduction
 
-Use this to send clicks and impressions to the Topsort API.
+Topsort's `analytics.js` is a JavaScript library that allows you to automatically report user interaction events with products on your website to Topsort's Analytics service. This helps you understand how users are interacting with sponsored and organic listings.
 
-# Installation
+## 2. Installation
 
-With npm
+You can install the library using npm:
 
-```
+```bash
 npm install @topsort/analytics.js --save
 ```
 
-# Usage
+## 3. Usage
 
-### Load topsort.js
+### Option 1: With a Bundler (e.g., Webpack, Vite)
+
+If you're building a JavaScript application with a bundler, you can import the library directly into your project.
+
+In your application's entry point (e.g., `index.js`, `main.ts`), you need to configure Topsort Analytics *before* you import the library. The library's code runs on import and will look for a global `window.TS` object.
+
+```javascript
+// Configure Topsort Analytics
+window.TS = {
+  token: "<YOUR-TOPSORT.JS-TOKEN>", // Generate a token for each environment in the Topsort Auction Manager
+  url: "https://api.topsort.com",
+};
+
+// Import the library to initialize it.
+// This will start the event listeners.
+import "@topsort/analytics.js";
+```
+
+The library will automatically start listening for DOM changes and user interactions once it's imported.
+
+### Option 2: With a Local Script File
+
+If you are not using a bundler, you can include the library by serving the file yourself.
+
+First, you'll need to locate the `ts.js` file in your `node_modules` directory at `@topsort/analytics.js/dist/ts.js`. Copy this file to a public directory in your project that is served to the client (e.g., `public/` or `assets/`).
+
+Then, include it in your HTML file with a `<script>` tag. Make sure you configure `window.TS` *before* the script is loaded.
 
 ```html
 <script>
+  // Configure Topsort Analytics
   window.TS = {
     token: "<YOUR-TOPSORT.JS-TOKEN>", // Generate a token for each environment in the Topsort Auction Manager
     url: "https://api.topsort.com",
   };
 </script>
-<script src="https://unpkg.com/@topsort/analytics.js@2.4.0/dist/ts.js"></script>
+<script src="/path/to/your/public/folder/ts.js"></script>
 ```
 
-### Add markup to your products
+## 4. Configuration
 
-Either mix quotes (single/double) or escape certain characters inside your values. In javascript:
+The configuration is done via the global `window.TS` object, which must be set before the library is loaded.
 
-```js
-const newvalue = currentvalue.replace('"', "&quot;").replace("'", "&apos;"); // etc.
-```
+* `token`: **(Required)** This is your unique Topsort.js token. You can generate a token for each of your environments (e.g., development, production) in the Topsort Auction Manager.
+* `url`: **(Optional)** The URL of the Topsort API. Defaults to `https://api.topsort.com`.
 
-Add the following markup to promoted products:
+## 5. Tracking Impressions
+
+The library automatically detects and reports impressions of products when they become visible on the screen. To enable this, you need to add the `data-ts-resolved-bid` attribute. The value should be the `resolvedBidId` you received from the Topsort API when you ran an auction.
 
 ```html
-<div class="product" data-ts-resolved-bid="<resolvedBidId>">...</div>
+<div class="product" data-ts-resolved-bid="<resolvedBidId>">
+  <!-- Your product content here -->
+</div>
 ```
 
-and the following for organic products (which is optional)
+## 6. Tracking Clicks
+
+The library can also track when a user clicks on a product. By default, it will consider a click on any part of the product element as a conversion.
+
+If you want more granular control over what constitutes a clickable area, you can use the `data-ts-clickable` attribute. This is useful when only a part of the product container should trigger a click event (e.g., the image and title, but not a "help" icon).
 
 ```html
-<div class="product" data-ts-product="<productId>">...</div>
-```
-
-Additionally, in case not all the container is clickable (i.e., does not produce an action or does not take you to the product page) or parts of it lead you to a non-related product page, make sure to use the `data-ts-clickable` attribute to indicate what portions of the product should count as a conversion.
-
-```html
-<div class="product" ...>
+<div class="product" data-ts-resolved-bid="<resolvedBidId>">
   <div data-ts-clickable>
-    <img src="https://cdn.marketplace.com/product.png" />
+    <img src="https://cdn.marketplace.com/product.png" alt="Product Image">
     <span>Product Title</span>
   </div>
   <span>Help</span>
 </div>
 ```
 
-Adding further information to purchases can be made by passing the `ts-data-items` JSON array:
+## 7. Tracking Purchases
+
+To track purchases, you need to add the `data-ts-action="purchase"` attribute to an element that the user interacts with to complete a purchase (e.g., a "Buy Now" or "Complete Purchase" button).
+
+You also need to provide the details of the purchased items using the `data-ts-items` attribute. This attribute should contain a JSON string representing an array of purchased items. Each item object can have the following properties:
+
+* `product_id`: The ID of the product.
+* `quantity`: The quantity of the product purchased.
+* `price`: The price of the product.
+* `vendorId`: (Optional) The ID of the vendor.
 
 ```html
-<div
+<button
   data-ts-action="purchase"
-  data-ts-items='[{"product": "product-id-purchase-1", "quantity":1, "price": 2399}, {"product": "product-id-purchase-2", "quantity": 2, "price": 399, "vendorId": "example-vendor"}]'
+  data-ts-items='[{"product_id": "product-123", "quantity": 1, "price": 2399}, {"product_id": "product-456", "quantity": 2, "price": 399, "vendorId": "vendor-abc"}]'
 >
-  My purchase
-</div>
+  Complete Purchase
+</button>
 ```
 
-Finally, in case you are using banners and want to have further control on the attributable products you need to add the following markup in the banner's destination page.
+**Note:** The attribute value must be a valid JSON string. Ensure that you properly escape any quotes within the string.
+
+## 8. Advanced Usage
+
+### Banner Clicks
+
+If you are using banners to promote products, you can track clicks on those banners and attribute them to the products on the banner's destination page.
+
+When a user clicks a banner, they are taken to a destination page. On that page, for each product that was featured in the banner, add the `data-ts-resolved-bid="inherit"` attribute. This tells the library that the impression and potential click are a result of the banner interaction.
 
 ```html
-<div
-  class="product"
-  data-ts-product="<productId>"
-  data-ts-resolved-bid="inherit"
->
-  ...
+<div class="product" data-ts-product="<productId>" data-ts-resolved-bid="inherit">
+  <!-- Product content -->
 </div>
 ```
 
-### Overriding default User ID behavior
+### Overriding User ID
 
-If you want to pass your own User ID when sending events, you can do so by overiding the `getUserID()` function which is
-responsible for retrieving a unique identifier for the user. It should additionally set a new value if none is found. This function should return a string with the User ID (as a string) passed in the events.
+By default, the library manages a user ID to track user sessions. If you want to use your own user identification system, you can override the `getUserId` function in the `window.TS` configuration.
+
+Your custom `getUserId` function should return the user's ID as a string. You are responsible for generating and persisting the ID (e.g., in a cookie or local storage).
 
 ```javascript
 window.TS = {
-	token: "<YOUR-TOPSORT.JS-TOKEN>",
-	getUserId() {
-		// globalUserId is the user id you would like to pass to the analytics
-		// generateAndStoreUserId is a function that generates a new user id and stores it in a cookie/local storage
-		return globalUserId ?? generateAndStoreUserId();
-	},
+  token: "<YOUR-TOPSORT.JS-TOKEN>",
+  getUserId() {
+    // globalUserId is the user id you would like to pass to the analytics
+    // generateAndStoreUserId is a function that generates a new user id and stores it in a cookie/local storage
+    return globalUserId ?? generateAndStoreUserId();
+  },
 };
 ```
 
-```html
-# Troubleshooting
+This configuration needs to be set *before* the library is loaded or imported.
 
-## I see `Uncaught Error: Mismatched anonymous define() module` in the browser console
+## 9. Tracking Organic Products
 
-You are most likely running into issues with how the library is loaded. This is a common issue with RequireJS and other AMD loaders. The library is not AMD compatible, so you need to load it as a global script.
+The library can track both impressions and clicks for organic products. This is optional but recommended for a more complete analytics picture of how users interact with all items on your site.
 
-Another approach is to use the ESM version of the library, which you can either import directly should you import the library as part of your distribution; or use the published version called `ts.mjs`: `https://unpkg.com/@topsort/analytics.js@2.4.0/dist/ts.mjs`.
+### Organic Product Impressions
 
-# E2E tests
+To track impressions for an organic product, add the `data-ts-product` attribute with the product's unique ID.
 
-Execute `npm run test:e2e`, at the end it will show you the url you need to visit to test the library.
+### Organic Product Clicks
 
-Ideally you would check the library both in desktop and mobile browsers. For that you need to be connected to the same network.
+Clicks on organic products are tracked automatically when the product element has the `data-ts-product` attribute. If you need to specify which parts of the product element are clickable, you can use the `data-ts-clickable` attribute, just as you would for promoted products.
+
+## 10. Troubleshooting
+
+### "Uncaught Error: Mismatched anonymous define() module"
+
+This error can occur if you are using an AMD loader like RequireJS. This library is not AMD-compatible. You should use the ESM version of the library (`ts.mjs`), which can be imported as a module in modern JavaScript environments, as shown in the "Usage with a Bundler" section.

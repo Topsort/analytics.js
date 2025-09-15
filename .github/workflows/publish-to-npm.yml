@@ -44,6 +44,4 @@ jobs:
 
       - name: Publish to npm
         id: publish
-        run: |
-          pnpm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-          pnpm publish --access public --no-git-checks
+        run: pnpm publish

@@ -44,4 +44,4 @@ jobs:
 
       - name: Publish to npm
         id: publish
-        run: pnpm publish
+        run: pnpm publish --no-git-checks

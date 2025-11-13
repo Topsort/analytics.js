@@ -10,8 +10,6 @@ const eventsCount: Record<string, number> = {};
 function recordEvent(event: any) {
   const d = event.detail;
   const k = `${d.type}-${d.product}`;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   eventsCount[k] = eventsCount[k] === undefined ? 1 : eventsCount[k] + 1;
 }
 window.addEventListener("topsort", recordEvent);

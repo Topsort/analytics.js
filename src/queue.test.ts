@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { Entry, ProcessorResult, Queue } from "./queue";
+import { type Entry, type ProcessorResult, Queue } from "./queue";
 
 let processedEvents: Entry[] = [];
 async function processor(chunk: Entry[]): Promise<ProcessorResult> {

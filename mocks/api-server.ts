@@ -1,7 +1,6 @@
-import * as os from "os";
-import * as path from "path";
-import * as url from "url";
-
+import * as os from "node:os";
+import * as path from "node:path";
+import * as url from "node:url";
 import express from "express";
 
 const PORT = process.env.port || 8000;

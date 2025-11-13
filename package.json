@@ -7,16 +7,22 @@
   "repository": {
     "url": "https://github.com/Topsort/analytics.js"
   },
-  "packageManager": "pnpm@9.9.0",
-  "keywords": ["ads", "sponsored listings", "auctions", "analytics", "topsort"],
+  "packageManager": "pnpm@10.22.0",
+  "keywords": [
+    "ads",
+    "sponsored listings",
+    "auctions",
+    "analytics",
+    "topsort"
+  ],
   "engines": {
     "node": ">=20.0.0"
   },
   "exports": {
     ".": {
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/ts.mjs",
-      "require": "./dist/ts.js",
-      "types": "./dist/src/events.d.ts"
+      "require": "./dist/ts.js"
     }
   },
   "module": "./dist/ts.mjs",
@@ -24,7 +30,7 @@
     "dist/src",
     "dist/ts.js",
     "dist/ts.mjs",
-    "dist/*.d.ts",
+    "dist/src/*.d.ts",
     "package.json",
     "README.md",
     "CHANGELOG.md"
@@ -32,41 +38,37 @@
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
     "build": "vite build",
-    "format": "biome check",
-    "format:fix": "biome check --write",
-    "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
-    "lint:fix": "eslint . --max-warnings 0 --ignore-path .gitignore --fix",
-    "lint:ci": "eslint . --max-warnings 0 --ignore-path .gitignore",
+    "format": "biome format",
+    "format:fix": "biome format --write",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "lint:ci": "biome ci",
     "test": "vitest run --coverage",
     "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && node dist/mocks/api-server.js",
-    "types:check": "tsc"
+    "types:check": "tsc --noemit"
   },
   "author": "Topsort",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "^1.9.2",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.13.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^7.9.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "@vitest/coverage-v8": "^2.1.9",
-    "eslint": "^8.57.0",
-    "eslint-plugin-vitest": "^0.4.1",
-    "express": "^4.20.0",
-    "jsdom": "^27.2.0",
-    "msw": "^2.6.6",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
-    "tslib": "^2.6.3",
-    "typescript": "^5.5.2",
-    "vite": "^5.4.21",
-    "vite-plugin-dts": "^4.2.3",
-    "vitest": "^2.1.9"
+    "@biomejs/biome": "2.3.5",
+    "@types/express": "5.0.5",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.4",
+    "@types/react-dom": "19.2.3",
+    "@vitest/coverage-v8": "4.0.8",
+    "express": "5.1.0",
+    "jsdom": "27.2.0",
+    "msw": "2.12.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-router-dom": "7.9.5",
+    "tslib": "2.8.1",
+    "typescript": "5.9.3",
+    "vite": "7.2.2",
+    "vite-plugin-dts": "4.5.4",
+    "vitest": "4.0.8"
   },
   "dependencies": {
-    "@topsort/sdk": "^0.3.1"
+    "@topsort/sdk": "0.3.8"
   }
 }

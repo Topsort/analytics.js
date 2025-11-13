@@ -6,7 +6,7 @@ test("check banner clicks", async () => {
   };
   const events: any[] = [];
   window.addEventListener("topsort", (e) => {
-    if ((e as any).detail.type == "Click") {
+    if ((e as any).detail.type === "Click") {
       events.push((e as any).detail);
     }
   });

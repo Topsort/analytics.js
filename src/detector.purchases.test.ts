@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+
 test("check purchase", async () => {
   window.TS = {
     token: "token",

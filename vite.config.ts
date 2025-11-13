@@ -1,9 +1,9 @@
-import { resolve } from "path";
-import type { UserConfig } from "vite";
+import { copyFileSync } from "node:fs";
+import { resolve } from "node:path";
 import dts from "vite-plugin-dts";
-import type { UserConfig as VitestConfig } from "vitest";
+import { defineConfig } from "vitest/config";
 
-export default {
+export default defineConfig({
   root: ".",
   build: {
     lib: {
@@ -17,10 +17,13 @@ export default {
   },
   plugins: [
     dts({
-      exclude: ["./vite.config.ts", "tests/**/*", "mocks/**/*"],
+      exclude: ["./vite.config.ts", "tests/**/*", "mocks/**/*", "**/*.test.ts", "**/*.test.tsx"],
+      afterBuild: () => {
+        copyFileSync("src/index.d.ts", "dist/src/index.d.ts");
+      },
     }),
   ],
   test: {
     environment: "jsdom",
   },
-} satisfies UserConfig & { test: VitestConfig };
+});

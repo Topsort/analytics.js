@@ -66,14 +66,14 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
   const placement = {
     path: event.page,
   };
-  let entity: Entity | undefined = undefined;
+  let entity: Entity | undefined;
   if (event.product) {
     entity = {
       type: "product",
       id: event.product,
     };
   }
-  let additionalAttribution: Entity | undefined = undefined;
+  let additionalAttribution: Entity | undefined;
   if (event.additionalProduct) {
     additionalAttribution = {
       type: "product",
@@ -214,7 +214,7 @@ function getPage(): string {
 function getEvent(type: EventType, node: HTMLElement): ProductEvent {
   let product = node.dataset.tsProduct;
   let bid = node.dataset.tsResolvedBid;
-  let additionalProduct: string | undefined = undefined;
+  let additionalProduct: string | undefined;
   if (bid === "inherit" && product && (type === "Click" || type === "Impression")) {
     bid = bidStore.get();
     additionalProduct = product;
@@ -250,7 +250,7 @@ function interactionHandler(event: Event): void {
   }
 }
 
-const intersectionObserver = !!window.IntersectionObserver
+const intersectionObserver = window.IntersectionObserver
   ? new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -276,8 +276,10 @@ const PRODUCT_SELECTOR =
 
 function addClickHandler(node: HTMLElement) {
   const clickables = node.querySelectorAll("[data-ts-clickable]");
-  const elements = clickables.length === 0 ? [node] : clickables;
-  elements.forEach((e) => e.addEventListener("click", interactionHandler));
+  const elements = clickables.length === 0 ? [node] : Array.from(clickables);
+  for (const e of elements) {
+    e.addEventListener("click", interactionHandler);
+  }
 }
 
 function processChild(node: HTMLElement) {

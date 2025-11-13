@@ -1,9 +1,8 @@
 import { resolve } from "path";
-import type { UserConfig } from "vite";
 import dts from "vite-plugin-dts";
-import type { UserConfig as VitestConfig } from "vitest";
+import { defineConfig } from "vitest/config";
 
-export default {
+export default defineConfig({
   root: ".",
   build: {
     lib: {
@@ -23,4 +22,4 @@ export default {
   test: {
     environment: "jsdom",
   },
-} satisfies UserConfig & { test: VitestConfig };
+});

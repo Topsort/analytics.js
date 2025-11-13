@@ -1,8 +1,7 @@
+import express from "express";
 import * as os from "os";
 import * as path from "path";
 import * as url from "url";
-
-import express from "express";
 
 const PORT = process.env.port || 8000;
 

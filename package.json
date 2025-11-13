@@ -20,7 +20,7 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/src/",
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/ts.mjs",
       "require": "./dist/ts.js"
     }

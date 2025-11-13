@@ -1,3 +1,4 @@
+import { copyFileSync } from "node:fs";
 import { resolve } from "node:path";
 import dts from "vite-plugin-dts";
 import { defineConfig } from "vitest/config";
@@ -16,7 +17,10 @@ export default defineConfig({
   },
   plugins: [
     dts({
-      exclude: ["./vite.config.ts", "tests/**/*", "mocks/**/*"],
+      exclude: ["./vite.config.ts", "tests/**/*", "mocks/**/*", "**/*.test.ts", "**/*.test.tsx"],
+      afterBuild: () => {
+        copyFileSync("src/index.d.ts", "dist/src/index.d.ts");
+      },
     }),
   ],
   test: {

@@ -130,10 +130,10 @@
   </div>
   <div id="root"></div>
   <script>
-    window.testId = Math.random() + ":" + Math.random();
+    window.testId = `${Math.random()}:${Math.random()}`;
     window.TS = {
       token: "ts-test-token",
-      url: window.location.origin + "/" + testId,
+      url: `${window.location.origin}/${testId}`,
     };
   </script>
   <script src="/js/ts.js"></script>

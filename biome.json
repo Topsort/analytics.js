@@ -21,6 +21,12 @@
     "lineWidth": 100
   },
   "linter": {
-    "enabled": false
+    "enabled": true,
+    "rules": {
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noDocumentCookie": "off"
+      }
+    }
   }
 }

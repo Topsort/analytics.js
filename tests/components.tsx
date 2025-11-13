@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 
@@ -41,7 +42,7 @@ function InfinitePages() {
   const [idx, setIdx] = useState(1);
   return (
     <>
-      <button onClick={() => setIdx(idx + 1)} id="next-page-react">
+      <button type="button" onClick={() => setIdx(idx + 1)} id="next-page-react">
         Next
       </button>
       <Page idx={idx} />
@@ -67,5 +68,7 @@ function App() {
 }
 
 const container = document.getElementById("root");
-const root = createRoot(container!);
-root.render(<App />);
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+}

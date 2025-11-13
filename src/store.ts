@@ -44,7 +44,7 @@ export class BidStore {
   get(): string | undefined {
     try {
       return this._storage.getItem(this._key) ?? undefined;
-    } catch (error) {
+    } catch (_error) {
       return this._bid;
     }
   }
@@ -52,6 +52,6 @@ export class BidStore {
     this._bid = bid;
     try {
       this._storage.setItem(this._key, bid);
-    } catch (error) {}
+    } catch (_error) {}
   }
 }

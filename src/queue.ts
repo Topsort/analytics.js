@@ -38,7 +38,7 @@ export type Processor<T extends Entry> = (data: T[]) => Promise<ProcessorResult>
 
 function expBackoff(startTime: number, retries: number): number {
   if (retries > 0) {
-    return startTime + (Math.random() + Math.pow(2, retries)) * 1000;
+    return startTime + (Math.random() + 2 ** retries) * 1000;
   }
   // This could be just startTime, but we chose to return 0, just to ensure
   // that the event is always added the first time. Even if the clock changed.
@@ -63,7 +63,7 @@ function getStore(): Store<RetryableEntry> {
     if (r[0]?.x === id) {
       return new LocalStorageStore<RetryableEntry>(STORAGE_KEY);
     }
-  } catch (error) {}
+  } catch (_error) {}
   return new MemoryStore<RetryableEntry>();
 }
 
@@ -116,7 +116,7 @@ export class Queue<T extends Entry> {
     let r: ProcessorResult = { done: new Set(), retry: new Set() };
     try {
       r = await this._processor(chunk);
-    } catch (error) {
+    } catch (_error) {
       // Mark all as failed
       for (const entry of chunk) {
         r.done.add(entry.id);

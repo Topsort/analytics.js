@@ -58,7 +58,7 @@
     "@vitest/coverage-v8": "4.0.8",
     "express": "5.1.0",
     "jsdom": "27.2.0",
-    "msw": "2.12.1",
+    "msw": "2.12.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-router-dom": "7.9.5",

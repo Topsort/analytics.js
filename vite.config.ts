@@ -11,7 +11,8 @@ export default defineConfig({
       entry: resolve(__dirname, "src/detector.ts"),
       name: "ts",
       formats: ["es", "umd", "iife"],
-      fileName: (format) => (format === "iife" ? "ts.iife.js" : `ts.${format === "es" ? "mjs" : "js"}`),
+      fileName: (format) =>
+        format === "iife" ? "ts.iife.js" : `ts.${format === "es" ? "mjs" : "js"}`,
     },
     emptyOutDir: true,
   },

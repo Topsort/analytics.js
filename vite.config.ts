@@ -10,8 +10,8 @@ export default defineConfig({
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, "src/detector.ts"),
       name: "ts",
-      fileName: (format) => `ts.${format === "es" ? "mjs" : format === "umd" ? "js" : "js"}`,
-      formats: ["es", "umd"],
+      formats: ["es", "umd", "iife"],
+      fileName: (format) => (format === "iife" ? "ts.iife.js" : `ts.${format === "es" ? "mjs" : "js"}`),
     },
     emptyOutDir: true,
   },

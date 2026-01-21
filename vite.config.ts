@@ -18,7 +18,7 @@ function formatSpecificExternal(): Plugin {
     },
     options(options) {
       const originalExternal = options.external;
-          
+
       options.external = (id, importer, isResolved) => {
         const isDependency =
           id.startsWith("@topsort/sdk") ||

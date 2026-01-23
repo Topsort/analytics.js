@@ -41,7 +41,7 @@
   ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build --mode iife",
     "format": "biome format",
     "format:fix": "biome format --write",
     "lint": "biome check",

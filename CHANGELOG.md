@@ -8,6 +8,8 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+## Version 2.7.0 (2025-01-23)
+
 ### Added
 
 - Add IIFE bundle for legacy systems that don't support ES modules

@@ -23,6 +23,9 @@
       "types": "./dist/src/index.d.ts",
       "import": "./dist/ts.mjs",
       "require": "./dist/ts.js"
+    },
+    "./iife": {
+      "default": "./dist/ts.iife.js"
     }
   },
   "module": "./dist/ts.mjs",
@@ -30,6 +33,7 @@
     "dist/src",
     "dist/ts.js",
     "dist/ts.mjs",
+    "dist/ts.iife.js",
     "dist/src/*.d.ts",
     "package.json",
     "README.md",
@@ -37,7 +41,7 @@
   ],
   "homepage": "https://github.com/Topsort/analytics.js#readme",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build --mode iife",
     "format": "biome format",
     "format:fix": "biome format --write",
     "lint": "biome check",

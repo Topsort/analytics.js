@@ -54,7 +54,7 @@
   "author": "Topsort",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "2.3.5",
+    "@biomejs/biome": "2.4.7",
     "@types/express": "5.0.6",
     "@types/node": "24.10.1",
     "@types/react": "19.2.4",

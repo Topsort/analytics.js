@@ -15,7 +15,6 @@ describe("detector bootstrap", () => {
   test("does nothing when already loaded", async () => {
     const observe = vi.fn();
     class MutationObserverMock {
-      constructor(_callback: MutationCallback) {}
       observe = observe;
     }
     Object.defineProperty(window, "MutationObserver", {
@@ -36,7 +35,6 @@ describe("detector bootstrap", () => {
   test("logs when token is missing", async () => {
     const observe = vi.fn();
     class MutationObserverMock {
-      constructor(_callback: MutationCallback) {}
       observe = observe;
     }
     Object.defineProperty(window, "MutationObserver", {
@@ -120,7 +118,6 @@ describe("detector bootstrap", () => {
 
     const mutationObserve = vi.fn();
     class MutationObserverMock {
-      constructor(_cb: MutationCallback) {}
       observe = mutationObserve;
       disconnect = vi.fn();
       takeRecords = vi.fn(() => []);
@@ -145,9 +142,9 @@ describe("detector bootstrap", () => {
 
     expect(observe).toHaveBeenCalledWith(expect.any(HTMLElement));
     expect(unobserve).toHaveBeenCalledWith(expect.any(HTMLElement));
-    expect(events.some((event) => event.type === "Impression" && event.product === "html-product")).toBe(
-      true,
-    );
+    expect(
+      events.some((event) => event.type === "Impression" && event.product === "html-product"),
+    ).toBe(true);
     expect(events.some((event) => event.product === "svg-product")).toBe(false);
   });
 

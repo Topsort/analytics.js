@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { type Entry, type ProcessorResult, Queue } from "./queue";
+import { MemoryStore } from "./store";
 
 let processedEvents: Entry[] = [];
 async function processor(chunk: Entry[]): Promise<ProcessorResult> {
@@ -118,5 +119,30 @@ test("simultaneous entries", async () => {
   // entry is resolved.
   expect(processedEvents).toEqual([entry3, entry2, entry1, entry4, entry5]);
   await flushPromises(250);
+  expectEmptyQueue(q);
+});
+
+test("falls back to memory store when localStorage probing fails", () => {
+  const setItemSpy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    throw new Error("storage blocked");
+  });
+
+  const q = new Queue(processor);
+
+  expect((q as any)._store).toBeInstanceOf(MemoryStore);
+  setItemSpy.mockRestore();
+});
+
+test("marks entries done when processor throws", async () => {
+  const failingProcessor = vi.fn(async (_chunk: Entry[]) => {
+    throw new Error("processor failed");
+  });
+  const q = new Queue(failingProcessor);
+  const entry = { id: "id-throw", t: now() };
+
+  q.append(entry, { highPriority: true });
+  await flushPromises();
+
+  expect(failingProcessor).toHaveBeenCalledWith([entry]);
   expectEmptyQueue(q);
 });

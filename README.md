@@ -7,7 +7,6 @@
 
 This tutorial will guide you through the process of integrating Topsort's Analytics.js library into your website to track events like impressions, clicks, and purchases.
 
-
 ## 1. Introduction
 
 Topsort's `analytics.js` is a JavaScript library that allows you to automatically report user interaction events with products on your website to Topsort's Analytics service. This helps you understand how users are interacting with sponsored and organic listings.

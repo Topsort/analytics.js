@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>analytics.js Playground</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #1a1a1a;
+        background: #f5f5f5;
+        min-height: 100vh;
+      }
+
+      header {
+        background: #0f0f0f;
+        color: #fff;
+        padding: 16px 24px;
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      header h1 { font-size: 18px; font-weight: 600; }
+      header p { font-size: 13px; color: #999; }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 0;
+        min-height: calc(100vh - 53px);
+      }
+
+      @media (max-width: 720px) {
+        .layout { grid-template-columns: 1fr; }
+        .panel-preview { order: -1; }
+      }
+
+      .panel-form {
+        background: #fff;
+        border-right: 1px solid #e5e5e5;
+        padding: 24px;
+        overflow-y: auto;
+      }
+
+      .panel-preview {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      h2 {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #666;
+        margin-bottom: 16px;
+      }
+
+      fieldset {
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      fieldset legend {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #999;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .field { margin-bottom: 12px; }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 4px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="number"] {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #1a1a1a;
+        background: #fafafa;
+        transition: border-color 0.15s, background 0.15s;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: #0066cc;
+        background: #fff;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
+        font-size: 12px;
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        color: #1a1a1a;
+        background: #fafafa;
+        transition: border-color 0.15s, background 0.15s;
+        outline: none;
+        resize: vertical;
+      }
+
+      textarea:focus {
+        border-color: #0066cc;
+        background: #fff;
+      }
+
+      .hint {
+        font-size: 11px;
+        color: #999;
+        margin-top: 3px;
+      }
+
+      .hint code {
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-size: 11px;
+        color: #555;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 400;
+        cursor: pointer;
+        padding: 6px 12px;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
+        background: #fafafa;
+        transition: border-color 0.15s, background 0.15s;
+        flex: 1;
+        justify-content: center;
+      }
+
+      .radio-group input[type="radio"] { margin: 0; }
+
+      .radio-group label:has(input:checked) {
+        border-color: #0066cc;
+        background: #e8f0fc;
+        color: #0052a3;
+        font-weight: 500;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 400;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #0066cc;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        margin-top: 4px;
+      }
+
+      button:hover { background: #0052a3; }
+      button:active { background: #003d7a; }
+
+      button.secondary {
+        background: #666;
+        margin-top: 8px;
+      }
+
+      button.secondary:hover { background: #555; }
+
+      button.danger {
+        background: #c62828;
+        margin-top: 8px;
+      }
+
+      button.danger:hover { background: #a01a1a; }
+
+      .preview-box {
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .preview-box-header {
+        padding: 10px 16px;
+        border-bottom: 1px solid #e5e5e5;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .preview-box-header .badge {
+        font-size: 11px;
+        background: #0066cc;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+
+      #preview-area {
+        padding: 24px;
+        min-height: 120px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .empty-state {
+        color: #bbb;
+        font-size: 13px;
+        font-style: italic;
+      }
+
+      /* Product cards in preview */
+      .ts-product-card {
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 16px;
+        min-width: 180px;
+        background: #fff;
+        cursor: pointer;
+        transition: box-shadow 0.15s, border-color 0.15s;
+        position: relative;
+      }
+
+      .ts-product-card:hover {
+        border-color: #0066cc;
+        box-shadow: 0 2px 8px rgba(0,102,204,0.12);
+      }
+
+      .ts-product-card .tag {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 8px;
+      }
+
+      .ts-product-card .tag.promoted { background: #e8f0fc; color: #0052a3; }
+      .ts-product-card .tag.organic { background: #e8f5e9; color: #2e7d32; }
+
+      .ts-product-card .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .ts-product-card .product-id {
+        font-size: 11px;
+        color: #999;
+        font-family: "SF Mono", "Fira Code", monospace;
+      }
+
+      /* Purchase card */
+      .ts-purchase-card {
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 16px;
+        width: 100%;
+        background: #fffde7;
+        border-color: #ffe082;
+      }
+
+      .ts-purchase-card .tag {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 8px;
+        background: #fff8e1;
+        color: #f57f17;
+      }
+
+      .ts-purchase-card .items-list {
+        font-size: 12px;
+        color: #555;
+        font-family: "SF Mono", "Fira Code", monospace;
+      }
+
+      /* Event log */
+      #event-log {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 12px 16px;
+      }
+
+      .event-entry {
+        font-size: 12px;
+        font-family: "SF Mono", "Fira Code", monospace;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .event-entry:last-child { border-bottom: none; }
+
+      .event-entry .event-type {
+        font-weight: 600;
+        font-size: 11px;
+        padding: 1px 6px;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+
+      .event-type.impression { background: #e3f2fd; color: #1565c0; }
+      .event-type.click { background: #fce4ec; color: #c62828; }
+      .event-type.purchase { background: #fff8e1; color: #f57f17; }
+
+      .event-entry .event-detail {
+        color: #555;
+        word-break: break-all;
+      }
+
+      .event-entry .event-time {
+        color: #bbb;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .event-entry .api-status {
+        font-size: 13px;
+        font-weight: 600;
+        font-family: system-ui, -apple-system, sans-serif;
+        margin-left: auto;
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 6px 14px;
+        border-radius: 8px;
+        line-height: 1.3;
+      }
+
+      .event-entry .api-status.pending {
+        color: #555;
+        background: #eee;
+      }
+
+      .event-entry .api-status.ok {
+        color: #1b5e20;
+        background: #e8f5e9;
+      }
+
+      .event-entry .api-status.fail {
+        color: #b71c1c;
+        background: #ffebee;
+      }
+
+      /* Snippet */
+      #snippet-area {
+        padding: 16px;
+        background: #1a1a1a;
+        overflow-x: auto;
+      }
+
+      #snippet-area pre {
+        margin: 0;
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-size: 12px;
+        color: #e5e5e5;
+        white-space: pre;
+        line-height: 1.6;
+      }
+
+      #snippet-area.hidden { display: none; }
+
+      /* Purchase fields */
+      .purchase-fields { display: none; }
+      .purchase-fields.visible { display: block; }
+
+      .item-row {
+        display: grid;
+        grid-template-columns: 1fr 60px 80px;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .item-row input {
+        padding: 6px 8px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>analytics.js</h1>
+      <p>Interactive Playground</p>
+    </header>
+
+    <div class="layout">
+      <aside class="panel-form">
+        <form id="config-form" autocomplete="off" novalidate>
+          <fieldset>
+            <legend>Configuration</legend>
+            <div class="field">
+              <label for="token">API Token</label>
+              <input type="password" id="token" name="token" placeholder="TSE_..." required />
+            </div>
+            <div class="field">
+              <label for="api-url">API URL (optional)</label>
+              <input type="text" id="api-url" name="api-url" placeholder="https://api.topsort.com" />
+              <p class="hint">Leave empty for production. Use a staging URL for testing.</p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Add Element</legend>
+            <div class="field">
+              <label>Type</label>
+              <div class="radio-group">
+                <label>
+                  <input type="radio" name="element-type" value="promoted" checked />
+                  Promoted products
+                </label>
+                <label>
+                  <input type="radio" name="element-type" value="organic" />
+                  Organic products
+                </label>
+                <label>
+                  <input type="radio" name="element-type" value="purchase" />
+                  Purchase
+                </label>
+              </div>
+            </div>
+
+            <div id="product-fields">
+              <div class="field">
+                <label for="product-id">Product ID</label>
+                <input type="text" id="product-id" name="product-id" placeholder="prod-123" />
+                <p class="hint">Maps to <code>data-ts-product</code></p>
+              </div>
+              <div class="field" id="bid-field">
+                <label for="resolved-bid">Resolved Bid ID (from auction that involves promoted product)</label>
+                <input type="text" id="resolved-bid" name="resolved-bid" placeholder="resolvedBidId from auction" />
+                <p class="hint">Maps to <code>data-ts-resolved-bid</code>. Use <code>inherit</code> for cross-page attribution.</p>
+              </div>
+              <div class="field">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="clickable" name="clickable" />
+                  Use <code>data-ts-clickable</code> on child
+                </label>
+                <p class="hint">When checked, only a child element triggers clicks, not the whole card.</p>
+              </div>
+            </div>
+
+            <div id="purchase-fields" class="purchase-fields">
+              <div class="field">
+                <label>Items <span style="font-weight:400;color:#999">(JSON array)</span></label>
+                <textarea id="purchase-items" rows="4" placeholder='[{"product":"prod-123","quantity":1,"price":1999}]'>[{"product":"prod-123","quantity":1,"price":1999}]</textarea>
+                <p class="hint">Maps to <code>data-ts-items</code>. Price in cents.</p>
+              </div>
+            </div>
+
+            <button type="submit">Add to Preview</button>
+          </fieldset>
+        </form>
+
+        <button class="danger" id="clear-btn" type="button">Clear Preview & Events</button>
+      </aside>
+
+      <main class="panel-preview">
+        <div>
+          <h2>Live Preview</h2>
+          <div class="preview-box">
+            <div class="preview-box-header">
+              Elements with <code>data-ts-*</code> attributes
+              <span class="badge" id="element-count">0</span>
+            </div>
+            <div id="preview-area">
+              <span class="empty-state">Add elements using the form on the left. Impressions fire automatically when elements appear. Click on product cards to trigger click events.</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2>Event Log</h2>
+          <div class="preview-box">
+            <div class="preview-box-header">
+              Captured <code>topsort</code> CustomEvents
+              <span class="badge" id="event-count">0</span>
+            </div>
+            <div id="event-log">
+              <span class="empty-state">Events will appear here as they are detected by analytics.js.</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2>Code Snippet</h2>
+          <div class="preview-box">
+            <div class="preview-box-header">Copy &amp; paste into your site</div>
+            <div id="snippet-area">
+              <pre id="snippet-code"></pre>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const form = document.getElementById("config-form");
+      const previewArea = document.getElementById("preview-area");
+      const eventLog = document.getElementById("event-log");
+      const snippetCode = document.getElementById("snippet-code");
+      const elementCountBadge = document.getElementById("element-count");
+      const eventCountBadge = document.getElementById("event-count");
+      const purchaseFields = document.getElementById("purchase-fields");
+      const productFields = document.getElementById("product-fields");
+      const bidField = document.getElementById("bid-field");
+
+      let elementCount = 0;
+      let eventCount = 0;
+      let analyticsLoaded = false;
+      let fetchPatched = false;
+
+      function extractEventIdFromPayload(body) {
+        if (!body || typeof body !== "object") return null;
+        const click = body.clicks?.[0];
+        const impression = body.impressions?.[0];
+        const purchase = body.purchases?.[0];
+        return click?.id ?? impression?.id ?? purchase?.id ?? null;
+      }
+
+      function updateApiStatus(eventId, ok, status, detailText) {
+        if (!eventId) return;
+        const safeId = typeof CSS !== "undefined" && CSS.escape ? CSS.escape(eventId) : eventId.replace(/"/g, '\\"');
+        const entry = eventLog.querySelector(`[data-event-id="${safeId}"]`);
+        if (!entry) return;
+        const badge = entry.querySelector(".api-status");
+        if (!badge) return;
+        badge.classList.remove("pending");
+        if (ok) {
+          badge.classList.add("ok");
+          badge.textContent = `Success (${status})`;
+        } else {
+          badge.classList.add("fail");
+          if (detailText) {
+            badge.textContent = `Error: ${detailText}`;
+          } else if (status) {
+            badge.textContent = `Error: HTTP ${status}`;
+          } else {
+            badge.textContent = "Error: request failed";
+          }
+        }
+      }
+
+      function patchFetchForEventApiStatus() {
+        if (fetchPatched) return;
+        fetchPatched = true;
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = async function patchedFetch(input, init) {
+          let eventId = null;
+          let isEventsPost = false;
+          try {
+            const url =
+              typeof input === "string"
+                ? input
+                : input instanceof URL
+                  ? input.href
+                  : input.url;
+            if (url.includes("/v2/events") && init?.method === "POST" && typeof init.body === "string") {
+              isEventsPost = true;
+              const body = JSON.parse(init.body);
+              eventId = extractEventIdFromPayload(body);
+            }
+          } catch {
+            /* ignore parse errors */
+          }
+
+          try {
+            const response = await originalFetch(input, init);
+            if (isEventsPost && eventId) {
+              updateApiStatus(eventId, response.ok, response.status);
+            }
+            return response;
+          } catch (err) {
+            if (isEventsPost && eventId) {
+              const msg = err instanceof Error ? err.message : "Network error";
+              updateApiStatus(eventId, false, 0, msg);
+            }
+            throw err;
+          }
+        };
+      }
+
+      // Toggle fields based on element type
+      document.querySelectorAll('[name="element-type"]').forEach((r) => {
+        r.addEventListener("change", () => {
+          const type = document.querySelector('[name="element-type"]:checked').value;
+          const isPurchase = type === "purchase";
+          const isPromoted = type === "promoted";
+          purchaseFields.className = isPurchase ? "purchase-fields visible" : "purchase-fields";
+          productFields.style.display = isPurchase ? "none" : "";
+          bidField.style.display = isPromoted ? "" : "none";
+        });
+      });
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      // Listen for topsort CustomEvents
+      function attachEventListener(el) {
+        el.addEventListener("topsort", (e) => {
+          eventCount++;
+          eventCountBadge.textContent = eventCount;
+
+          const detail = e.detail;
+          const time = new Date(detail.t).toLocaleTimeString();
+          const typeLower = detail.type.toLowerCase();
+
+          // Clear empty state
+          if (eventLog.querySelector(".empty-state")) {
+            eventLog.innerHTML = "";
+          }
+
+          const entry = document.createElement("div");
+          entry.className = "event-entry";
+          entry.dataset.eventId = detail.id;
+
+          let detailText = "";
+          if (detail.type === "Purchase") {
+            detailText = `items: ${JSON.stringify(detail.items)}`;
+          } else {
+            const parts = [];
+            if (detail.product) parts.push(`product: ${detail.product}`);
+            if (detail.bid) parts.push(`bid: ${detail.bid.substring(0, 20)}...`);
+            if (detail.additionalProduct) parts.push(`additional: ${detail.additionalProduct}`);
+            detailText = parts.join(", ") || "no product/bid";
+          }
+
+          entry.innerHTML = `
+            <span class="event-time">${escapeHtml(time)}</span>
+            <span class="event-type ${typeLower}">${escapeHtml(detail.type)}</span>
+            <span class="event-detail">${escapeHtml(detailText)}</span>
+            <span class="api-status pending">Sending…</span>
+          `;
+
+          eventLog.prepend(entry);
+          eventLog.scrollTop = 0;
+        });
+      }
+
+      function ensureAnalyticsLoaded() {
+        if (analyticsLoaded) return;
+
+        const token = document.getElementById("token").value.trim();
+        if (!token) {
+          alert("API Token is required to initialize analytics.js.");
+          return false;
+        }
+
+        const url = document.getElementById("api-url").value.trim();
+
+        window.TS = { token };
+        if (url) window.TS.url = url;
+
+        patchFetchForEventApiStatus();
+
+        // Load the analytics.js script
+        const script = document.createElement("script");
+        script.src = "../dist/ts.iife.js";
+        script.onerror = () => {
+          // Fallback: try the UMD build
+          const fallback = document.createElement("script");
+          fallback.src = "../dist/ts.js";
+          fallback.onerror = () => alert("Could not load analytics.js. Run `pnpm run build` first.");
+          document.head.appendChild(fallback);
+        };
+        document.head.appendChild(script);
+        analyticsLoaded = true;
+        return true;
+      }
+
+      function addProductElement(type, productId, resolvedBid, useClickable) {
+        const card = document.createElement("div");
+        card.className = "ts-product-card";
+
+        const isPromoted = type === "promoted";
+
+        if (isPromoted && resolvedBid) {
+          card.setAttribute("data-ts-resolved-bid", resolvedBid);
+        }
+        if (productId) {
+          card.setAttribute("data-ts-product", productId);
+        }
+
+        const tagClass = isPromoted ? "promoted" : "organic";
+        const tagLabel = isPromoted ? "Promoted" : "Organic";
+        const displayName = productId || resolvedBid || "Unknown";
+
+        let clickableHtml = "";
+        if (useClickable) {
+          clickableHtml = `<div data-ts-clickable style="margin-top:8px;padding:6px 12px;background:#f0f0f0;border-radius:4px;font-size:12px;text-align:center;cursor:pointer;">Click me (data-ts-clickable)</div>`;
+        }
+
+        card.innerHTML = `
+          <span class="tag ${tagClass}">${tagLabel}</span>
+          <div class="product-name">${escapeHtml(displayName)}</div>
+          <div class="product-id">${isPromoted && resolvedBid ? `bid: ${escapeHtml(resolvedBid.substring(0, 24))}...` : `id: ${escapeHtml(productId)}`}</div>
+          ${clickableHtml}
+        `;
+
+        attachEventListener(card);
+        return card;
+      }
+
+      function addPurchaseElement(itemsJson) {
+        const card = document.createElement("div");
+        card.className = "ts-purchase-card";
+        card.setAttribute("data-ts-action", "purchase");
+        card.setAttribute("data-ts-items", itemsJson);
+
+        let itemsSummary;
+        try {
+          const items = JSON.parse(itemsJson);
+          itemsSummary = items.map((i) => `${i.product} x${i.quantity} @ ${i.price}`).join(", ");
+        } catch {
+          itemsSummary = "Invalid JSON";
+        }
+
+        card.innerHTML = `
+          <span class="tag">Purchase</span>
+          <div class="items-list">${escapeHtml(itemsSummary)}</div>
+        `;
+
+        attachEventListener(card);
+        return card;
+      }
+
+      function updateSnippet() {
+        const elements = previewArea.querySelectorAll("[data-ts-product], [data-ts-action], [data-ts-resolved-bid]");
+        if (elements.length === 0) {
+          snippetCode.textContent = "<!-- Add elements to see the code snippet -->";
+          return;
+        }
+
+        const SO = "<" + "script";
+        const SC = "</" + "script" + ">";
+
+        const lines = [
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
+          `${SO}>`,
+          `  window.TS = { token: "YOUR_TOKEN" };`,
+          `${SC}`,
+          ``,
+        ];
+
+        for (const el of elements) {
+          if (el.dataset.tsAction === "purchase") {
+            const items = el.dataset.tsItems || "[]";
+            lines.push(`<div data-ts-action="purchase" data-ts-items='${items}'>`);
+            lines.push(`  Thank you for your purchase!`);
+            lines.push(`</div>`);
+          } else {
+            const attrs = [];
+            if (el.dataset.tsProduct) attrs.push(`data-ts-product="${escapeHtml(el.dataset.tsProduct)}"`);
+            if (el.dataset.tsResolvedBid) attrs.push(`data-ts-resolved-bid="${escapeHtml(el.dataset.tsResolvedBid)}"`);
+            const hasClickable = el.querySelector("[data-ts-clickable]");
+            lines.push(`<div ${attrs.join(" ")}>`);
+            if (hasClickable) {
+              lines.push(`  <a href="/product" data-ts-clickable>View Product</a>`);
+            } else {
+              lines.push(`  <a href="/product">View Product</a>`);
+            }
+            lines.push(`</div>`);
+          }
+          lines.push(``);
+        }
+
+        snippetCode.textContent = lines.join("\n");
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (ensureAnalyticsLoaded() === false) return;
+
+        const type = document.querySelector('[name="element-type"]:checked').value;
+
+        // Clear empty state on first add
+        if (previewArea.querySelector(".empty-state")) {
+          previewArea.innerHTML = "";
+        }
+
+        let card;
+        if (type === "purchase") {
+          const itemsJson = document.getElementById("purchase-items").value.trim();
+          if (!itemsJson) {
+            alert("Items JSON is required for purchase events.");
+            return;
+          }
+          card = addPurchaseElement(itemsJson);
+        } else {
+          const productId = document.getElementById("product-id").value.trim();
+          const resolvedBid = document.getElementById("resolved-bid").value.trim();
+          const useClickable = document.getElementById("clickable").checked;
+
+          if (!productId && !resolvedBid) {
+            alert("Product ID or Resolved Bid ID is required.");
+            return;
+          }
+          card = addProductElement(type, productId, resolvedBid, useClickable);
+        }
+
+        previewArea.appendChild(card);
+        elementCount++;
+        elementCountBadge.textContent = elementCount;
+        updateSnippet();
+      });
+
+      document.getElementById("clear-btn").addEventListener("click", () => {
+        previewArea.innerHTML = '<span class="empty-state">Add elements using the form on the left.</span>';
+        eventLog.innerHTML = '<span class="empty-state">Events will appear here as they are detected by analytics.js.</span>';
+        elementCount = 0;
+        eventCount = 0;
+        elementCountBadge.textContent = "0";
+        eventCountBadge.textContent = "0";
+        snippetCode.textContent = "<!-- Add elements to see the code snippet -->";
+
+        // Reset analytics.js so it can re-observe new elements
+        if (window.TS) window.TS.loaded = false;
+        analyticsLoaded = false;
+      });
+
+      // Initialize snippet
+      updateSnippet();
+    </script>
+  </body>
+</html>

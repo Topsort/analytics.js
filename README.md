@@ -160,7 +160,18 @@ To track impressions for an organic product, add the `data-ts-product` attribute
 
 Clicks on organic products are tracked automatically when the product element has the `data-ts-product` attribute. If you need to specify which parts of the product element are clickable, you can use the `data-ts-clickable` attribute, just as you would for promoted products.
 
-## 10. Troubleshooting
+## 10. Local Development
+
+To run the playground locally:
+
+```bash
+npm install
+npm run playground
+```
+
+This builds the library and serves the project. Open the URL shown in the terminal and navigate to `/demo/`.
+
+## 11. Troubleshooting
 
 ### "Uncaught Error: Mismatched anonymous define() module"
 

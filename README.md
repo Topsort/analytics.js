@@ -7,6 +7,7 @@
 
 This tutorial will guide you through the process of integrating Topsort's Analytics.js library into your website to track events like impressions, clicks, and purchases.
 
+
 ## 1. Introduction
 
 Topsort's `analytics.js` is a JavaScript library that allows you to automatically report user interaction events with products on your website to Topsort's Analytics service. This helps you understand how users are interacting with sponsored and organic listings.
@@ -160,7 +161,18 @@ To track impressions for an organic product, add the `data-ts-product` attribute
 
 Clicks on organic products are tracked automatically when the product element has the `data-ts-product` attribute. If you need to specify which parts of the product element are clickable, you can use the `data-ts-clickable` attribute, just as you would for promoted products.
 
-## 10. Troubleshooting
+## 10. Local Development
+
+To run the playground locally:
+
+```bash
+pnpm install
+pnpm run playground
+```
+
+This builds the library and serves the project. Open the URL shown in the terminal and navigate to `/demo/`.
+
+## 11. Troubleshooting
 
 ### "Uncaught Error: Mismatched anonymous define() module"
 

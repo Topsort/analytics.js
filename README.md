@@ -165,8 +165,8 @@ Clicks on organic products are tracked automatically when the product element ha
 To run the playground locally:
 
 ```bash
-pnpm install
-pnpm run playground
+npm install
+npm run playground
 ```
 
 This builds the library and serves the project. Open the URL shown in the terminal and navigate to `/demo/`.

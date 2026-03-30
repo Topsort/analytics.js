@@ -49,6 +49,7 @@
     "lint:ci": "biome ci",
     "test": "vitest run --coverage",
     "test:e2e": "vite build && vite build -c vite.config.browser-test.js && tsc && node dist/mocks/api-server.js",
+    "playground": "pnpm run build && npx serve .",
     "types:check": "tsc --noemit"
   },
   "author": "Topsort",

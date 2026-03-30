@@ -146,3 +146,93 @@ test("marks entries done when processor throws", async () => {
   expect(failingProcessor).toHaveBeenCalledWith([entry]);
   expectEmptyQueue(q);
 });
+
+test("pause keeps entries in queue with retry count unchanged and no scheduling", async () => {
+  let paused = true;
+  const pausingProcessor = vi.fn(async (chunk: Entry[]): Promise<ProcessorResult> => {
+    if (paused) {
+      return { done: new Set(), retry: new Set(), pause: true };
+    }
+    processedEvents.push(...chunk);
+    return { done: new Set(chunk.map((e) => e.id)), retry: new Set() };
+  });
+
+  const q = new Queue(pausingProcessor);
+  const entry = { id: "entry-paused", t: now() };
+  q.append(entry, { highPriority: true });
+  await flushPromises();
+
+  // Entry is still in queue with retry count = 0 (not incremented)
+  const stored = (
+    q as unknown as { _store: { get: () => Array<{ e: Entry; r: number }> } }
+  )._store.get();
+  expect(stored).toHaveLength(1);
+  expect(stored[0]?.r).toBe(0);
+  // Released from _processing so drain() can pick it up
+  expect((q as unknown as { _processing: Set<string> })._processing.size).toBe(0);
+  // No timer scheduled
+  expect((q as unknown as { _scheduled: boolean })._scheduled).toBe(false);
+});
+
+test("drain() triggers immediate processing after pause", async () => {
+  let paused = true;
+  const pausingProcessor = vi.fn(async (chunk: Entry[]): Promise<ProcessorResult> => {
+    if (paused) {
+      return { done: new Set(), retry: new Set(), pause: true };
+    }
+    processedEvents.push(...chunk);
+    return { done: new Set(chunk.map((e) => e.id)), retry: new Set() };
+  });
+
+  const q = new Queue(pausingProcessor);
+  const entry = { id: "entry-drain", t: now() };
+  q.append(entry, { highPriority: true });
+  await flushPromises();
+
+  expect(processedEvents).toEqual([]);
+
+  paused = false;
+  q.drain();
+  await flushPromises();
+
+  expect(processedEvents).toEqual([entry]);
+  expectEmptyQueue(q);
+});
+
+test("pause does not consume retry budget", async () => {
+  let paused = true;
+  let attempts = 0;
+  const pausingProcessor = vi.fn(async (chunk: Entry[]): Promise<ProcessorResult> => {
+    attempts++;
+    if (paused) {
+      return { done: new Set(), retry: new Set(), pause: true };
+    }
+    processedEvents.push(...chunk);
+    return { done: new Set(chunk.map((e) => e.id)), retry: new Set() };
+  });
+
+  const q = new Queue(pausingProcessor);
+  const entry = { id: "entry-budget", t: now() };
+  q.append(entry, { highPriority: true });
+  await flushPromises();
+
+  // Pause multiple times via drain
+  q.drain();
+  await flushPromises();
+  q.drain();
+  await flushPromises();
+
+  // Retry count stays 0 — budget is intact
+  const stored = (
+    q as unknown as { _store: { get: () => Array<{ e: Entry; r: number }> } }
+  )._store.get();
+  expect(stored[0]?.r).toBe(0);
+
+  // Now resume — entry should be processed successfully on first real attempt
+  paused = false;
+  q.drain();
+  await flushPromises();
+
+  expect(processedEvents).toEqual([entry]);
+  expectEmptyQueue(q);
+});

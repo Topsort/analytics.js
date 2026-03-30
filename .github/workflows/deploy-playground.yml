@@ -1,0 +1,61 @@
+name: Deploy Playground to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "demo/**"
+      - "src/**"
+      - "package.json"
+      - "vite.config.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        name: Install PNPM
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: pnpm
+          node-version-file: package.json
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Prepare pages artifact
+        run: |
+          mkdir -p _site/dist
+          cp demo/index.html _site/index.html
+          cp dist/ts.iife.js _site/dist/ts.iife.js
+          cp dist/ts.js _site/dist/ts.js
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

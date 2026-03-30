@@ -717,11 +717,11 @@
 
         // Load the analytics.js script
         const script = document.createElement("script");
-        script.src = "../dist/ts.iife.js";
+        script.src = "./dist/ts.iife.js";
         script.onerror = () => {
           // Fallback: try the UMD build
           const fallback = document.createElement("script");
-          fallback.src = "../dist/ts.js";
+          fallback.src = "./dist/ts.js";
           fallback.onerror = () => alert("Could not load analytics.js. Run `pnpm run build` first.");
           document.head.appendChild(fallback);
         };

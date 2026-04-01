@@ -10,6 +10,12 @@ const WAIT_TIME_MS = 250;
 export interface ProcessorResult {
   done: Set<string>;
   retry: Set<string>;
+  /**
+   * When true, the processor is not ready to handle events yet (e.g. no API token).
+   * All events in the current chunk are released back to the queue without incrementing
+   * their retry counter, and no further processing is scheduled until {@link Queue.drain} is called.
+   */
+  pause?: boolean;
 }
 
 export interface Entry {
@@ -80,6 +86,11 @@ export class Queue<T extends Entry> {
     this._processor = processor;
   }
 
+  /** Force-trigger processing immediately, bypassing the scheduled delay. */
+  drain(): void {
+    this._processNow(this._store.get());
+  }
+
   append(entry: Entry, opts?: { highPriority: boolean }): void {
     let entries = this._store.get();
     entries.push({
@@ -121,6 +132,14 @@ export class Queue<T extends Entry> {
       for (const entry of chunk) {
         r.done.add(entry.id);
       }
+    }
+    if (r.pause) {
+      // Processor is not ready — release chunk back to queue without retrying or scheduling.
+      // Processing resumes only when drain() is called externally (e.g. once a token is set).
+      for (const entry of chunk) {
+        this._processing.delete(entry.id);
+      }
+      return;
     }
     // Remove entries from processing
     const newProcessing: string[] = [];

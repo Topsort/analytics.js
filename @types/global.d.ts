@@ -3,7 +3,7 @@ export {};
 declare global {
   interface Window {
     TS: {
-      token: string;
+      token?: string;
       url?: string;
       cookieName?: string;
       getUserId?: () => string;

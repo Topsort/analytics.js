@@ -130,6 +130,9 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
 
 // TODO: batch requests. Unfortunately at the moment only the impressions are batchable.
 async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
+  if (!window.TS.token) {
+    return { done: new Set(), retry: new Set(), pause: true };
+  }
   const r: ProcessorResult = {
     done: new Set(),
     retry: new Set(),
@@ -337,15 +340,28 @@ function mutationCallback(mutationsList: MutationRecord[]) {
   }
 }
 
+function watchForToken(): void {
+  const ts = window.TS;
+  let token: string | undefined;
+  Object.defineProperty(ts, "token", {
+    get(): string | undefined {
+      return token;
+    },
+    set(value: string) {
+      token = value;
+      if (value) {
+        queue.drain();
+      }
+    },
+    configurable: true,
+  });
+}
+
 function start() {
   if (window.TS?.loaded) {
     return;
   }
   window.TS.loaded = true;
-  if (!window.TS?.token) {
-    console.error("Missing TS token");
-    return;
-  }
   checkChildren(document);
   const MutationObserverImpl =
     window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
@@ -356,6 +372,9 @@ function start() {
     subtree: true,
     attributeFilter: ["data-ts-product", "data-ts-action", "data-ts-items", "data-ts-resolved-bid"],
   });
+  if (!window.TS.token) {
+    watchForToken();
+  }
 }
 
 if (/complete|interactive|loaded/.test(document.readyState)) {

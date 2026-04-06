@@ -32,10 +32,12 @@ describe("detector bootstrap", () => {
     expect(observe).not.toHaveBeenCalled();
   });
 
-  test("logs when token is missing", async () => {
+  test("starts observing and installs token watcher when token is missing", async () => {
     const observe = vi.fn();
     class MutationObserverMock {
       observe = observe;
+      disconnect = vi.fn();
+      takeRecords = vi.fn(() => []);
     }
     Object.defineProperty(window, "MutationObserver", {
       configurable: true,
@@ -43,12 +45,16 @@ describe("detector bootstrap", () => {
       value: MutationObserverMock,
     });
 
-    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     window.TS = {} as typeof window.TS;
 
     await import("./detector");
-    expect(error).toHaveBeenCalledWith("Missing TS token");
-    expect(observe).not.toHaveBeenCalled();
+
+    // DOM observation starts even without a token
+    expect(observe).toHaveBeenCalled();
+    // A getter/setter is installed on window.TS.token so setting it later drains the queue
+    const descriptor = Object.getOwnPropertyDescriptor(window.TS, "token");
+    expect(typeof descriptor?.get).toBe("function");
+    expect(typeof descriptor?.set).toBe("function");
   });
 
   test("registers DOMContentLoaded listener when document is loading", async () => {

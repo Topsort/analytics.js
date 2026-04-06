@@ -148,7 +148,7 @@ test("marks entries done when processor throws", async () => {
 });
 
 test("pause keeps entries in queue with retry count unchanged and no scheduling", async () => {
-  let paused = true;
+  const paused = true;
   const pausingProcessor = vi.fn(async (chunk: Entry[]): Promise<ProcessorResult> => {
     if (paused) {
       return { done: new Set(), retry: new Set(), pause: true };
@@ -201,9 +201,7 @@ test("drain() triggers immediate processing after pause", async () => {
 
 test("pause does not consume retry budget", async () => {
   let paused = true;
-  let attempts = 0;
   const pausingProcessor = vi.fn(async (chunk: Entry[]): Promise<ProcessorResult> => {
-    attempts++;
     if (paused) {
       return { done: new Set(), retry: new Set(), pause: true };
     }
@@ -216,23 +214,29 @@ test("pause does not consume retry budget", async () => {
   q.append(entry, { highPriority: true });
   await flushPromises();
 
-  // Pause multiple times via drain
+  expect(pausingProcessor).toHaveBeenCalledTimes(1);
+
+  // Pause multiple times via drain — each call re-enters the processor without incrementing r
   q.drain();
   await flushPromises();
   q.drain();
   await flushPromises();
+
+  expect(pausingProcessor).toHaveBeenCalledTimes(3);
 
   // Retry count stays 0 — budget is intact
   const stored = (
     q as unknown as { _store: { get: () => Array<{ e: Entry; r: number }> } }
   )._store.get();
+  expect(stored).toHaveLength(1);
   expect(stored[0]?.r).toBe(0);
 
-  // Now resume — entry should be processed successfully on first real attempt
+  // Now resume — entry should be processed successfully on first non-pause attempt
   paused = false;
   q.drain();
   await flushPromises();
 
+  expect(pausingProcessor).toHaveBeenCalledTimes(4);
   expect(processedEvents).toEqual([entry]);
   expectEmptyQueue(q);
 });

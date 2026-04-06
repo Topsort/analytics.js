@@ -373,6 +373,9 @@ function start() {
     attributeFilter: ["data-ts-product", "data-ts-action", "data-ts-items", "data-ts-resolved-bid"],
   });
   if (!window.TS.token) {
+    console.log(
+      "No token, watching for token to be set. Events will be queued until token is set.",
+    );
     watchForToken();
   }
 }

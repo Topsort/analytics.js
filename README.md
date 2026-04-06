@@ -43,7 +43,13 @@ window.TS = {
 import "@topsort/analytics.js";
 ```
 
-The library will automatically start listening for DOM changes and user interactions once it's imported. In case token is not given upon initiation, then window.TS.token has to be set for the queue of events to be flushed.
+The library will automatically start listening for DOM changes and user interactions once it's imported. If the token is not provided at initialization, events are queued until the token is set. To flush the queue, assign the token via **property assignment**:
+
+```js
+window.TS.token = "<YOUR-TOPSORT.JS-TOKEN>";
+```
+
+> **Important:** Do **not** replace the entire `window.TS` object after the library has loaded (e.g. `window.TS = { token: "..." }`). The library installs an internal setter on the existing `window.TS` reference to detect when the token becomes available. Replacing the object destroys that setter and the queued events will never be sent.
 
 ### Option 2: With a Local Script File
 

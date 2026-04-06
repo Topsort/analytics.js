@@ -341,6 +341,10 @@ function mutationCallback(mutationsList: MutationRecord[]) {
 }
 
 function watchForToken(): void {
+  // NOTE: This setter is installed on the *current* window.TS object reference.
+  // If the user replaces the entire object (window.TS = { token: "abc" }) the setter
+  // is lost and the queue will never be drained. Users must assign to the property
+  // directly: window.TS.token = "abc".
   const ts = window.TS;
   let token: string | undefined;
   Object.defineProperty(ts, "token", {
@@ -355,6 +359,11 @@ function watchForToken(): void {
     },
     configurable: true,
   });
+  console.warn(
+    "[Topsort] No API token found. Events will be queued until window.TS.token is set. " +
+      "Use property assignment (window.TS.token = '<token>'), not object replacement " +
+      "(window.TS = { token: '<token>' }), or the queue will not be drained.",
+  );
 }
 
 function start() {
@@ -373,9 +382,6 @@ function start() {
     attributeFilter: ["data-ts-product", "data-ts-action", "data-ts-items", "data-ts-resolved-bid"],
   });
   if (!window.TS.token) {
-    console.log(
-      "No token, watching for token to be set. Events will be queued until token is set.",
-    );
     watchForToken();
   }
 }

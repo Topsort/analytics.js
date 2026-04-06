@@ -43,7 +43,7 @@ window.TS = {
 import "@topsort/analytics.js";
 ```
 
-The library will automatically start listening for DOM changes and user interactions once it's imported.
+The library will automatically start listening for DOM changes and user interactions once it's imported. In case token is not given upon initiation, then window.TS.token has to be set for the queue of events to be flushed.
 
 ### Option 2: With a Local Script File
 

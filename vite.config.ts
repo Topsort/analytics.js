@@ -35,6 +35,12 @@ export default defineConfig(({ mode }) => {
     ],
     test: {
       environment: "jsdom",
+      environmentOptions: {
+        jsdom: {
+          url: "http://localhost",
+        },
+      },
+      execArgv: ["--no-experimental-webstorage"],
     },
   };
 });

@@ -8,6 +8,22 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+## Version 2.8.0 (2026-04-15)
+
+### Added
+
+- Lazy token loading: events queue when no API token is set and drain automatically when `window.TS.token` is assigned later ([#360](https://github.com/Topsort/analytics.js/pull/360))
+- Interactive playground for testing the analytics library ([#359](https://github.com/Topsort/analytics.js/pull/359))
+
+### Fixed
+
+- Add `lang` attribute to HTML elements for a11y compliance ([#355](https://github.com/Topsort/analytics.js/pull/355))
+- Configure jsdom for Node.js 25+ localStorage compatibility
+
+### Tests
+
+- New queue tests for memory store fallback and error handling ([#358](https://github.com/Topsort/analytics.js/pull/358))
+
 ## Version 2.7.0 (2025-01-23)
 
 ### Added

@@ -51,7 +51,6 @@ jobs:
           mkdir -p _site/dist
           cp demo/index.html _site/index.html
           cp dist/ts.iife.js _site/dist/ts.iife.js
-          cp dist/ts.js _site/dist/ts.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

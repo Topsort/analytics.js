@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
     <title>analytics.js Playground</title>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -736,15 +737,12 @@
 
         patchFetchForEventApiStatus();
 
-        // Load the analytics.js script
+        // Load the analytics.js IIFE bundle (self-contained, includes @topsort/sdk).
+        // The UMD build (ts.js) cannot work standalone because it treats the SDK as external.
         const script = document.createElement("script");
         script.src = "./dist/ts.iife.js";
         script.onerror = () => {
-          // Fallback: try the UMD build
-          const fallback = document.createElement("script");
-          fallback.src = "./dist/ts.js";
-          fallback.onerror = () => alert("Could not load analytics.js. Run `pnpm run build` first.");
-          document.head.appendChild(fallback);
+          alert("Could not load analytics.js. Make sure the IIFE bundle exists at dist/ts.iife.js (run `pnpm run build`).");
         };
         document.head.appendChild(script);
         analyticsLoaded = true;

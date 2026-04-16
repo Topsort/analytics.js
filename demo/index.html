@@ -682,7 +682,9 @@
 
       // Listen for topsort CustomEvents
       function attachEventListener(el) {
+        console.debug("[Playground] Attaching topsort listener to", el.dataset.tsProduct || el.dataset.tsAction || "(unknown)");
         el.addEventListener("topsort", (e) => {
+          console.debug("[Playground] topsort event received:", e.detail.type, e.detail.product || e.detail.items);
           eventCount++;
           eventCountBadge.textContent = eventCount;
 
@@ -724,10 +726,15 @@
       }
 
       function ensureAnalyticsLoaded() {
-        if (analyticsLoaded) return true;
+        if (analyticsLoaded) {
+          console.debug("[Playground] analytics.js already loaded, skipping init");
+          return true;
+        }
 
         const token = document.getElementById("token").value.trim();
         const url = document.getElementById("api-url").value.trim();
+
+        console.debug("[Playground] Initializing analytics.js", { token: token ? "(set)" : "(empty)", url: url || "(default)" });
 
         window.TS = {};
         if (token) window.TS.token = token;
@@ -741,7 +748,12 @@
         // The UMD build (ts.js) cannot work standalone because it treats the SDK as external.
         const script = document.createElement("script");
         script.src = "./dist/ts.iife.js";
-        script.onerror = () => {
+        script.onload = () => {
+          console.debug("[Playground] ts.iife.js loaded successfully");
+          console.debug("[Playground] window.TS.loaded =", window.TS.loaded, "| token =", window.TS.token ? "(set)" : "(empty)");
+        };
+        script.onerror = (err) => {
+          console.error("[Playground] Failed to load ts.iife.js", err);
           alert("Could not load analytics.js. Make sure the IIFE bundle exists at dist/ts.iife.js (run `pnpm run build`).");
         };
         document.head.appendChild(script);
@@ -853,6 +865,7 @@
         if (ensureAnalyticsLoaded() === false) return;
 
         const type = document.querySelector('[name="element-type"]:checked').value;
+        console.debug("[Playground] Adding element:", type);
 
         // Clear empty state on first add
         if (previewArea.querySelector(".empty-state")) {
@@ -879,13 +892,16 @@
           card = addProductElement(type, productId, resolvedBid, useClickable);
         }
 
+        console.debug("[Playground] Appending card to DOM:", { attributes: Array.from(card.attributes).map(a => `${a.name}="${a.value}"`).join(" ") });
         previewArea.appendChild(card);
+        console.debug("[Playground] Card in DOM. Preview children:", previewArea.querySelectorAll("[data-ts-product],[data-ts-action],[data-ts-resolved-bid]").length);
         elementCount++;
         elementCountBadge.textContent = elementCount;
         updateSnippet();
       });
 
       document.getElementById("clear-btn").addEventListener("click", () => {
+        console.debug("[Playground] Clear clicked, resetting state");
         previewArea.innerHTML = '<span class="empty-state">Add elements using the form on the left.</span>';
         eventLog.innerHTML = '<span class="empty-state">Events will appear here as they are detected by analytics.js.</span>';
         elementCount = 0;
@@ -904,9 +920,11 @@
       // When the token field is updated after the library is already loaded,
       // set it directly on window.TS so the watchForToken setter fires and drains the queue.
       document.getElementById("token").addEventListener("change", () => {
+        console.debug("[Playground] Token change event fired, analyticsLoaded =", analyticsLoaded);
         if (!analyticsLoaded) return;
         const token = document.getElementById("token").value.trim();
         if (token) {
+          console.debug("[Playground] Setting window.TS.token via change handler");
           window.TS.token = token;
           noTokenNotice.classList.remove("visible");
         }

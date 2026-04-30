@@ -27,8 +27,6 @@ jobs:
           cache: pnpm
           node-version-file: package.json
           registry-url: https://registry.npmjs.org
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
       - name: Install dependencies
         run: pnpm install
@@ -50,4 +48,6 @@ jobs:
   
       - name: Publish to npm
         id: publish
-        run: npm publish --no-git-checks
+        run: npm publish --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

@@ -1,7 +1,0 @@
-# This overrides the global yaml with project-related settings only
-
-comment: false
-
-coverage:
-  status:
-    patch: off

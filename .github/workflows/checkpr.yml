@@ -64,12 +64,6 @@ jobs:
       - name: Tests
         run: pnpm run test
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v6.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: coverage/clover.xml
-
   format:
     name: Biome Lint
     runs-on: ubuntu-22.04

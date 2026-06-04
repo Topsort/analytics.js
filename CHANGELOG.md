@@ -8,6 +8,10 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+### Dependencies
+
+chore(ci): remove codecov integration in #379
+
 ## Version 2.8.0 (2026-04-15)
 
 ### Added

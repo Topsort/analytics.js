@@ -107,7 +107,16 @@ describe("detector bootstrap", () => {
         callback = cb;
       }
       observe = observe.mockImplementation((node: Element) => {
-        callback?.([{ isIntersecting: true, target: node } as IntersectionObserverEntry], this);
+        callback?.(
+          [
+            {
+              isIntersecting: true,
+              intersectionRatio: 1,
+              target: node,
+            } as IntersectionObserverEntry,
+          ],
+          this,
+        );
       });
       unobserve = unobserve;
       disconnect = vi.fn();
@@ -144,7 +153,12 @@ describe("detector bootstrap", () => {
       events.push((event as CustomEvent).detail);
     });
 
+    // The impression is only reported after the element stays visible for the
+    // full dwell, so drive the timer forward before asserting.
+    vi.useFakeTimers();
     await import("./detector");
+    vi.advanceTimersByTime(1000);
+    vi.useRealTimers();
 
     expect(observe).toHaveBeenCalledWith(expect.any(HTMLElement));
     expect(unobserve).toHaveBeenCalledWith(expect.any(HTMLElement));

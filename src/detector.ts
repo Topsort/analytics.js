@@ -7,6 +7,9 @@ import { BidStore } from "./store";
 const MAX_EVENTS_SIZE = 2500;
 // See https://support.google.com/admanager/answer/4524488?hl=en
 const INTERSECTION_THRESHOLD = 0.5;
+// Minimum continuous time (ms) an element must stay >= INTERSECTION_THRESHOLD
+// visible before it counts as a viewable impression (IAB/MRC standard).
+const IMPRESSION_DWELL_MS = 1000;
 let seenEvents = new Set<string>();
 const bidStore = new BidStore("ts-b");
 
@@ -253,17 +256,38 @@ function interactionHandler(event: Event): void {
   }
 }
 
+// Pending dwell timers, keyed by the observed node. A timer is started when a
+// node becomes >= INTERSECTION_THRESHOLD visible and cleared if it leaves the
+// threshold before IMPRESSION_DWELL_MS elapses.
+const dwellTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+
 const intersectionObserver = window.IntersectionObserver
   ? new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const node = entry.target;
-            if (node instanceof HTMLElement) {
+          const node = entry.target;
+          if (!(node instanceof HTMLElement)) {
+            continue;
+          }
+          // `isIntersecting` alone can be true below the configured threshold in
+          // some engines, so gate on the ratio as well.
+          if (entry.isIntersecting && entry.intersectionRatio >= INTERSECTION_THRESHOLD) {
+            if (dwellTimers.has(node)) {
+              continue; // Already counting down; don't restart the timer.
+            }
+            const timer = setTimeout(() => {
+              dwellTimers.delete(node);
               logEvent(getEvent("Impression", node), node);
-              if (intersectionObserver) {
-                intersectionObserver.unobserve(node);
-              }
+              intersectionObserver?.unobserve(node);
+            }, IMPRESSION_DWELL_MS);
+            dwellTimers.set(node, timer);
+          } else {
+            // Left the threshold before the dwell completed — cancel the pending
+            // impression so a quick scroll-past doesn't count.
+            const timer = dwellTimers.get(node);
+            if (timer !== undefined) {
+              clearTimeout(timer);
+              dwellTimers.delete(node);
             }
           }
         }

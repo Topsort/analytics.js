@@ -53,7 +53,7 @@ jobs:
           cp dist/ts.iife.js _site/dist/ts.iife.js
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
 
       - name: Deploy to GitHub Pages
         id: deployment

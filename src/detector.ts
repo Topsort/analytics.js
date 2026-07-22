@@ -260,6 +260,10 @@ function interactionHandler(event: Event): void {
 // node becomes >= INTERSECTION_THRESHOLD visible and cleared if it leaves the
 // threshold before IMPRESSION_DWELL_MS elapses.
 const dwellTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+// Nodes that are currently >= INTERSECTION_THRESHOLD visible and awaiting their
+// dwell. Tracked in an enumerable Set alongside `dwellTimers` so the Page
+// Visibility handler below can cancel and later restart every pending timer.
+const pendingDwellNodes = new Set<HTMLElement>();
 
 const intersectionObserver = window.IntersectionObserver
   ? new IntersectionObserver(
@@ -272,23 +276,13 @@ const intersectionObserver = window.IntersectionObserver
           // `isIntersecting` alone can be true below the configured threshold in
           // some engines, so gate on the ratio as well.
           if (entry.isIntersecting && entry.intersectionRatio >= INTERSECTION_THRESHOLD) {
-            if (dwellTimers.has(node)) {
-              continue; // Already counting down; don't restart the timer.
-            }
-            const timer = setTimeout(() => {
-              dwellTimers.delete(node);
-              logEvent(getEvent("Impression", node), node);
-              intersectionObserver?.unobserve(node);
-            }, IMPRESSION_DWELL_MS);
-            dwellTimers.set(node, timer);
+            pendingDwellNodes.add(node);
+            startDwell(node);
           } else {
             // Left the threshold before the dwell completed — cancel the pending
             // impression so a quick scroll-past doesn't count.
-            const timer = dwellTimers.get(node);
-            if (timer !== undefined) {
-              clearTimeout(timer);
-              dwellTimers.delete(node);
-            }
+            pendingDwellNodes.delete(node);
+            clearDwellTimer(node);
           }
         }
       },
@@ -297,6 +291,50 @@ const intersectionObserver = window.IntersectionObserver
       },
     )
   : undefined;
+
+// Start a node's dwell timer, unless it is already counting (repeated
+// intersecting callbacks must not restart it) or the tab is hidden (the ad is
+// not viewable then — see the `visibilitychange` handler below).
+function startDwell(node: HTMLElement): void {
+  if (document.hidden || dwellTimers.has(node)) {
+    return;
+  }
+  const timer = setTimeout(() => {
+    dwellTimers.delete(node);
+    pendingDwellNodes.delete(node);
+    logEvent(getEvent("Impression", node), node);
+    intersectionObserver?.unobserve(node);
+  }, IMPRESSION_DWELL_MS);
+  dwellTimers.set(node, timer);
+}
+
+// Cancel a node's pending dwell timer, if any, without forgetting that it is
+// still viewable — used both when a node drops below the threshold and when the
+// tab is hidden.
+function clearDwellTimer(node: HTMLElement): void {
+  const timer = dwellTimers.get(node);
+  if (timer !== undefined) {
+    clearTimeout(timer);
+    dwellTimers.delete(node);
+  }
+}
+
+// IAB/MRC viewability requires the ad to be in view for the continuous second,
+// and a backgrounded/hidden tab is not viewable. So pause the dwell while the
+// tab is hidden: cancel the running timers (a hide breaks continuity) and, once
+// the tab is shown again, restart a fresh full second for every node that is
+// still visible. Partial time accrued before hiding does not carry over.
+if (intersectionObserver) {
+  document.addEventListener("visibilitychange", () => {
+    for (const node of pendingDwellNodes) {
+      if (document.hidden) {
+        clearDwellTimer(node);
+      } else {
+        startDwell(node);
+      }
+    }
+  });
+}
 
 const PRODUCT_SELECTOR =
   "[data-ts-product],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";

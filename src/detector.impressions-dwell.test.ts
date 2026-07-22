@@ -47,6 +47,18 @@ function entry(
   return { target, intersectionRatio: ratio, isIntersecting } as IntersectionObserverEntry;
 }
 
+// Drive the Page Visibility API: jsdom computes `document.hidden` from
+// `visibilityState`, so override both and dispatch the `visibilitychange` event
+// the detector listens for.
+function setHidden(hidden: boolean): void {
+  Object.defineProperty(document, "hidden", { configurable: true, get: () => hidden });
+  Object.defineProperty(document, "visibilityState", {
+    configurable: true,
+    get: () => (hidden ? "hidden" : "visible"),
+  });
+  document.dispatchEvent(new Event("visibilitychange"));
+}
+
 const events: any[] = [];
 let io: MockIntersectionObserver;
 
@@ -67,6 +79,7 @@ beforeAll(async () => {
     <div data-ts-product="product-id-dwell-scroll"></div>
     <div data-ts-product="product-id-dwell-below"></div>
     <div data-ts-product="product-id-dwell-reentry"></div>
+    <div data-ts-product="product-id-dwell-hidden"></div>
   `;
 
   vi.useFakeTimers();
@@ -140,4 +153,33 @@ test("re-entering while counting does not restart or duplicate the timer", () =>
 
   vi.advanceTimersByTime(1);
   expect(impressionsFor("product-id-dwell-reentry")).toHaveLength(1);
+});
+
+test("pauses the dwell while the tab is hidden and requires a fresh second on return", () => {
+  const node = document.querySelector<HTMLElement>('[data-ts-product="product-id-dwell-hidden"]');
+  if (!node) throw new Error("missing node");
+
+  io.emit([entry(node, 0.6)]);
+  vi.advanceTimersByTime(500); // halfway through the dwell
+
+  // The tab is backgrounded: the ad is no longer viewable, so the pending dwell
+  // is cancelled. Even after well over a second hidden, nothing is reported.
+  setHidden(true);
+  vi.advanceTimersByTime(DWELL_MS * 2);
+  expect(impressionsFor("product-id-dwell-hidden")).toHaveLength(0);
+
+  // The tab returns to the foreground. Because a hide breaks the continuous
+  // second, the ad must earn a *fresh* full second — the earlier 500ms does not
+  // carry over.
+  setHidden(false);
+  vi.advanceTimersByTime(DWELL_MS - 1);
+  expect(impressionsFor("product-id-dwell-hidden")).toHaveLength(0);
+
+  vi.advanceTimersByTime(1);
+  expect(impressionsFor("product-id-dwell-hidden")).toHaveLength(1);
+  // Counted once, then unobserved.
+  expect(io.observed.has(node)).toBe(false);
+
+  // Restore visibility so later suites are unaffected.
+  setHidden(false);
 });

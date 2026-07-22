@@ -55,7 +55,7 @@
   "author": "Topsort",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "2.4.7",
+    "@biomejs/biome": "2.5.3",
     "@types/express": "5.0.6",
     "@types/node": "25.9.1",
     "@types/react": "19.2.14",
@@ -65,13 +65,13 @@
     "jsdom": "27.2.0",
     "msw": "2.12.4",
     "react": "19.2.4",
-    "react-dom": "19.2.0",
+    "react-dom": "19.2.4",
     "react-router-dom": "7.9.5",
     "tslib": "2.8.1",
     "typescript": "5.9.3",
-    "vite": "7.3.2",
+    "vite": "7.3.5",
     "vite-plugin-dts": "5.0.0",
-    "vitest": "4.0.8"
+    "vitest": "4.1.0"
   },
   "dependencies": {
     "@topsort/sdk": "0.3.8"

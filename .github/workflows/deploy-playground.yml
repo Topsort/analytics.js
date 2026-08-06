@@ -52,9 +52,17 @@ jobs:
           cp demo/index.html _site/index.html
           cp dist/ts.iife.js _site/dist/ts.iife.js
 
+      # Artifact names are scoped to the workflow run, not the attempt. Re-running
+      # failed jobs uploads a second "github-pages" artifact and deploy-pages@v5
+      # aborts. Suffix with run_attempt so each attempt is unique.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
+        with:
+          name: github-pages-${{ github.run_attempt }}
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}

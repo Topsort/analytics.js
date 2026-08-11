@@ -13,6 +13,12 @@ export function isRendered(el: HTMLElement): boolean {
       contentVisibilityAuto: true,
       opacityProperty: true,
       visibilityProperty: true,
+      // Chrome/Edge 105-120 and Firefox 106-121 shipped checkVisibility before
+      // these options were renamed, and silently ignore the two names above —
+      // which would report a visibility:hidden element as visible. Unknown
+      // dictionary members are ignored, so passing both spellings is safe.
+      checkOpacity: true,
+      checkVisibilityCSS: true,
     });
   }
   let node: HTMLElement | null = el;

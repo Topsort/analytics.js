@@ -57,7 +57,28 @@ test("prefers Element.checkVisibility when the engine provides it", () => {
   // Nothing in the computed styles says hidden, so a `false` here can only have
   // come from checkVisibility.
   expect(isRendered(el)).toBe(false);
-  expect(calls).toEqual([
-    { contentVisibilityAuto: true, opacityProperty: true, visibilityProperty: true },
-  ]);
+  expect(calls).toHaveLength(1);
+});
+
+test("passes the legacy option spellings alongside the standard ones", () => {
+  // Chrome/Edge 105-120 and Firefox 106-121 have checkVisibility but only accept
+  // checkOpacity/checkVisibilityCSS. Sending the standard names alone there falls
+  // back to the defaults (all false), so only display:none would be caught and a
+  // visibility:hidden banner would be reported as visible.
+  const el = render(`<div id="target"></div>`);
+  let received: Record<string, boolean> | undefined;
+  (el as unknown as { checkVisibility: (opts?: unknown) => boolean }).checkVisibility = (opts) => {
+    received = opts as Record<string, boolean>;
+    return true;
+  };
+
+  isRendered(el);
+
+  expect(received).toEqual({
+    contentVisibilityAuto: true,
+    opacityProperty: true,
+    visibilityProperty: true,
+    checkOpacity: true,
+    checkVisibilityCSS: true,
+  });
 });

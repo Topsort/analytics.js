@@ -87,6 +87,21 @@ The library automatically detects and reports impressions of products when they 
 </div>
 ```
 
+### When an impression counts
+
+An impression is reported only when both of these hold:
+
+1. At least 50% of the element is inside the viewport (`IntersectionObserver`).
+2. The element is actually painted — not hidden by `display:none`, `visibility:hidden`, `opacity:0`, or `content-visibility:hidden` on itself or any ancestor.
+
+The second check matters because `IntersectionObserver` is purely geometric: it considers a `visibility:hidden` element visible as long as its box overlaps the viewport. Without the paint check, markup preloaded into a hidden container — a mega-menu revealed on hover, a closed drawer, an inactive tab — would record an impression on page load for something the shopper never saw.
+
+You can therefore write the bid into the DOM as soon as the auction resolves, whatever the container's visibility. Once the element is revealed, the impression fires then. Reveals that change no geometry (a menu toggled via `visibility` or `opacity`) produce no `IntersectionObserver` callback, so they are detected by a short poll that runs only while the element is near the viewport.
+
+> On engines without `IntersectionObserver`, viewport gating is unavailable and only the paint check applies.
+
+Because the check runs per element at the moment the impression would fire, it also holds for markup that is cloned or moved after render — responsive duplicates, carousel clones, tag-manager rewrites. Each copy is judged on its own visibility.
+
 ## 6. Tracking Clicks
 
 The library can also track when a user clicks on a product. By default, it will consider a click on any part of the product element as a conversion.

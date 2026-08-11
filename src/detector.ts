@@ -3,10 +3,13 @@ import { version } from "../package.json";
 import { type ProcessorResult, Queue } from "./queue";
 import { truncateSet } from "./set";
 import { BidStore } from "./store";
+import { isRendered } from "./visibility";
 
 const MAX_EVENTS_SIZE = 2500;
 // See https://support.google.com/admanager/answer/4524488?hl=en
 const INTERSECTION_THRESHOLD = 0.5;
+// How often to re-check elements that are in the viewport but not yet painted.
+const REVEAL_POLL_INTERVAL_MS = 200;
 let seenEvents = new Set<string>();
 const bidStore = new BidStore("ts-b");
 
@@ -53,6 +56,9 @@ if (typeof window.TS.getUserId !== "function") {
   window.TS.getUserId = getUserId;
 }
 window.TS.resetUserId = resetUserId;
+// Lets @topsort/banners know a bid can go into the DOM as soon as its auction
+// resolves, because visibility is gated here.
+window.TS.gatedImpressions = true;
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {
@@ -253,18 +259,77 @@ function interactionHandler(event: Event): void {
   }
 }
 
+// Elements in the viewport but not yet painted, e.g. a menu hidden with
+// `visibility`/`opacity`. Revealing those changes no geometry, so no observer
+// callback arrives and they have to be polled instead. `display:none` elements
+// have no box, so revealing them does change geometry.
+const awaitingReveal = new Set<HTMLElement>();
+let revealTimer: ReturnType<typeof setInterval> | undefined;
+
+function stopRevealPoll(): void {
+  if (revealTimer !== undefined) {
+    clearInterval(revealTimer);
+    revealTimer = undefined;
+  }
+}
+
+function unwatchReveal(node: HTMLElement): void {
+  awaitingReveal.delete(node);
+  if (awaitingReveal.size === 0) {
+    stopRevealPoll();
+  }
+}
+
+function startRevealPoll(): void {
+  if (revealTimer !== undefined) {
+    return;
+  }
+  revealTimer = setInterval(() => {
+    for (const node of awaitingReveal) {
+      if (!node.isConnected) {
+        awaitingReveal.delete(node);
+        continue;
+      }
+      if (isRendered(node)) {
+        reportImpression(node);
+      }
+    }
+    if (awaitingReveal.size === 0) {
+      stopRevealPoll();
+    }
+  }, REVEAL_POLL_INTERVAL_MS);
+}
+
+function reportImpression(node: HTMLElement): void {
+  unwatchReveal(node);
+  logEvent(getEvent("Impression", node), node);
+  intersectionObserver?.unobserve(node);
+}
+
+/** Reports when `node` is both in view and painted, deferring until it is. */
+function reportWhenVisible(node: HTMLElement): void {
+  if (isRendered(node)) {
+    reportImpression(node);
+    return;
+  }
+  awaitingReveal.add(node);
+  startRevealPoll();
+}
+
 const intersectionObserver = window.IntersectionObserver
   ? new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
+          const node = entry.target;
+          if (!(node instanceof HTMLElement)) {
+            continue;
+          }
           if (entry.isIntersecting) {
-            const node = entry.target;
-            if (node instanceof HTMLElement) {
-              logEvent(getEvent("Impression", node), node);
-              if (intersectionObserver) {
-                intersectionObserver.unobserve(node);
-              }
-            }
+            reportWhenVisible(node);
+          } else {
+            // Off-screen: stop polling. If it is revealed while off-screen,
+            // scrolling it into view re-fires the observer.
+            unwatchReveal(node);
           }
         }
       },
@@ -290,7 +355,9 @@ function processChild(node: HTMLElement) {
     if (intersectionObserver) {
       intersectionObserver.observe(node);
     } else {
-      logEvent(getEvent("Impression", node), node);
+      // No IntersectionObserver: viewport gating is unavailable, but the paint
+      // check still applies.
+      reportWhenVisible(node);
     }
     addClickHandler(node);
   } else {

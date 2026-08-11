@@ -8,6 +8,11 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ## Unreleased
 
+### Added
+
+- Impressions are gated on real visibility: an element must be both in the viewport and actually painted (not `display:none`, `visibility:hidden`, `opacity:0` or `content-visibility:hidden`) before an impression is reported. Reveals that change no geometry, such as a mega-menu toggled via `visibility`, are picked up by a short poll
+- `window.TS.gatedImpressions` signals to other Topsort libraries that visibility gating happens here, so a bid can be written to the DOM as soon as its auction resolves
+
 ### Dependencies
 
 chore(ci): remove codecov integration in #379

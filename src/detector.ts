@@ -392,6 +392,12 @@ if (intersectionObserver) {
     for (const node of pendingDwellNodes) {
       if (document.hidden) {
         clearDwellTimer(node);
+      } else if (!node.isConnected) {
+        // Removed from the DOM while the tab was hidden — a background tab
+        // won't reliably deliver the observer callback that would otherwise
+        // clean this up, so drop it here instead of resuming a dwell for a
+        // node that can no longer be seen.
+        pendingDwellNodes.delete(node);
       } else {
         startDwell(node);
       }

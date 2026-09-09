@@ -183,3 +183,28 @@ test("pauses the dwell while the tab is hidden and requires a fresh second on re
   // Restore visibility so later suites are unaffected.
   setHidden(false);
 });
+
+test("does not resume the dwell for a node removed from the DOM while hidden", () => {
+  const node = document.createElement("div");
+  node.dataset.tsProduct = "product-id-dwell-removed";
+  document.body.appendChild(node);
+
+  // The "topsort" event bubbles, so once `node` is detached it can no longer
+  // reach the window listener even if wrongly re-logged — listen on the node
+  // itself so removal doesn't mask the bug under test.
+  const localEvents: unknown[] = [];
+  node.addEventListener("topsort", (e) => localEvents.push((e as CustomEvent).detail));
+
+  io.emit([entry(node, 0.6)]);
+  vi.advanceTimersByTime(500); // halfway through the dwell
+
+  // e.g. an SPA navigates away while the tab is backgrounded.
+  setHidden(true);
+  node.remove();
+  setHidden(false);
+  vi.advanceTimersByTime(DWELL_MS);
+
+  expect(localEvents).toHaveLength(0);
+
+  setHidden(false);
+});

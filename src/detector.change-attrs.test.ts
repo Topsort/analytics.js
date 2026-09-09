@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 
 test("change attributes", async () => {
   window.TS = {
@@ -11,7 +11,10 @@ test("change attributes", async () => {
   document.body.innerHTML = `
     <div id="product" data-ts-product="product-id-mod-1" data-ts-resolved-bid="1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
   `;
+  vi.useFakeTimers();
   await import("./detector");
+  // Each state must dwell for the full second before it is reported.
+  vi.advanceTimersByTime(1000);
 
   const p = document.getElementById("product");
   if (p) {
@@ -19,6 +22,7 @@ test("change attributes", async () => {
     delete p.dataset.tsResolvedBid;
   }
   await new Promise(process.nextTick);
+  vi.advanceTimersByTime(1000);
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
     {
@@ -44,6 +48,8 @@ test("change attributes", async () => {
     p.dataset.tsResolvedBid = "1247eaae-63a1-4c20-9b52-9efdcdef3095";
   }
   await new Promise(process.nextTick);
+  vi.advanceTimersByTime(1000);
+  vi.useRealTimers();
   expect(events).toMatchObject([
     {
       type: "Impression",

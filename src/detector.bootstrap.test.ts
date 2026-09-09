@@ -123,6 +123,7 @@ describe("detector bootstrap", () => {
       takeRecords = vi.fn(() => []);
       root = null;
       rootMargin = "";
+      scrollMargin = "";
       thresholds = [0.5];
     }
     Object.defineProperty(window, "IntersectionObserver", {

@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 
 test("dynamic content", async () => {
   window.TS = {
@@ -8,6 +8,7 @@ test("dynamic content", async () => {
   window.addEventListener("topsort", (e) => {
     events.push((e as any).detail);
   });
+  vi.useFakeTimers();
   await import("./detector");
 
   const div = document.createElement("div");
@@ -15,6 +16,8 @@ test("dynamic content", async () => {
   div.dataset.tsResolvedBid = "1247eaae-63a1-4c20-9b52-9efdcdef3095";
   document.body.appendChild(div);
   await new Promise(process.nextTick);
+  vi.advanceTimersByTime(1000);
+  vi.useRealTimers();
   expect(events).toMatchObject([
     {
       type: "Impression",

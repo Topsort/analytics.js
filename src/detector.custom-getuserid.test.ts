@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 
 test("support custom getUserId function", async () => {
   window.TS = {
@@ -14,7 +14,10 @@ test("support custom getUserId function", async () => {
   document.body.innerHTML = `
     <div id="product" data-ts-product="product-id-click-1" data-ts-resolved-bid="1247eaae-63a1-4c20-9b52-9efdcdef3095"></div>
   `;
+  vi.useFakeTimers();
   await import("./detector");
+  vi.advanceTimersByTime(1000);
+  vi.useRealTimers();
 
   document.getElementById("product")?.click();
   expect(events).toMatchObject([

@@ -10,6 +10,7 @@ declare global {
       resetUserId?: () => string;
       setUserId?: (id: string) => void;
       loaded?: boolean;
+      gatedImpressions?: boolean;
     };
     testId?: string;
     MozMutationObserver: MutationObserver;

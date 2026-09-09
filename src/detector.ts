@@ -3,6 +3,7 @@ import { version } from "../package.json";
 import { type ProcessorResult, Queue } from "./queue";
 import { truncateSet } from "./set";
 import { BidStore } from "./store";
+import { isRendered } from "./visibility";
 
 const MAX_EVENTS_SIZE = 2500;
 // See https://support.google.com/admanager/answer/4524488?hl=en
@@ -10,6 +11,8 @@ const INTERSECTION_THRESHOLD = 0.5;
 // Minimum continuous time (ms) an element must stay >= INTERSECTION_THRESHOLD
 // visible before it counts as a viewable impression (IAB/MRC standard).
 const IMPRESSION_DWELL_MS = 1000;
+// How often to re-check elements that are in the viewport but not yet painted.
+const REVEAL_POLL_INTERVAL_MS = 200;
 let seenEvents = new Set<string>();
 const bidStore = new BidStore("ts-b");
 
@@ -56,6 +59,9 @@ if (typeof window.TS.getUserId !== "function") {
   window.TS.getUserId = getUserId;
 }
 window.TS.resetUserId = resetUserId;
+// Lets @topsort/banners know a bid can go into the DOM as soon as its auction
+// resolves, because visibility is gated here.
+window.TS.gatedImpressions = true;
 
 // Based on https://stackoverflow.com/a/25490531/1413687
 function getUserIdCookie(): string | undefined {
@@ -256,14 +262,68 @@ function interactionHandler(event: Event): void {
   }
 }
 
-// Pending dwell timers, keyed by the observed node. A timer is started when a
-// node becomes >= INTERSECTION_THRESHOLD visible and cleared if it leaves the
-// threshold before IMPRESSION_DWELL_MS elapses.
+// Elements in the viewport but not yet painted, e.g. a menu hidden with
+// `visibility`/`opacity`. Revealing those changes no geometry, so no observer
+// callback arrives and they have to be polled instead. `display:none` elements
+// have no box, so revealing them does change geometry.
+const awaitingReveal = new Set<HTMLElement>();
+let revealTimer: ReturnType<typeof setInterval> | undefined;
+
+// Pending dwell timers, keyed by the observed node. A timer is started once a
+// node is both >= INTERSECTION_THRESHOLD visible and painted, and cleared if it
+// leaves the threshold before IMPRESSION_DWELL_MS elapses.
 const dwellTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
-// Nodes that are currently >= INTERSECTION_THRESHOLD visible and awaiting their
-// dwell. Tracked in an enumerable Set alongside `dwellTimers` so the Page
-// Visibility handler below can cancel and later restart every pending timer.
+// Nodes that are currently dwelling. Tracked in an enumerable Set alongside
+// `dwellTimers` so the Page Visibility handler below can cancel and later
+// restart every pending timer.
 const pendingDwellNodes = new Set<HTMLElement>();
+
+function stopRevealPoll(): void {
+  if (revealTimer !== undefined) {
+    clearInterval(revealTimer);
+    revealTimer = undefined;
+  }
+}
+
+function unwatchReveal(node: HTMLElement): void {
+  awaitingReveal.delete(node);
+  if (awaitingReveal.size === 0) {
+    stopRevealPoll();
+  }
+}
+
+function startRevealPoll(): void {
+  if (revealTimer !== undefined) {
+    return;
+  }
+  revealTimer = setInterval(() => {
+    for (const node of awaitingReveal) {
+      if (!node.isConnected) {
+        awaitingReveal.delete(node);
+        continue;
+      }
+      if (isRendered(node)) {
+        unwatchReveal(node);
+        pendingDwellNodes.add(node);
+        startDwell(node);
+      }
+    }
+    if (awaitingReveal.size === 0) {
+      stopRevealPoll();
+    }
+  }, REVEAL_POLL_INTERVAL_MS);
+}
+
+/** Starts the viewable-impression dwell once `node` is both in view and painted, deferring until painted. */
+function reportWhenVisible(node: HTMLElement): void {
+  if (isRendered(node)) {
+    pendingDwellNodes.add(node);
+    startDwell(node);
+    return;
+  }
+  awaitingReveal.add(node);
+  startRevealPoll();
+}
 
 const intersectionObserver = window.IntersectionObserver
   ? new IntersectionObserver(
@@ -276,11 +336,14 @@ const intersectionObserver = window.IntersectionObserver
           // `isIntersecting` alone can be true below the configured threshold in
           // some engines, so gate on the ratio as well.
           if (entry.isIntersecting && entry.intersectionRatio >= INTERSECTION_THRESHOLD) {
-            pendingDwellNodes.add(node);
-            startDwell(node);
+            reportWhenVisible(node);
           } else {
-            // Left the threshold before the dwell completed — cancel the pending
-            // impression so a quick scroll-past doesn't count.
+            // Left the threshold before the dwell completed, or went
+            // off-screen before ever painting — cancel the pending impression
+            // (a quick scroll-past shouldn't count) and stop polling for paint.
+            // If it's revealed/scrolled back into view later, the observer
+            // re-fires.
+            unwatchReveal(node);
             pendingDwellNodes.delete(node);
             clearDwellTimer(node);
           }
@@ -352,7 +415,9 @@ function processChild(node: HTMLElement) {
     if (intersectionObserver) {
       intersectionObserver.observe(node);
     } else {
-      logEvent(getEvent("Impression", node), node);
+      // No IntersectionObserver: viewport gating is unavailable, but the paint
+      // check still applies.
+      reportWhenVisible(node);
     }
     addClickHandler(node);
   } else {

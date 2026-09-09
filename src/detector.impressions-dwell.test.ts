@@ -80,6 +80,7 @@ beforeAll(async () => {
     <div data-ts-product="product-id-dwell-below"></div>
     <div data-ts-product="product-id-dwell-reentry"></div>
     <div data-ts-product="product-id-dwell-hidden"></div>
+    <div data-ts-product="product-id-dwell-scrolled-away"></div>
   `;
 
   vi.useFakeTimers();
@@ -168,10 +169,16 @@ test("pauses the dwell while the tab is hidden and requires a fresh second on re
   vi.advanceTimersByTime(DWELL_MS * 2);
   expect(impressionsFor("product-id-dwell-hidden")).toHaveLength(0);
 
-  // The tab returns to the foreground. Because a hide breaks the continuous
-  // second, the ad must earn a *fresh* full second — the earlier 500ms does not
-  // carry over.
+  // The tab returns to the foreground. Nothing has re-confirmed the node is
+  // still visible yet (IntersectionObserver callbacks were paused while
+  // hidden), so the detector re-observes it, and the browser reports it's
+  // still in view.
   setHidden(false);
+  expect(io.observed.has(node)).toBe(true);
+  io.emit([entry(node, 0.6)]);
+
+  // Because a hide breaks the continuous second, the ad must earn a *fresh*
+  // full second — the earlier 500ms does not carry over.
   vi.advanceTimersByTime(DWELL_MS - 1);
   expect(impressionsFor("product-id-dwell-hidden")).toHaveLength(0);
 
@@ -205,6 +212,37 @@ test("does not resume the dwell for a node removed from the DOM while hidden", (
   vi.advanceTimersByTime(DWELL_MS);
 
   expect(localEvents).toHaveLength(0);
+
+  setHidden(false);
+});
+
+test("does not resume the dwell for a node until its current visibility is reconfirmed", () => {
+  const node = document.querySelector<HTMLElement>(
+    '[data-ts-product="product-id-dwell-scrolled-away"]',
+  );
+  if (!node) throw new Error("missing node");
+
+  io.emit([entry(node, 0.6)]);
+  vi.advanceTimersByTime(500); // halfway through the dwell
+
+  // The page reflows while the tab is backgrounded (e.g. content above `node`
+  // collapses), scrolling it out of view. IntersectionObserver callbacks are
+  // paused for hidden documents, so nothing reports this until the detector
+  // re-observes on return — and until it does, the dwell must not resume just
+  // because the tab became visible again.
+  setHidden(true);
+  setHidden(false);
+  vi.advanceTimersByTime(DWELL_MS);
+  expect(impressionsFor("product-id-dwell-scrolled-away")).toHaveLength(0);
+
+  // The re-observe's callback finally arrives, confirming it's back in view —
+  // only now does a fresh dwell start.
+  io.emit([entry(node, 0.6)]);
+  vi.advanceTimersByTime(DWELL_MS - 1);
+  expect(impressionsFor("product-id-dwell-scrolled-away")).toHaveLength(0);
+
+  vi.advanceTimersByTime(1);
+  expect(impressionsFor("product-id-dwell-scrolled-away")).toHaveLength(1);
 
   setHidden(false);
 });

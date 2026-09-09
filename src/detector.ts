@@ -384,9 +384,8 @@ function clearDwellTimer(node: HTMLElement): void {
 
 // IAB/MRC viewability requires the ad to be in view for the continuous second,
 // and a backgrounded/hidden tab is not viewable. So pause the dwell while the
-// tab is hidden: cancel the running timers (a hide breaks continuity) and, once
-// the tab is shown again, restart a fresh full second for every node that is
-// still visible. Partial time accrued before hiding does not carry over.
+// tab is hidden: cancel the running timers (a hide breaks continuity). Partial
+// time accrued before hiding does not carry over.
 if (intersectionObserver) {
   document.addEventListener("visibilitychange", () => {
     for (const node of pendingDwellNodes) {
@@ -399,7 +398,16 @@ if (intersectionObserver) {
         // node that can no longer be seen.
         pendingDwellNodes.delete(node);
       } else {
-        startDwell(node);
+        // Do NOT just restart the timer here: `IntersectionObserver`
+        // callbacks are paused while the document is hidden, so nothing has
+        // confirmed the node is still >= threshold visible — the page may
+        // have scrolled or reflowed while backgrounded. Re-observing forces
+        // the browser to deliver a fresh callback with its current geometry,
+        // and the ordinary intersecting/not-intersecting branches above
+        // decide from there whether to resume the dwell.
+        pendingDwellNodes.delete(node);
+        intersectionObserver.unobserve(node);
+        intersectionObserver.observe(node);
       }
     }
   });

@@ -7,6 +7,7 @@ import { afterAll, afterEach, beforeAll, expect, test, vi } from "vitest";
 interface FakeEntry {
   target: Element;
   isIntersecting: boolean;
+  intersectionRatio: number;
 }
 
 class FakeIntersectionObserver {
@@ -45,6 +46,7 @@ class FakeIntersectionObserver {
 }
 
 const POLL_MS = 200;
+const DWELL_MS = 1000;
 const events: { type: string; product?: string; bid?: string }[] = [];
 
 /** The single observer the detector creates at module scope. */
@@ -70,6 +72,16 @@ async function inject(html: string): Promise<HTMLElement> {
 
 function open(id: string, style: Partial<CSSStyleDeclaration>): void {
   Object.assign((document.getElementById(id) as HTMLElement).style, style);
+}
+
+/** A fully in-view entry, as a real observer would report at the 0.5 threshold. */
+function intersecting(target: Element): FakeEntry {
+  return { target, isIntersecting: true, intersectionRatio: 1 };
+}
+
+/** An off-screen / below-threshold entry. */
+function notIntersecting(target: Element): FakeEntry {
+  return { target, isIntersecting: false, intersectionRatio: 0 };
 }
 
 beforeAll(async () => {
@@ -108,7 +120,7 @@ test("does not report a banner hidden by display:none", async () => {
   // A real observer reports a display:none element as not intersecting, since it
   // has no box. Claim it is intersecting anyway: the paint check must still
   // refuse, so the gate cannot be defeated by geometry alone.
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
   vi.advanceTimersByTime(1000);
 
   expect(events).toEqual([]);
@@ -120,12 +132,15 @@ test("reports once a display:none menu is opened", async () => {
       <div data-ts-product="p-open" data-ts-resolved-bid="bid-open"></div>
     </div>
   `);
-  observer().trigger([{ target, isIntersecting: false }]);
+  observer().trigger([notIntersecting(target)]);
   expect(events).toEqual([]);
 
   // Opening the menu gives the element a box, which re-fires the observer.
   open("menu", { display: "block" });
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
+  // Painted and in view: the dwell now has to elapse before it counts.
+  expect(events).toEqual([]);
+  vi.advanceTimersByTime(DWELL_MS);
 
   expect(events).toMatchObject([{ type: "Impression", product: "p-open", bid: "bid-open" }]);
   expect(observer().observed.has(target)).toBe(false);
@@ -139,7 +154,7 @@ test("polls for a CSS-only reveal, which fires no observer callback", async () =
   `);
 
   // visibility:hidden keeps the box, so the element is intersecting.
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
   expect(events).toEqual([]);
 
   vi.advanceTimersByTime(3 * POLL_MS);
@@ -149,19 +164,25 @@ test("polls for a CSS-only reveal, which fires no observer callback", async () =
   // will arrive — only the poll can catch this.
   open("menu", { visibility: "visible" });
   vi.advanceTimersByTime(POLL_MS);
+  // The poll just caught the paint, so the dwell has only now started.
+  expect(events).toEqual([]);
+
+  vi.advanceTimersByTime(DWELL_MS);
   expect(events).toMatchObject([{ type: "Impression", product: "p-css", bid: "bid-css" }]);
 
   vi.advanceTimersByTime(5 * POLL_MS);
   expect(events).toHaveLength(1);
 });
 
-test("reports a visible banner immediately", async () => {
+test("reports a visible banner after it dwells", async () => {
   const target = await inject(
     `<div data-ts-product="p-visible" data-ts-resolved-bid="bid-visible"></div>`,
   );
 
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
+  expect(events).toEqual([]);
 
+  vi.advanceTimersByTime(DWELL_MS);
   expect(events).toMatchObject([{ type: "Impression", product: "p-visible", bid: "bid-visible" }]);
 });
 
@@ -173,7 +194,7 @@ test("stops polling for an element removed before it was revealed", async () => 
   `);
   // Drop the queue's own pending timers so the count below is only the poll.
   vi.clearAllTimers();
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
   expect(vi.getTimerCount()).toBe(1);
 
   target.remove();
@@ -191,9 +212,9 @@ test("does not poll while the element is far off-screen", async () => {
   `);
 
   vi.clearAllTimers();
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
   expect(vi.getTimerCount()).toBe(1);
-  observer().trigger([{ target, isIntersecting: false }]);
+  observer().trigger([notIntersecting(target)]);
   expect(vi.getTimerCount()).toBe(0);
 
   // Revealed while off-screen: still nothing, because it is not in view.
@@ -202,7 +223,8 @@ test("does not poll while the element is far off-screen", async () => {
   expect(events).toEqual([]);
 
   // Scrolling it into view re-fires the observer.
-  observer().trigger([{ target, isIntersecting: true }]);
+  observer().trigger([intersecting(target)]);
+  vi.advanceTimersByTime(DWELL_MS);
   expect(events).toMatchObject([
     { type: "Impression", product: "p-offscreen", bid: "bid-offscreen" },
   ]);

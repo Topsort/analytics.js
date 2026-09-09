@@ -8,6 +8,9 @@ import { isRendered } from "./visibility";
 const MAX_EVENTS_SIZE = 2500;
 // See https://support.google.com/admanager/answer/4524488?hl=en
 const INTERSECTION_THRESHOLD = 0.5;
+// Minimum continuous time (ms) an element must stay >= INTERSECTION_THRESHOLD
+// visible before it counts as a viewable impression (IAB/MRC standard).
+const IMPRESSION_DWELL_MS = 1000;
 // How often to re-check elements that are in the viewport but not yet painted.
 const REVEAL_POLL_INTERVAL_MS = 200;
 let seenEvents = new Set<string>();
@@ -266,6 +269,15 @@ function interactionHandler(event: Event): void {
 const awaitingReveal = new Set<HTMLElement>();
 let revealTimer: ReturnType<typeof setInterval> | undefined;
 
+// Pending dwell timers, keyed by the observed node. A timer is started once a
+// node is both >= INTERSECTION_THRESHOLD visible and painted, and cleared if it
+// leaves the threshold before IMPRESSION_DWELL_MS elapses.
+const dwellTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+// Nodes that are currently dwelling. Tracked in an enumerable Set alongside
+// `dwellTimers` so the Page Visibility handler below can cancel and later
+// restart every pending timer.
+const pendingDwellNodes = new Set<HTMLElement>();
+
 function stopRevealPoll(): void {
   if (revealTimer !== undefined) {
     clearInterval(revealTimer);
@@ -291,7 +303,9 @@ function startRevealPoll(): void {
         continue;
       }
       if (isRendered(node)) {
-        reportImpression(node);
+        unwatchReveal(node);
+        pendingDwellNodes.add(node);
+        startDwell(node);
       }
     }
     if (awaitingReveal.size === 0) {
@@ -300,16 +314,11 @@ function startRevealPoll(): void {
   }, REVEAL_POLL_INTERVAL_MS);
 }
 
-function reportImpression(node: HTMLElement): void {
-  unwatchReveal(node);
-  logEvent(getEvent("Impression", node), node);
-  intersectionObserver?.unobserve(node);
-}
-
-/** Reports when `node` is both in view and painted, deferring until it is. */
+/** Starts the viewable-impression dwell once `node` is both in view and painted, deferring until painted. */
 function reportWhenVisible(node: HTMLElement): void {
   if (isRendered(node)) {
-    reportImpression(node);
+    pendingDwellNodes.add(node);
+    startDwell(node);
     return;
   }
   awaitingReveal.add(node);
@@ -324,12 +333,19 @@ const intersectionObserver = window.IntersectionObserver
           if (!(node instanceof HTMLElement)) {
             continue;
           }
-          if (entry.isIntersecting) {
+          // `isIntersecting` alone can be true below the configured threshold in
+          // some engines, so gate on the ratio as well.
+          if (entry.isIntersecting && entry.intersectionRatio >= INTERSECTION_THRESHOLD) {
             reportWhenVisible(node);
           } else {
-            // Off-screen: stop polling. If it is revealed while off-screen,
-            // scrolling it into view re-fires the observer.
+            // Left the threshold before the dwell completed, or went
+            // off-screen before ever painting — cancel the pending impression
+            // (a quick scroll-past shouldn't count) and stop polling for paint.
+            // If it's revealed/scrolled back into view later, the observer
+            // re-fires.
             unwatchReveal(node);
+            pendingDwellNodes.delete(node);
+            clearDwellTimer(node);
           }
         }
       },
@@ -338,6 +354,64 @@ const intersectionObserver = window.IntersectionObserver
       },
     )
   : undefined;
+
+// Start a node's dwell timer, unless it is already counting (repeated
+// intersecting callbacks must not restart it) or the tab is hidden (the ad is
+// not viewable then — see the `visibilitychange` handler below).
+function startDwell(node: HTMLElement): void {
+  if (document.hidden || dwellTimers.has(node)) {
+    return;
+  }
+  const timer = setTimeout(() => {
+    dwellTimers.delete(node);
+    pendingDwellNodes.delete(node);
+    logEvent(getEvent("Impression", node), node);
+    intersectionObserver?.unobserve(node);
+  }, IMPRESSION_DWELL_MS);
+  dwellTimers.set(node, timer);
+}
+
+// Cancel a node's pending dwell timer, if any, without forgetting that it is
+// still viewable — used both when a node drops below the threshold and when the
+// tab is hidden.
+function clearDwellTimer(node: HTMLElement): void {
+  const timer = dwellTimers.get(node);
+  if (timer !== undefined) {
+    clearTimeout(timer);
+    dwellTimers.delete(node);
+  }
+}
+
+// IAB/MRC viewability requires the ad to be in view for the continuous second,
+// and a backgrounded/hidden tab is not viewable. So pause the dwell while the
+// tab is hidden: cancel the running timers (a hide breaks continuity). Partial
+// time accrued before hiding does not carry over.
+if (intersectionObserver) {
+  document.addEventListener("visibilitychange", () => {
+    for (const node of pendingDwellNodes) {
+      if (document.hidden) {
+        clearDwellTimer(node);
+      } else if (!node.isConnected) {
+        // Removed from the DOM while the tab was hidden — a background tab
+        // won't reliably deliver the observer callback that would otherwise
+        // clean this up, so drop it here instead of resuming a dwell for a
+        // node that can no longer be seen.
+        pendingDwellNodes.delete(node);
+      } else {
+        // Do NOT just restart the timer here: `IntersectionObserver`
+        // callbacks are paused while the document is hidden, so nothing has
+        // confirmed the node is still >= threshold visible — the page may
+        // have scrolled or reflowed while backgrounded. Re-observing forces
+        // the browser to deliver a fresh callback with its current geometry,
+        // and the ordinary intersecting/not-intersecting branches above
+        // decide from there whether to resume the dwell.
+        pendingDwellNodes.delete(node);
+        intersectionObserver.unobserve(node);
+        intersectionObserver.observe(node);
+      }
+    }
+  });
+}
 
 const PRODUCT_SELECTOR =
   "[data-ts-product],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";

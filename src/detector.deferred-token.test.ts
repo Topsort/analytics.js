@@ -18,7 +18,10 @@ test("captures impressions before token is set", async () => {
   const events: CustomEvent[] = [];
   window.addEventListener("topsort", (e) => events.push(e as CustomEvent));
 
+  vi.useFakeTimers();
   await import("./detector");
+  vi.advanceTimersByTime(1000);
+  vi.useRealTimers();
 
   expect(events).toHaveLength(1);
   expect(events[0]?.detail.type).toBe("Impression");
@@ -48,12 +51,15 @@ test("observes dynamically added elements before token is set", async () => {
   const events: CustomEvent[] = [];
   window.addEventListener("topsort", (e) => events.push(e as CustomEvent));
 
+  vi.useFakeTimers();
   await import("./detector");
 
   const div = document.createElement("div");
   div.dataset.tsProduct = "prod-dynamic";
   document.body.appendChild(div);
   await new Promise(process.nextTick);
+  vi.advanceTimersByTime(1000);
+  vi.useRealTimers();
 
   expect(events.some((e) => e.detail.product === "prod-dynamic")).toBe(true);
 });

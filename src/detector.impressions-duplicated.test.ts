@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 
 test("check impresssions", async () => {
   window.TS = {
@@ -12,7 +12,10 @@ test("check impresssions", async () => {
     <div data-ts-product="product-id-imp-1"></div>
     <div data-ts-product="product-id-imp-1"></div>
   `;
+  vi.useFakeTimers();
   await import("./detector");
+  vi.advanceTimersByTime(1000);
+  vi.useRealTimers();
 
   const uid = events[0]?.uid;
   expect(events).toMatchObject([

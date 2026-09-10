@@ -6,6 +6,13 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 2.10.0 (2026-09-10)
+
+### Added
+
+- Impressions now require a continuous 1-second dwell (≥50% visible, per the [IAB/MRC viewability standard](https://support.google.com/admanager/answer/4524488)) before being reported, instead of firing the instant the intersection threshold is crossed ([#382](https://github.com/Topsort/analytics.js/pull/382))
+- The dwell timer pauses while the tab is hidden and re-confirms visibility before resuming, so backgrounded tabs don't count toward viewability ([#382](https://github.com/Topsort/analytics.js/pull/382))
+
 ## Version 2.9.0 (2026-08-11)
 
 ### Added

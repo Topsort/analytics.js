@@ -26,7 +26,6 @@ jobs:
         with:
           cache: pnpm
           node-version-file: package.json
-          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: pnpm install
@@ -47,9 +46,7 @@ jobs:
         # Pinned: npm 12 removed the `git-checks` config the next step relies
         # on (`--no-git-checks`), so floating on `@latest` broke publishing.
         run: npm install -g npm@10
-  
+
       - name: Publish to npm
         id: publish
         run: npm publish --no-git-checks --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

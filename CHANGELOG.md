@@ -6,6 +6,17 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 2.11.0 (2026-09-21)
+
+### Added
+
+- Render events: report when a sponsored ad is inserted into the page, regardless of visibility, separate from impressions ([#391](https://github.com/Topsort/analytics.js/pull/391))
+- Bumped `@topsort/sdk` to 0.5.0, which adds render event support
+
+### Dependencies
+
+chore(deps-dev): bump vitest from 4.1.0 to 4.1.11 in #388
+
 ## Version 2.10.0 (2026-09-10)
 
 ### Added

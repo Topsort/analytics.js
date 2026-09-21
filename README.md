@@ -5,7 +5,7 @@
 ![license](https://img.shields.io/github/license/Topsort/analytics.js)
 ![GitHub Repo stars](https://img.shields.io/github/stars/topsort/analytics.js?style=social)
 
-This tutorial will guide you through the process of integrating Topsort's Analytics.js library into your website to track events like impressions, clicks, and purchases.
+This tutorial will guide you through the process of integrating Topsort's Analytics.js library into your website to track events like renders, impressions, clicks, and purchases.
 
 ## Playground
 
@@ -77,7 +77,13 @@ The configuration is done via the global `window.TS` object, which must be set b
 * `token`: **(Required)** This is your unique Topsort.js token. You can generate a token for each of your environments (e.g., development, production) in the Topsort Auction Manager.
 * `url`: **(Optional)** The URL of the Topsort API. Defaults to `https://api.topsort.com`.
 
-## 5. Tracking Impressions
+## 5. Tracking Renders
+
+The library automatically reports a render event as soon as a sponsored ad is inserted into the page, using the same `data-ts-resolved-bid` attribute as impressions. A render is reported regardless of whether the element ever becomes visible — it only requires an explicit `resolvedBidId`, so it does not fire for organic products or for `data-ts-resolved-bid="inherit"`.
+
+Renders let you distinguish ads that were delivered from ads that were actually seen (tracked separately as impressions).
+
+## 6. Tracking Impressions
 
 The library automatically detects and reports impressions of products when they become visible on the screen. To enable this, you need to add the `data-ts-resolved-bid` attribute. The value should be the `resolvedBidId` you received from the Topsort API when you ran an auction.
 
@@ -102,7 +108,7 @@ You can therefore write the bid into the DOM as soon as the auction resolves, wh
 
 Because the check runs per element at the moment the impression would fire, it also holds for markup that is cloned or moved after render — responsive duplicates, carousel clones, tag-manager rewrites. Each copy is judged on its own visibility.
 
-## 6. Tracking Clicks
+## 7. Tracking Clicks
 
 The library can also track when a user clicks on a product. By default, it will consider a click on any part of the product element as a conversion.
 
@@ -118,7 +124,7 @@ If you want more granular control over what constitutes a clickable area, you ca
 </div>
 ```
 
-## 7. Tracking Purchases
+## 8. Tracking Purchases
 
 To track purchases, you need to add the `data-ts-action="purchase"` attribute to an element that the user interacts with to complete a purchase (e.g., a "Buy Now" or "Complete Purchase" button).
 
@@ -140,7 +146,7 @@ You also need to provide the details of the purchased items using the `data-ts-i
 
 **Note:** The attribute value must be a valid JSON string. Ensure that you properly escape any quotes within the string.
 
-## 8. Advanced Usage
+## 9. Advanced Usage
 
 ### Banner Clicks
 
@@ -173,7 +179,7 @@ window.TS = {
 
 This configuration needs to be set *before* the library is loaded or imported.
 
-## 9. Tracking Organic Products
+## 10. Tracking Organic Products
 
 The library can track both impressions and clicks for organic products. This is optional but recommended for a more complete analytics picture of how users interact with all items on your site.
 
@@ -185,7 +191,7 @@ To track impressions for an organic product, add the `data-ts-product` attribute
 
 Clicks on organic products are tracked automatically when the product element has the `data-ts-product` attribute. If you need to specify which parts of the product element are clickable, you can use the `data-ts-clickable` attribute, just as you would for promoted products.
 
-## 10. Local Development for playground
+## 11. Local Development for playground
 
 To run the playground locally:
 
@@ -196,7 +202,7 @@ npm run playground
 
 This builds the library and serves the project. Open the URL shown in the terminal and navigate to `/demo/`.
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 ### "Uncaught Error: Mismatched anonymous define() module"
 

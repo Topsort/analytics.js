@@ -26,6 +26,14 @@ test("change attributes", async () => {
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
     {
+      type: "Render",
+      page: "/",
+      product: "product-id-mod-1",
+      bid: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
+      id: expect.stringMatching(/[\d.a-zA-Z-]+/),
+      uid,
+    },
+    {
       type: "Impression",
       page: "/",
       product: "product-id-mod-1",
@@ -42,7 +50,8 @@ test("change attributes", async () => {
     },
   ]);
 
-  // Reverting changes should not generate another impression
+  // Reverting changes should not generate another render or impression, since
+  // both match the ones already reported for this page/product/bid combination.
   if (p) {
     p.dataset.tsProduct = "product-id-mod-1";
     p.dataset.tsResolvedBid = "1247eaae-63a1-4c20-9b52-9efdcdef3095";
@@ -51,6 +60,14 @@ test("change attributes", async () => {
   vi.advanceTimersByTime(1000);
   vi.useRealTimers();
   expect(events).toMatchObject([
+    {
+      type: "Render",
+      page: "/",
+      product: "product-id-mod-1",
+      bid: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
+      id: expect.stringMatching(/[\d.a-zA-Z-]+/),
+      uid,
+    },
     {
       type: "Impression",
       page: "/",

@@ -116,6 +116,9 @@ test("does not report a banner hidden by display:none", async () => {
     </div>
   `);
   expect(observer().observed.has(target)).toBe(true);
+  // A render fires as soon as the ad is inserted into the page, regardless of
+  // visibility — display:none does not gate it.
+  expect(events).toMatchObject([{ type: "Render", product: "p-display", bid: "bid-display" }]);
 
   // A real observer reports a display:none element as not intersecting, since it
   // has no box. Claim it is intersecting anyway: the paint check must still
@@ -123,7 +126,8 @@ test("does not report a banner hidden by display:none", async () => {
   observer().trigger([intersecting(target)]);
   vi.advanceTimersByTime(1000);
 
-  expect(events).toEqual([]);
+  // No impression: only the render from insertion.
+  expect(events).toMatchObject([{ type: "Render", product: "p-display", bid: "bid-display" }]);
 });
 
 test("reports once a display:none menu is opened", async () => {
@@ -132,17 +136,22 @@ test("reports once a display:none menu is opened", async () => {
       <div data-ts-product="p-open" data-ts-resolved-bid="bid-open"></div>
     </div>
   `);
+  expect(events).toMatchObject([{ type: "Render", product: "p-open", bid: "bid-open" }]);
+
   observer().trigger([notIntersecting(target)]);
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-open", bid: "bid-open" }]);
 
   // Opening the menu gives the element a box, which re-fires the observer.
   open("menu", { display: "block" });
   observer().trigger([intersecting(target)]);
   // Painted and in view: the dwell now has to elapse before it counts.
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-open", bid: "bid-open" }]);
   vi.advanceTimersByTime(DWELL_MS);
 
-  expect(events).toMatchObject([{ type: "Impression", product: "p-open", bid: "bid-open" }]);
+  expect(events).toMatchObject([
+    { type: "Render", product: "p-open", bid: "bid-open" },
+    { type: "Impression", product: "p-open", bid: "bid-open" },
+  ]);
   expect(observer().observed.has(target)).toBe(false);
 });
 
@@ -152,38 +161,46 @@ test("polls for a CSS-only reveal, which fires no observer callback", async () =
       <div data-ts-product="p-css" data-ts-resolved-bid="bid-css"></div>
     </div>
   `);
+  expect(events).toMatchObject([{ type: "Render", product: "p-css", bid: "bid-css" }]);
 
   // visibility:hidden keeps the box, so the element is intersecting.
   observer().trigger([intersecting(target)]);
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-css", bid: "bid-css" }]);
 
   vi.advanceTimersByTime(3 * POLL_MS);
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-css", bid: "bid-css" }]);
 
   // Hovering flips visibility with no geometry change, so no observer callback
   // will arrive — only the poll can catch this.
   open("menu", { visibility: "visible" });
   vi.advanceTimersByTime(POLL_MS);
   // The poll just caught the paint, so the dwell has only now started.
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-css", bid: "bid-css" }]);
 
   vi.advanceTimersByTime(DWELL_MS);
-  expect(events).toMatchObject([{ type: "Impression", product: "p-css", bid: "bid-css" }]);
+  expect(events).toMatchObject([
+    { type: "Render", product: "p-css", bid: "bid-css" },
+    { type: "Impression", product: "p-css", bid: "bid-css" },
+  ]);
 
   vi.advanceTimersByTime(5 * POLL_MS);
-  expect(events).toHaveLength(1);
+  expect(events).toHaveLength(2);
 });
 
 test("reports a visible banner after it dwells", async () => {
   const target = await inject(
     `<div data-ts-product="p-visible" data-ts-resolved-bid="bid-visible"></div>`,
   );
+  expect(events).toMatchObject([{ type: "Render", product: "p-visible", bid: "bid-visible" }]);
 
   observer().trigger([intersecting(target)]);
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-visible", bid: "bid-visible" }]);
 
   vi.advanceTimersByTime(DWELL_MS);
-  expect(events).toMatchObject([{ type: "Impression", product: "p-visible", bid: "bid-visible" }]);
+  expect(events).toMatchObject([
+    { type: "Render", product: "p-visible", bid: "bid-visible" },
+    { type: "Impression", product: "p-visible", bid: "bid-visible" },
+  ]);
 });
 
 test("stops polling for an element removed before it was revealed", async () => {
@@ -192,6 +209,8 @@ test("stops polling for an element removed before it was revealed", async () => 
       <div data-ts-product="p-removed" data-ts-resolved-bid="bid-removed"></div>
     </div>
   `);
+  expect(events).toMatchObject([{ type: "Render", product: "p-removed", bid: "bid-removed" }]);
+
   // Drop the queue's own pending timers so the count below is only the poll.
   vi.clearAllTimers();
   observer().trigger([intersecting(target)]);
@@ -200,7 +219,7 @@ test("stops polling for an element removed before it was revealed", async () => 
   target.remove();
   vi.advanceTimersByTime(POLL_MS);
 
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-removed", bid: "bid-removed" }]);
   expect(vi.getTimerCount()).toBe(0);
 });
 
@@ -210,6 +229,7 @@ test("does not poll while the element is far off-screen", async () => {
       <div data-ts-product="p-offscreen" data-ts-resolved-bid="bid-offscreen"></div>
     </div>
   `);
+  expect(events).toMatchObject([{ type: "Render", product: "p-offscreen", bid: "bid-offscreen" }]);
 
   vi.clearAllTimers();
   observer().trigger([intersecting(target)]);
@@ -217,15 +237,16 @@ test("does not poll while the element is far off-screen", async () => {
   observer().trigger([notIntersecting(target)]);
   expect(vi.getTimerCount()).toBe(0);
 
-  // Revealed while off-screen: still nothing, because it is not in view.
+  // Revealed while off-screen: still nothing new, because it is not in view.
   open("menu", { visibility: "visible" });
   vi.advanceTimersByTime(5 * POLL_MS);
-  expect(events).toEqual([]);
+  expect(events).toMatchObject([{ type: "Render", product: "p-offscreen", bid: "bid-offscreen" }]);
 
   // Scrolling it into view re-fires the observer.
   observer().trigger([intersecting(target)]);
   vi.advanceTimersByTime(DWELL_MS);
   expect(events).toMatchObject([
+    { type: "Render", product: "p-offscreen", bid: "bid-offscreen" },
     { type: "Impression", product: "p-offscreen", bid: "bid-offscreen" },
   ]);
 });

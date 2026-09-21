@@ -134,6 +134,20 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           },
         ],
       };
+    case "Render":
+      // Render events only exist for sponsored ads, so a Render ProductEvent is only ever
+      // created (in processChild) when event.bid is a concrete resolvedBidId.
+      return {
+        renders: [
+          {
+            resolvedBidId: event.bid as string,
+            placement,
+            occurredAt: t,
+            opaqueUserId: event.uid,
+            id: event.id,
+          },
+        ],
+      };
   }
 }
 
@@ -172,7 +186,7 @@ async function processor(data: ProductEvent[]): Promise<ProcessorResult> {
 
 const queue = new Queue(processor);
 
-export type EventType = "Click" | "Purchase" | "Impression";
+export type EventType = "Click" | "Purchase" | "Impression" | "Render";
 
 interface Purchase {
   product: string;
@@ -426,6 +440,14 @@ function addClickHandler(node: HTMLElement) {
 
 function processChild(node: HTMLElement) {
   if (!isPurchase(node)) {
+    // Renders are reported as soon as a sponsored ad is inserted into the page,
+    // regardless of visibility — unlike impressions, which wait for paint + dwell.
+    // "inherit" isn't a real ad on this page (it just carries banner-click
+    // attribution to an organic product), so it never counts as a render.
+    const resolvedBid = node.dataset.tsResolvedBid;
+    if (resolvedBid && resolvedBid !== "inherit") {
+      logEvent(getEvent("Render", node), node);
+    }
     if (intersectionObserver) {
       intersectionObserver.observe(node);
     } else {

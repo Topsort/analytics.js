@@ -19,12 +19,20 @@ test("check clicks", async () => {
   // These do not generate a click event
   document.getElementById("product")?.click();
   document.getElementById("non-clickable")?.click();
-  expect(events).toHaveLength(1);
+  expect(events).toHaveLength(2);
 
   document.getElementById("clickable2")?.click();
 
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
+    {
+      type: "Render",
+      page: "/",
+      product: "product-id-click-1",
+      bid: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
+      id: expect.stringMatching(/[\d.a-zA-Z-]+/),
+      uid,
+    },
     {
       type: "Impression",
       page: "/",

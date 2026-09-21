@@ -1,6 +1,6 @@
 # analytics.js
 
-Topsort's analytics.js is a browser-side JavaScript library that auto-detects DOM events (impressions, clicks, and purchases) via `data-ts-*` HTML attributes, deduplicates and queues them with retry logic, and sends them to the Topsort Analytics API using `@topsort/sdk`. It is published to npm as `@topsort/analytics.js`.
+Topsort's analytics.js is a browser-side JavaScript library that auto-detects DOM events (renders, impressions, clicks, and purchases) via `data-ts-*` HTML attributes, deduplicates and queues them with retry logic, and sends them to the Topsort Analytics API using `@topsort/sdk`. It is published to npm as `@topsort/analytics.js`.
 
 ## Git Workflow
 
@@ -70,7 +70,8 @@ tests/
 
 1. **Initialization** (`detector.ts`): On `DOMContentLoaded` (or immediately if the document is already loaded), the library reads `window.TS` config (token, url, optional getUserId). It scans the existing DOM for elements matching `[data-ts-product]`, `[data-ts-action]`, `[data-ts-items]`, or `[data-ts-resolved-bid]`.
 
-2. **Detection**: Two mechanisms detect events:
+2. **Detection**: Several mechanisms detect events:
+   - **Render**: Fired synchronously, as soon as a node with an explicit `data-ts-resolved-bid` (not `"inherit"`) is processed — i.e. the ad was inserted into the page, regardless of visibility. Unlike impressions, it is not gated by the IntersectionObserver or the paint check.
    - **IntersectionObserver** (threshold 0.5): Fires `Impression` events when a product element becomes 50% visible. Each element is unobserved after its first impression.
    - **MutationObserver**: Watches for new child elements and attribute changes (`data-ts-product`, `data-ts-action`, `data-ts-items`, `data-ts-resolved-bid`) to detect dynamically added or modified products.
    - **Click listeners**: Attached to product elements (or their `[data-ts-clickable]` children for granular control). Clicks on banners store the `resolvedBidId` in session storage (`BidStore`) for cross-page attribution via `data-ts-resolved-bid="inherit"`.

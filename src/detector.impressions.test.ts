@@ -20,6 +20,14 @@ test("check impresssions", async () => {
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
     {
+      type: "Render",
+      page: "/",
+      product: "product-id-imp-2",
+      bid: "1247eaae-63a1-4c20-9b52-9efdcdef3095",
+      id: expect.stringMatching(/[\d.a-zA-Z-]+/),
+      uid,
+    },
+    {
       type: "Impression",
       page: "/",
       product: "product-id-imp-1",

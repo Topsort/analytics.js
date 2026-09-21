@@ -20,6 +20,13 @@ test("check clicks", async () => {
   const uid = events[0]?.uid;
   expect(events).toMatchObject([
     {
+      type: "Render",
+      page: "/",
+      bid: "1212eaae-12a1-4c20-9b52-9efdcdef3095",
+      id: expect.stringMatching(/[\d.a-zA-Z-]+/),
+      uid,
+    },
+    {
       type: "Impression",
       page: "/",
       bid: "1212eaae-12a1-4c20-9b52-9efdcdef3095",

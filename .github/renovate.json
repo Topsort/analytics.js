@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":disableRateLimiting"],
+  "timezone": "Europe/Lisbon",
+  "schedule": ["before 9pm on sunday"],
+  "labels": ["dependencies"],
+  "automerge": false,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 9pm on sunday"],
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "description": "Automerge patch, minor, pin and digest updates once CI passes",
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Keep the runtime SDK dependency reviewed, it ships to customers",
+      "matchDepTypes": ["dependencies"],
+      "automerge": false
+    },
+    {
+      "description": "Keep Node and pnpm within their declared majors",
+      "matchPackageNames": ["node", "pnpm"],
+      "rangeStrategy": "in-range-only"
+    }
+  ]
+}

@@ -7,7 +7,7 @@
   "automerge": false,
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 9pm on sunday"],
+    "schedule": ["before 5am"],
     "automerge": true
   },
   "packageRules": [
@@ -26,5 +26,6 @@
       "matchPackageNames": ["node", "pnpm"],
       "rangeStrategy": "in-range-only"
     }
-  ]
+  ],
+  "platformAutomerge": false
 }

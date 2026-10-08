@@ -451,6 +451,10 @@ function addClickHandler(node: HTMLElement) {
 }
 
 function processChild(node: HTMLElement) {
+  // Attribute mutations re-process the node; it may no longer be a product.
+  if (!node.matches(PRODUCT_SELECTOR)) {
+    return;
+  }
   if (!isPurchase(node)) {
     // Renders are reported as soon as a sponsored ad is inserted into the page,
     // regardless of visibility — unlike impressions, which wait for paint + dwell.

@@ -37,8 +37,8 @@ importers:
         specifier: 5.2.1
         version: 5.2.1
       jsdom:
-        specifier: 27.2.0
-        version: 27.2.0
+        specifier: 27.4.0
+        version: 27.4.0
       msw:
         specifier: 2.12.4
         version: 2.12.4(@types/node@25.9.9)(typescript@7.0.2)
@@ -65,7 +65,7 @@ importers:
         version: 5.0.3(rolldown@1.2.13)(typescript@7.0.2)(vite@8.3.4(@types/node@25.9.9))
       vitest:
         specifier: 4.1.11
-        version: 4.1.11(@types/node@25.9.9)(@vitest/coverage-v8@4.0.8)(jsdom@27.2.0)(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9))
+        version: 4.1.11(@types/node@25.9.9)(@vitest/coverage-v8@4.0.8)(jsdom@27.4.0)(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9))
 
 packages:
 
@@ -190,6 +190,15 @@ packages:
   '@csstools/css-tokenizer@4.0.2':
     resolution: {integrity: sha512-OoKoR0f76dCY666JlcbhmVTs2drYj1GUXZTYTcbUgJjh9Nv41aFfZ21bPQTERm5+L5cBDo466NltB2lplS5GBw==}
     engines: {node: '>=20.19.0'}
+
+  '@exodus/bytes@1.16.0':
+    resolution: {integrity: sha512-IcpW84uEn3N7ETtNZMlxKhfl6Pec8rUNGOTBtWbK1FKhJxIFAptZyVrvVRVBimAJxJCgc3PxepxkdWWG4DVzfA==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    peerDependencies:
+      '@noble/hashes': ^1.8.0 || ^2.0.0
+    peerDependenciesMeta:
+      '@noble/hashes':
+        optional: true
 
   '@inquirer/ansi@1.0.2':
     resolution: {integrity: sha512-S8qNSZiYzFd0wAcyG5AXCvUHC5Sr7xpZ9wZ2py9XR88jUz8wooStVx5M6dRzczbBWjic9NP7+rY0Xi7qqK/aMQ==}
@@ -855,9 +864,9 @@ packages:
   headers-polyfill@4.0.3:
     resolution: {integrity: sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ==}
 
-  html-encoding-sniffer@4.0.0:
-    resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
-    engines: {node: '>=18'}
+  html-encoding-sniffer@6.0.0:
+    resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
 
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
@@ -873,10 +882,6 @@ packages:
   https-proxy-agent@7.0.6:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
-
-  iconv-lite@0.6.3:
-    resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
-    engines: {node: '>=0.10.0'}
 
   iconv-lite@0.7.3:
     resolution: {integrity: sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==}
@@ -921,8 +926,8 @@ packages:
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
-  jsdom@27.2.0:
-    resolution: {integrity: sha512-454TI39PeRDW1LgpyLPyURtB4Zx1tklSr6+OFOipsxGUH1WMTvk6C65JQdrj455+DP2uJ1+veBEHTGFKWVLFoA==}
+  jsdom@27.4.0:
+    resolution: {integrity: sha512-mjzqwWRD9Y1J1KUi7W97Gja1bwOOM5Ug0EZ6UDK3xS7j7mndrkwozHtSblfomlzyB4NepioNt+B2sOSzczVgtQ==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -1505,11 +1510,6 @@ packages:
   webpack-virtual-modules@0.6.2:
     resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
 
-  whatwg-encoding@3.1.1:
-    resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
-    engines: {node: '>=18'}
-    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
-
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
     engines: {node: '>=18'}
@@ -1668,6 +1668,8 @@ snapshots:
       css-tree: 3.2.1
 
   '@csstools/css-tokenizer@4.0.2': {}
+
+  '@exodus/bytes@1.16.0': {}
 
   '@inquirer/ansi@1.0.2': {}
 
@@ -1930,7 +1932,7 @@ snapshots:
       magicast: 0.5.5
       std-env: 3.10.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@25.9.9)(@vitest/coverage-v8@4.0.8)(jsdom@27.2.0)(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9))
+      vitest: 4.1.11(@types/node@25.9.9)(@vitest/coverage-v8@4.0.8)(jsdom@27.4.0)(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9))
     transitivePeerDependencies:
       - supports-color
 
@@ -2246,9 +2248,11 @@ snapshots:
 
   headers-polyfill@4.0.3: {}
 
-  html-encoding-sniffer@4.0.0:
+  html-encoding-sniffer@6.0.0:
     dependencies:
-      whatwg-encoding: 3.1.1
+      '@exodus/bytes': 1.16.0
+    transitivePeerDependencies:
+      - '@noble/hashes'
 
   html-escaper@2.0.2: {}
 
@@ -2273,10 +2277,6 @@ snapshots:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
-
-  iconv-lite@0.6.3:
-    dependencies:
-      safer-buffer: 2.1.2
 
   iconv-lite@0.7.3:
     dependencies:
@@ -2317,14 +2317,15 @@ snapshots:
 
   js-tokens@10.0.0: {}
 
-  jsdom@27.2.0:
+  jsdom@27.4.0:
     dependencies:
       '@acemir/cssom': 0.9.31
       '@asamuzakjp/dom-selector': 6.8.1
+      '@exodus/bytes': 1.16.0
       cssstyle: 5.3.7
       data-urls: 6.0.1
       decimal.js: 10.6.0
-      html-encoding-sniffer: 4.0.0
+      html-encoding-sniffer: 6.0.0
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       is-potential-custom-element-name: 1.0.1
@@ -2334,12 +2335,12 @@ snapshots:
       tough-cookie: 6.0.2
       w3c-xmlserializer: 5.0.0
       webidl-conversions: 8.0.1
-      whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 15.1.0
       ws: 8.22.0
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
+      - '@noble/hashes'
       - bufferutil
       - supports-color
       - utf-8-validate
@@ -2828,7 +2829,7 @@ snapshots:
       '@types/node': 25.9.9
       fsevents: 2.3.3
 
-  vitest@4.1.11(@types/node@25.9.9)(@vitest/coverage-v8@4.0.8)(jsdom@27.2.0)(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9)):
+  vitest@4.1.11(@types/node@25.9.9)(@vitest/coverage-v8@4.0.8)(jsdom@27.4.0)(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9)):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(msw@2.12.4(@types/node@25.9.9)(typescript@7.0.2))(vite@8.3.4(@types/node@25.9.9))
@@ -2853,7 +2854,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 25.9.9
       '@vitest/coverage-v8': 4.0.8(vitest@4.1.11)
-      jsdom: 27.2.0
+      jsdom: 27.4.0
     transitivePeerDependencies:
       - msw
 
@@ -2866,10 +2867,6 @@ snapshots:
   webidl-conversions@8.0.1: {}
 
   webpack-virtual-modules@0.6.2: {}
-
-  whatwg-encoding@3.1.1:
-    dependencies:
-      iconv-lite: 0.6.3
 
   whatwg-mimetype@4.0.0: {}
 

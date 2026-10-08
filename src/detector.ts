@@ -242,8 +242,10 @@ function getPage(): string {
 }
 
 function getEvent(type: EventType, node: HTMLElement): ProductEvent {
-  let product = node.dataset.tsProduct;
-  let bid = node.dataset.tsResolvedBid;
+  // An empty attribute value is treated as absent, e.g. an organic product
+  // whose template renders data-ts-resolved-bid="".
+  let product = node.dataset.tsProduct || undefined;
+  let bid = node.dataset.tsResolvedBid || undefined;
   let additionalProduct: string | undefined;
   if (bid === "inherit" && product && (type === "Click" || type === "Impression")) {
     bid = bidStore.get();
@@ -431,8 +433,14 @@ if (intersectionObserver) {
   });
 }
 
-const PRODUCT_SELECTOR =
-  "[data-ts-product],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";
+// An empty value means the template rendered the attribute without a product,
+// action, items or bid; such elements are not products.
+const PRODUCT_SELECTOR = [
+  '[data-ts-product]:not([data-ts-product=""])',
+  '[data-ts-action]:not([data-ts-action=""])',
+  '[data-ts-items]:not([data-ts-items=""])',
+  '[data-ts-resolved-bid]:not([data-ts-resolved-bid=""])',
+].join(",");
 
 function addClickHandler(node: HTMLElement) {
   const clickables = node.querySelectorAll("[data-ts-clickable]");
@@ -443,6 +451,16 @@ function addClickHandler(node: HTMLElement) {
 }
 
 function processChild(node: HTMLElement) {
+  // Attribute mutations re-process the node; it may no longer be a product.
+  // Drop any tracking already in flight so a pending dwell or reveal poll
+  // cannot report an impression for it.
+  if (!node.matches(PRODUCT_SELECTOR)) {
+    unwatchReveal(node);
+    pendingDwellNodes.delete(node);
+    clearDwellTimer(node);
+    intersectionObserver?.unobserve(node);
+    return;
+  }
   if (!isPurchase(node)) {
     // Renders are reported as soon as a sponsored ad is inserted into the page,
     // regardless of visibility — unlike impressions, which wait for paint + dwell.

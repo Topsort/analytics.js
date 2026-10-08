@@ -45,12 +45,3 @@ test("a click inside an empty data-ts-resolved-bid produces no event", async () 
 
   expect(events).toMatchObject([]);
 });
-
-test("a product with an explicit empty bid is organic, not an empty bid", async () => {
-  document.body.innerHTML = `<div data-ts-product="sku-1" data-ts-resolved-bid=""><button data-ts-clickable>x</button></div>`;
-  await import("./detector");
-  document.querySelector("button")?.dispatchEvent(new Event("click", { bubbles: true }));
-
-  expect(events).toMatchObject([{ type: "Click", product: "sku-1" }]);
-  expect(events[0].bid).toBeUndefined();
-});

@@ -431,8 +431,14 @@ if (intersectionObserver) {
   });
 }
 
-const PRODUCT_SELECTOR =
-  "[data-ts-product],[data-ts-action],[data-ts-items],[data-ts-resolved-bid]";
+// An empty value means the template rendered the attribute without a product,
+// action, items or bid; such elements are not products.
+const PRODUCT_SELECTOR = [
+  '[data-ts-product]:not([data-ts-product=""])',
+  '[data-ts-action]:not([data-ts-action=""])',
+  '[data-ts-items]:not([data-ts-items=""])',
+  '[data-ts-resolved-bid]:not([data-ts-resolved-bid=""])',
+].join(",");
 
 function addClickHandler(node: HTMLElement) {
   const clickables = node.querySelectorAll("[data-ts-clickable]");

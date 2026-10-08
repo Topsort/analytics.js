@@ -64,6 +64,9 @@ jobs:
       - name: Tests
         run: pnpm run test
 
+      - name: Build
+        run: pnpm run build
+
   format:
     name: Biome Lint
     runs-on: ubuntu-22.04

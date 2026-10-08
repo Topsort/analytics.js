@@ -452,7 +452,13 @@ function addClickHandler(node: HTMLElement) {
 
 function processChild(node: HTMLElement) {
   // Attribute mutations re-process the node; it may no longer be a product.
+  // Drop any tracking already in flight so a pending dwell or reveal poll
+  // cannot report an impression for it.
   if (!node.matches(PRODUCT_SELECTOR)) {
+    unwatchReveal(node);
+    pendingDwellNodes.delete(node);
+    clearDwellTimer(node);
+    intersectionObserver?.unobserve(node);
     return;
   }
   if (!isPurchase(node)) {

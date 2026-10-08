@@ -35,10 +35,10 @@ test("opacity:0 on an ancestor is not rendered", () => {
 });
 
 test("an unset opacity is not treated as transparent", () => {
-  // jsdom resolves an unset opacity to "" rather than "1" — that must not be
+  // jsdom < 29 resolves an unset opacity to "" and jsdom >= 29 to "1"; neither must be
   // read as fully transparent.
   const el = render(`<div id="target"></div>`);
-  expect(getComputedStyle(el).opacity).toBe("");
+  expect(["", "1"]).toContain(getComputedStyle(el).opacity);
   expect(isRendered(el)).toBe(true);
 });
 

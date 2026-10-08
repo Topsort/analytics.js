@@ -23,7 +23,11 @@ const bidStore = new BidStore("ts-b");
  * just be a random number;
  */
 function generateId(): string {
-  return window.URL.createObjectURL?.(new Blob()).split("/").pop() || `${Math.random()}`;
+  try {
+    return window.URL.createObjectURL?.(new Blob()).split("/").pop() || `${Math.random()}`;
+  } catch {
+    return `${Math.random()}`;
+  }
 }
 
 let globalUserId: string | undefined;

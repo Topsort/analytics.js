@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -43,7 +43,7 @@ jobs:
         run: pnpm run types:check
 
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -69,7 +69,7 @@ jobs:
 
   format:
     name: Biome Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -82,7 +82,7 @@ jobs:
 
   size:
     name: Bundle Size
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     outputs:
       size-exceeded: ${{ steps.size-check.outputs.exceeded }}
     steps:
@@ -117,7 +117,7 @@ jobs:
   size-report:
     name: Bundle Size Report
     needs: size
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     if: >-
       github.event_name == 'pull_request' &&
       always() &&

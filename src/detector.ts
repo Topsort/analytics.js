@@ -242,8 +242,10 @@ function getPage(): string {
 }
 
 function getEvent(type: EventType, node: HTMLElement): ProductEvent {
-  let product = node.dataset.tsProduct;
-  let bid = node.dataset.tsResolvedBid;
+  // An empty attribute value is treated as absent, e.g. an organic product
+  // whose template renders data-ts-resolved-bid="".
+  let product = node.dataset.tsProduct || undefined;
+  let bid = node.dataset.tsResolvedBid || undefined;
   let additionalProduct: string | undefined;
   if (bid === "inherit" && product && (type === "Click" || type === "Impression")) {
     bid = bidStore.get();

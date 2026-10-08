@@ -79,3 +79,65 @@ jobs:
 
       - name: Run Biome
         run: biome ci --reporter=github
+
+  size:
+    name: Bundle Size
+    runs-on: ubuntu-22.04
+    outputs:
+      size-exceeded: ${{ steps.size-check.outputs.exceeded }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        name: Install PNPM
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          cache: pnpm
+          node-version-file: package.json
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Check bundle size
+        id: size-check
+        run: |
+          if pnpm size; then
+            echo "exceeded=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "exceeded=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+  size-report:
+    name: Bundle Size Report
+    needs: size
+    runs-on: ubuntu-22.04
+    if: >-
+      github.event_name == 'pull_request' &&
+      always() &&
+      needs.size.outputs.size-exceeded == 'true'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        name: Install PNPM
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          cache: pnpm
+          node-version-file: package.json
+
+      - uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          script: pnpm size

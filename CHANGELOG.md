@@ -6,6 +6,14 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 2.12.0 (2026-10-15)
+
+### Fixed
+
+- Elements whose `data-ts-*` attribute is an empty string are ignored instead of reported ([#418](https://github.com/Topsort/analytics.js/pull/418))
+- Fall back to a random event id when `createObjectURL` throws ([#417](https://github.com/Topsort/analytics.js/pull/417))
+- Publishing to npm works again through trusted publishing ([#425](https://github.com/Topsort/analytics.js/pull/425)). 2.10.0 was never published to npm and 2.11.0 on npm contains the 2.9.0 build, so this is the first npm release with render events (2.11.0) and the 1-second viewability dwell (2.10.0)
+
 ## Version 2.11.0 (2026-09-21)
 
 ### Added

@@ -27,6 +27,16 @@ jobs:
           cache: pnpm
           node-version-file: package.json
 
+      # npm publish uses the version in package.json, so a tag cut before the
+      # version bump would try to republish the previous version.
+      - name: Check release tag matches package.json
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
+            echo "::error::Release tag ${GITHUB_REF_NAME} does not match package.json version ${version}. Bump package.json and cut the release on that commit."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: pnpm install
 
@@ -42,11 +52,8 @@ jobs:
       - name: Build dist
         run: pnpm run build
 
-      - name: Update npm
-        # Pinned: npm 12 removed the `git-checks` config the next step relies
-        # on (`--no-git-checks`), so floating on `@latest` broke publishing.
-        run: npm install -g npm@10
-
+      # Uses the npm bundled with Node. Trusted publishing (OIDC) needs
+      # npm 11.5.1 or later; Node 24 ships npm 11.
       - name: Publish to npm
         id: publish
-        run: npm publish --no-git-checks --provenance
+        run: npm publish --provenance

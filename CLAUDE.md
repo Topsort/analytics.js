@@ -128,7 +128,7 @@ Concurrency: grouped by workflow + ref, cancels in-progress runs on new pushes.
 ### On Release Published (`publish-to-npm.yml`)
 
 1. Install + lint + test + type-check + build
-2. Publish to npm via `npm publish --no-git-checks` (uses `NPM_PUBLISH_TOKEN` secret)
+2. Publish to npm via `npm publish --provenance`, authenticated with npm trusted publishing (OIDC, no token). Needs the npm bundled with Node 24 (11.5.1 or later). `npm publish` does not build, so `package.json` must already carry the release version.
 
 ### Dependabot
 

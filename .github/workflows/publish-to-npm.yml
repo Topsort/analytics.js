@@ -42,12 +42,8 @@ jobs:
       - name: Build dist
         run: pnpm run build
 
-      - name: Update npm
-        # Pinned: npm 12 removed the `git-checks` config the next step relies
-        # on (`--no-git-checks`), so floating on `@latest` broke publishing.
-        # Trusted publishing (OIDC) needs npm 11.5.1 or later.
-        run: npm install -g npm@^11.5.1
-
+      # Uses the npm bundled with Node. Trusted publishing (OIDC) needs
+      # npm 11.5.1 or later; Node 24 ships npm 11.
       - name: Publish to npm
         id: publish
-        run: npm publish --no-git-checks --provenance
+        run: npm publish --provenance

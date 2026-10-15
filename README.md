@@ -130,18 +130,17 @@ To track purchases, you need to add the `data-ts-action="purchase"` attribute to
 
 You also need to provide the details of the purchased items using the `data-ts-items` attribute. This attribute should contain a JSON string representing an array of purchased items. Each item object can have the following properties:
 
-* `productId`: The ID of the product.
+* `product`: The ID of the product. Sent to Topsort as `productId`.
 * `quantity`: The quantity of the product purchased.
-* `price`: The price of the product.
-* `vendorId`: (Optional) The ID of the vendor.
+* `price`: The price of one unit of the product. Sent to Topsort as `unitPrice`.
 
 ```html
 <button
   data-ts-action="purchase"
-  data-ts-items='[{"productId": "product-123", "quantity": 1, "price": 2399}, {"productId": "product-456", "quantity": 2, "price": 399, "vendorId": "vendor-abc"}]'
+  data-ts-items='[{"product": "product-123", "quantity": 1, "price": 2399}, {"product": "product-456", "quantity": 2, "price": 399}]'
 >
   Complete Purchase
-</button onclick="return false;">
+</button>
 ```
 
 **Note:** The attribute value must be a valid JSON string. Ensure that you properly escape any quotes within the string.

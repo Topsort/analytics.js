@@ -27,6 +27,16 @@ jobs:
           cache: pnpm
           node-version-file: package.json
 
+      # npm publish uses the version in package.json, so a tag cut before the
+      # version bump would try to republish the previous version.
+      - name: Check release tag matches package.json
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
+            echo "::error::Release tag ${GITHUB_REF_NAME} does not match package.json version ${version}. Bump package.json and cut the release on that commit."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: pnpm install
 

@@ -129,11 +129,19 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           {
             occurredAt: t,
             opaqueUserId: event.uid,
-            items: (event.items || []).map((e) => ({
-              productId: e.product,
-              quantity: e.quantity,
-              unitPrice: e.price,
-            })),
+            items: (event.items || []).map((e) => {
+              // Optional, needed for halo attribution. The API takes a string, so numbers are
+              // converted and any other type, or an empty value, is left out.
+              const raw: unknown = e.vendorId;
+              const vendorId =
+                typeof raw === "string" ? raw.trim() : typeof raw === "number" ? String(raw) : "";
+              return {
+                productId: e.product,
+                quantity: e.quantity,
+                unitPrice: e.price,
+                ...(vendorId ? { vendorId } : {}),
+              };
+            }),
             id: event.id,
           },
         ],

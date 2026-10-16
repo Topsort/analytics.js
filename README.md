@@ -133,11 +133,12 @@ You also need to provide the details of the purchased items using the `data-ts-i
 * `product`: The ID of the product. Sent to Topsort as `productId`.
 * `quantity`: The quantity of the product purchased.
 * `price`: The price of one unit of the product. Sent to Topsort as `unitPrice`.
+* `vendorId` (optional): The ID of the vendor selling the product. Required for halo attribution, and recommended when a product is sold by more than one vendor.
 
 ```html
 <button
   data-ts-action="purchase"
-  data-ts-items='[{"product": "product-123", "quantity": 1, "price": 2399}, {"product": "product-456", "quantity": 2, "price": 399}]'
+  data-ts-items='[{"product": "product-123", "quantity": 1, "price": 2399}, {"product": "product-456", "quantity": 2, "price": 399, "vendorId": "vendor-abc"}]'
 >
   Complete Purchase
 </button>

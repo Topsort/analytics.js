@@ -105,6 +105,47 @@ describe("detector reporting", () => {
     });
   });
 
+  test("forwards vendorId on purchase items only when it is set", async () => {
+    reportEventMock.mockResolvedValue({ retry: false });
+    const items = JSON.stringify([
+      { product: "sku-1", quantity: 1, price: 10, vendorId: "vendor-1" },
+      { product: "sku-2", quantity: 1, price: 20 },
+      { product: "sku-3", quantity: 1, price: 30, vendorId: "" },
+      { product: "sku-4", quantity: 1, price: 40, vendorId: 12345 },
+      { product: "sku-5", quantity: 1, price: 50, vendorId: null },
+      { product: "sku-6", quantity: 1, price: 60, vendorId: " vendor-2 " },
+      { product: "sku-7", quantity: 1, price: 70, vendorId: "   " },
+      { product: "sku-8", quantity: 1, price: 80, vendorId: true },
+      { product: "sku-9", quantity: 1, price: 90, vendorId: {} },
+      { product: "sku-10", quantity: 1, price: 100, vendorId: ["a", "b"] },
+    ]);
+    document.body.innerHTML = `<div data-ts-action="purchase" data-ts-items='${items}'></div>`;
+
+    await import("./detector");
+    await flushQueue();
+
+    const purchasePayload = reportEventMock.mock.calls
+      .map(([payload]) => payload)
+      .find((payload) => "purchases" in (payload as Record<string, unknown>)) as {
+      purchases: Array<{ items: unknown }>;
+    };
+
+    expect(purchasePayload).toBeDefined();
+    // toStrictEqual fails on a `vendorId: undefined` key, so items without a vendor omit it.
+    expect(purchasePayload.purchases[0]?.items).toStrictEqual([
+      { productId: "sku-1", quantity: 1, unitPrice: 10, vendorId: "vendor-1" },
+      { productId: "sku-2", quantity: 1, unitPrice: 20 },
+      { productId: "sku-3", quantity: 1, unitPrice: 30 },
+      { productId: "sku-4", quantity: 1, unitPrice: 40, vendorId: "12345" },
+      { productId: "sku-5", quantity: 1, unitPrice: 50 },
+      { productId: "sku-6", quantity: 1, unitPrice: 60, vendorId: "vendor-2" },
+      { productId: "sku-7", quantity: 1, unitPrice: 70 },
+      { productId: "sku-8", quantity: 1, unitPrice: 80 },
+      { productId: "sku-9", quantity: 1, unitPrice: 90 },
+      { productId: "sku-10", quantity: 1, unitPrice: 100 },
+    ]);
+  });
+
   test("continues processing when reportEvent rejects", async () => {
     reportEventMock.mockRejectedValue(new Error("network-error"));
     document.body.innerHTML = `<div id="product" data-ts-product="p-1"></div>`;

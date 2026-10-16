@@ -113,6 +113,11 @@ describe("detector reporting", () => {
       { product: "sku-3", quantity: 1, price: 30, vendorId: "" },
       { product: "sku-4", quantity: 1, price: 40, vendorId: 12345 },
       { product: "sku-5", quantity: 1, price: 50, vendorId: null },
+      { product: "sku-6", quantity: 1, price: 60, vendorId: " vendor-2 " },
+      { product: "sku-7", quantity: 1, price: 70, vendorId: "   " },
+      { product: "sku-8", quantity: 1, price: 80, vendorId: true },
+      { product: "sku-9", quantity: 1, price: 90, vendorId: {} },
+      { product: "sku-10", quantity: 1, price: 100, vendorId: ["a", "b"] },
     ]);
     document.body.innerHTML = `<div data-ts-action="purchase" data-ts-items='${items}'></div>`;
 
@@ -133,6 +138,11 @@ describe("detector reporting", () => {
       { productId: "sku-3", quantity: 1, unitPrice: 30 },
       { productId: "sku-4", quantity: 1, unitPrice: 40, vendorId: "12345" },
       { productId: "sku-5", quantity: 1, unitPrice: 50 },
+      { productId: "sku-6", quantity: 1, unitPrice: 60, vendorId: "vendor-2" },
+      { productId: "sku-7", quantity: 1, unitPrice: 70 },
+      { productId: "sku-8", quantity: 1, unitPrice: 80 },
+      { productId: "sku-9", quantity: 1, unitPrice: 90 },
+      { productId: "sku-10", quantity: 1, unitPrice: 100 },
     ]);
   });
 

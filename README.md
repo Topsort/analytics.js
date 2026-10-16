@@ -29,15 +29,19 @@ npm install @topsort/analytics.js --save
 
 If you're building a JavaScript application with a bundler, you can import the library directly into your project.
 
-In your application's entry point (e.g., `index.js`, `main.ts`), you need to configure Topsort Analytics *before* you import the library. The library's code runs on import and will look for a global `window.TS` object.
+You need to configure Topsort Analytics *before* the library loads: its code runs on import and reads the global `window.TS` object. Imports are evaluated before the rest of a module, so setting `window.TS` in the same file as the import is too late and the library throws on load. Put the configuration in its own module and import it first:
 
 ```javascript
-// Configure Topsort Analytics
+// topsort-config.js
 window.TS = {
   token: "<YOUR-TOPSORT.JS-TOKEN>", // Generate a token for each environment in the Topsort Auction Manager
   url: "https://api.topsort.com",
 };
+```
 
+```javascript
+// Your application's entry point (e.g., index.js, main.ts)
+import "./topsort-config.js";
 // Import the library to initialize it.
 // This will start the event listeners.
 import "@topsort/analytics.js";
@@ -55,7 +59,7 @@ window.TS.token = "<YOUR-TOPSORT.JS-TOKEN>";
 
 If you are not using a bundler, you can include the library by serving the file yourself.
 
-First, you'll need to locate the `ts.js` file in your `node_modules` directory at `@topsort/analytics.js/dist/ts.js`. Copy this file to a public directory in your project that is served to the client (e.g., `public/` or `assets/`).
+First, you'll need to locate the `ts.iife.js` file in your `node_modules` directory at `@topsort/analytics.js/dist/ts.iife.js`. It bundles everything the library needs; `dist/ts.js` expects `@topsort/sdk` to be loaded separately and does not work on its own. Copy this file to a public directory in your project that is served to the client (e.g., `public/` or `assets/`).
 
 Then, include it in your HTML file with a `<script>` tag. Make sure you configure `window.TS` *before* the script is loaded.
 
@@ -67,7 +71,7 @@ Then, include it in your HTML file with a `<script>` tag. Make sure you configur
     url: "https://api.topsort.com",
   };
 </script>
-<script src="/path/to/your/public/folder/ts.js"></script>
+<script src="/path/to/your/public/folder/ts.iife.js"></script>
 ```
 
 ## 4. Configuration

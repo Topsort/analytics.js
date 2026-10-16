@@ -6,11 +6,12 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
-## Unreleased
+## Version 2.12.1 (2026-10-16)
 
 ### Fixed
 
 - `vendorId` in `data-ts-items` is sent to Topsort on purchase items. It was parsed but dropped from the request, so halo attribution never received it ([#434](https://github.com/Topsort/analytics.js/pull/434))
+- README: the bundler example sets `window.TS` in its own module imported before the library, and the script tag example uses the standalone `dist/ts.iife.js` ([#432](https://github.com/Topsort/analytics.js/pull/432))
 
 ## Version 2.12.0 (2026-10-15)
 

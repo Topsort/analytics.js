@@ -111,6 +111,8 @@ describe("detector reporting", () => {
       { product: "sku-1", quantity: 1, price: 10, vendorId: "vendor-1" },
       { product: "sku-2", quantity: 1, price: 20 },
       { product: "sku-3", quantity: 1, price: 30, vendorId: "" },
+      { product: "sku-4", quantity: 1, price: 40, vendorId: 12345 },
+      { product: "sku-5", quantity: 1, price: 50, vendorId: null },
     ]);
     document.body.innerHTML = `<div data-ts-action="purchase" data-ts-items='${items}'></div>`;
 
@@ -119,14 +121,18 @@ describe("detector reporting", () => {
 
     const purchasePayload = reportEventMock.mock.calls
       .map(([payload]) => payload)
-      .find((payload) => "purchases" in (payload as Record<string, unknown>));
+      .find((payload) => "purchases" in (payload as Record<string, unknown>)) as {
+      purchases: Array<{ items: unknown }>;
+    };
 
     expect(purchasePayload).toBeDefined();
-    // Compare the serialized body, which is what the SDK sends to the API.
-    expect(JSON.parse(JSON.stringify(purchasePayload)).purchases[0].items).toEqual([
+    // toStrictEqual fails on a `vendorId: undefined` key, so items without a vendor omit it.
+    expect(purchasePayload.purchases[0]?.items).toStrictEqual([
       { productId: "sku-1", quantity: 1, unitPrice: 10, vendorId: "vendor-1" },
       { productId: "sku-2", quantity: 1, unitPrice: 20 },
       { productId: "sku-3", quantity: 1, unitPrice: 30 },
+      { productId: "sku-4", quantity: 1, unitPrice: 40, vendorId: "12345" },
+      { productId: "sku-5", quantity: 1, unitPrice: 50 },
     ]);
   });
 

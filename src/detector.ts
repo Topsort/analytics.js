@@ -129,13 +129,16 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
           {
             occurredAt: t,
             opaqueUserId: event.uid,
-            items: (event.items || []).map((e) => ({
-              productId: e.product,
-              quantity: e.quantity,
-              unitPrice: e.price,
-              // Optional, needed for halo attribution. An empty string fails API validation.
-              vendorId: e.vendorId || undefined,
-            })),
+            items: (event.items || []).map((e) => {
+              // Optional, needed for halo attribution. The API requires a non-empty string.
+              const vendorId = e.vendorId == null ? "" : String(e.vendorId);
+              return {
+                productId: e.product,
+                quantity: e.quantity,
+                unitPrice: e.price,
+                ...(vendorId ? { vendorId } : {}),
+              };
+            }),
             id: event.id,
           },
         ],

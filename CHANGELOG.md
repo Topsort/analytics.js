@@ -10,7 +10,7 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ### Fixed
 
-- `vendorId` in `data-ts-items` is sent to Topsort on purchase items. It was parsed but dropped from the request, so halo attribution never received it
+- `vendorId` in `data-ts-items` is sent to Topsort on purchase items. It was parsed but dropped from the request, so halo attribution never received it ([#434](https://github.com/Topsort/analytics.js/pull/434))
 
 ## Version 2.12.0 (2026-10-15)
 

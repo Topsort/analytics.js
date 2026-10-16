@@ -133,6 +133,8 @@ function getApiPayload(event: ProductEvent): TopsortEvent {
               productId: e.product,
               quantity: e.quantity,
               unitPrice: e.price,
+              // Optional, needed for halo attribution. An empty string fails API validation.
+              vendorId: e.vendorId || undefined,
             })),
             id: event.id,
           },

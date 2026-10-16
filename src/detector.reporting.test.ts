@@ -105,6 +105,31 @@ describe("detector reporting", () => {
     });
   });
 
+  test("forwards vendorId on purchase items only when it is set", async () => {
+    reportEventMock.mockResolvedValue({ retry: false });
+    const items = JSON.stringify([
+      { product: "sku-1", quantity: 1, price: 10, vendorId: "vendor-1" },
+      { product: "sku-2", quantity: 1, price: 20 },
+      { product: "sku-3", quantity: 1, price: 30, vendorId: "" },
+    ]);
+    document.body.innerHTML = `<div data-ts-action="purchase" data-ts-items='${items}'></div>`;
+
+    await import("./detector");
+    await flushQueue();
+
+    const purchasePayload = reportEventMock.mock.calls
+      .map(([payload]) => payload)
+      .find((payload) => "purchases" in (payload as Record<string, unknown>));
+
+    expect(purchasePayload).toBeDefined();
+    // Compare the serialized body, which is what the SDK sends to the API.
+    expect(JSON.parse(JSON.stringify(purchasePayload)).purchases[0].items).toEqual([
+      { productId: "sku-1", quantity: 1, unitPrice: 10, vendorId: "vendor-1" },
+      { productId: "sku-2", quantity: 1, unitPrice: 20 },
+      { productId: "sku-3", quantity: 1, unitPrice: 30 },
+    ]);
+  });
+
   test("continues processing when reportEvent rejects", async () => {
     reportEventMock.mockRejectedValue(new Error("network-error"));
     document.body.innerHTML = `<div id="product" data-ts-product="p-1"></div>`;

@@ -36,7 +36,7 @@ You need to configure Topsort Analytics *before* the library loads: its code run
 ```javascript
 // topsort-config.js
 window.TS = {
-  token: "<YOUR-TOPSORT-API-KEY>", // A Marketplace API key (starts with TSE_), from Tools → Integrations → Topsort API in the Topsort app
+  token: "<YOUR-TOPSORT-API-KEY>", // A Marketplace API key (starts with TSE_), see "Configuration"
   url: "https://api.topsort.com",
 };
 ```
@@ -71,7 +71,7 @@ Then, include it in your HTML file with a `<script>` tag. Make sure you configur
 <script>
   // Configure Topsort Analytics
   window.TS = {
-    token: "<YOUR-TOPSORT-API-KEY>", // A Marketplace API key (starts with TSE_), from Tools → Integrations → Topsort API in the Topsort app
+    token: "<YOUR-TOPSORT-API-KEY>", // A Marketplace API key (starts with TSE_), see "Configuration"
     url: "https://api.topsort.com",
   };
 </script>
@@ -82,7 +82,7 @@ Then, include it in your HTML file with a `<script>` tag. Make sure you configur
 
 The configuration is done via the global `window.TS` object, which must be set before the library is loaded.
 
-* `token`: **(Required)** Your Topsort Marketplace API key, which starts with `TSE_`. Generate one for each of your environments (e.g., development, production) in the Topsort app under Tools → Integrations → Topsort API.
+* `token`: **(Required)** Your Topsort Marketplace API key, which starts with `TSE_`. Generate one for each of your environments (e.g., development, production) in the Topsort app, as described in [API key types](https://docs.topsort.com/en/api-reference/authentication/api-key-types#marketplace-api-key).
 * `url`: **(Optional)** The URL of the Topsort API. Defaults to `https://api.topsort.com`.
 * `cookieName`: **(Optional)** Name of the cookie that stores the user ID. Defaults to `tsuid`.
 * `getUserId`: **(Optional)** A function that returns your own user ID. See "Overriding User ID".
@@ -111,8 +111,7 @@ An impression is reported only when all three of these hold:
 
 1. At least 50% of the element is inside the viewport (`IntersectionObserver`).
 2. The element is actually painted — not hidden by `display:none`, `visibility:hidden`, `opacity:0`, or `content-visibility:hidden` on itself or any ancestor.
-
-3. Conditions 1 and 2 hold continuously for 1 second.
+3. Both of the above hold continuously for 1 second.
 
 If the element drops below 50% or the tab is hidden before the second is up, the timer is cancelled and starts again from zero once the element is visible again. Each element reports at most one impression.
 
@@ -120,9 +119,9 @@ The second check matters because `IntersectionObserver` is purely geometric: it 
 
 You can therefore write the bid into the DOM as soon as the auction resolves, whatever the container's visibility. Once the element is revealed, the impression fires then. Reveals that change no geometry (a menu toggled via `visibility` or `opacity`) produce no `IntersectionObserver` callback, so they are detected by a short poll that runs only while the element is near the viewport.
 
-> On engines without `IntersectionObserver`, viewport gating is unavailable and only the paint check applies.
+> On engines without `IntersectionObserver`, viewport gating is unavailable: only the paint check and the 1 second dwell apply, and the dwell is not paused while the tab is hidden.
 
-Because the check runs per element at the moment the impression would fire, it also holds for markup that is cloned or moved after render (responsive duplicates, carousel clones, tag-manager rewrites). Each copy is judged on its own visibility, but copies that carry the same product and bid on the same page count as one impression (see "Deduplication").
+Because the check runs per element at the moment the impression would fire, it also holds for markup that is cloned or moved after render (responsive duplicates, carousel clones, tag-manager rewrites). Each copy is judged on its own visibility, but copies that carry the same product and bid on the same page count as one impression (see "Deduplication and Delivery").
 
 ## 7. Tracking Clicks
 
@@ -156,12 +155,12 @@ You also need to provide the details of the purchased items using the `data-ts-i
 * `vendorId` (optional): The ID of the vendor selling the product. Required for halo attribution, and recommended when a product is sold by more than one vendor.
 
 ```html
-<button
+<!-- On the order confirmation page, rendered once the order is completed -->
+<div
   data-ts-action="purchase"
   data-ts-items='[{"product": "product-123", "quantity": 1, "price": 23.99}, {"product": "product-456", "quantity": 2, "price": 3.99, "vendorId": "vendor-abc"}]'
->
-  Complete Purchase
-</button>
+  hidden
+></div>
 ```
 
 **Note:** The attribute value must be a valid JSON string. Ensure that you properly escape any quotes within the string.
@@ -209,7 +208,7 @@ To keep the library's cookie-based ID instead, you can call `window.TS.setUserId
 
 ### Deduplication and Delivery
 
-Within one page load, the library reports each combination of route, event type, product, bid and purchase items only once. The route is the path plus the query string (or the hash, for hash routers), so navigating to another route allows the same product to be reported again, and a page reload resets everything. A request that fails with a network error is dropped; the library retries only when the API asks it to.
+Within one page load, the library reports each combination of route, event type, product, bid and purchase items only once. The route is the path plus the query string (or the hash, for hash routers), so navigating to another route allows the same product to be reported again, and a page reload resets everything. Requests that fail with a network error or a 4xx response are dropped. A 429 or 5xx response is retried up to 3 times with exponential backoff.
 
 ## 10. Tracking Organic Products
 

@@ -4,13 +4,14 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@topsort/sdk@0.6.1':
+    hash: 2e8a782f09a82cdf1edd63315fca4071cce36599139f657b729cf72557180612
+    path: patches/@topsort__sdk@0.6.1.patch
+
 importers:
 
   .:
-    dependencies:
-      '@topsort/sdk':
-        specifier: 0.6.2
-        version: 0.6.2
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.15
@@ -18,6 +19,9 @@ importers:
       '@size-limit/file':
         specifier: ^14.0.0
         version: 14.3.0(size-limit@14.3.0)
+      '@topsort/sdk':
+        specifier: 0.6.1
+        version: 0.6.1(patch_hash=2e8a782f09a82cdf1edd63315fca4071cce36599139f657b729cf72557180612)
       '@types/express':
         specifier: 5.0.6
         version: 5.0.6
@@ -351,8 +355,8 @@ packages:
     peerDependencies:
       size-limit: 14.3.0
 
-  '@topsort/sdk@0.6.2':
-    resolution: {integrity: sha512-bgtalEsZiNTC13zqKNVTcnFiSCPgSDfDgm6Ytu/YwXsA6r2vreY8UA20AKJbVNRg6TV7XnjPDK0anMkVPS3UTw==}
+  '@topsort/sdk@0.6.1':
+    resolution: {integrity: sha512-j9/Rha7Qyh4eoKC+yV4CgnsOT60UNu5vo7WkS3X0LsSMMh07/vSvK9HHedqSpu1FvEdOaZUtEt08v0ZsN1iB8g==}
 
   '@tybys/wasm-util@0.10.4':
     resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
@@ -1581,7 +1585,7 @@ snapshots:
     dependencies:
       size-limit: 14.3.0
 
-  '@topsort/sdk@0.6.2': {}
+  '@topsort/sdk@0.6.1(patch_hash=2e8a782f09a82cdf1edd63315fca4071cce36599139f657b729cf72557180612)': {}
 
   '@tybys/wasm-util@0.10.4':
     dependencies:

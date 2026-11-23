@@ -50,11 +50,14 @@ describe("detector reporting", () => {
     organic?.dispatchEvent(new Event("click", { bubbles: true }));
     await flushQueue();
 
-    const clickPayload = reportEventMock.mock.calls
+    const clickPayloads = reportEventMock.mock.calls
       .map(([payload]) => payload)
-      .find((payload) => "clicks" in (payload as Record<string, unknown>)) as {
+      .filter((payload) => "clicks" in (payload as Record<string, unknown>)) as Array<{
       clicks: Array<Record<string, unknown>>;
-    };
+    }>;
+    expect(clickPayloads).toHaveLength(2);
+    // Clicks are sent in the order they happen, so the organic click is the second one.
+    const clickPayload = clickPayloads[1] as (typeof clickPayloads)[number];
 
     expect(clickPayload).toBeDefined();
     expect(clickPayload.clicks).toHaveLength(1);

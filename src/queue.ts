@@ -25,19 +25,11 @@ export interface Entry {
   t: number;
 }
 
-const PRIORITY_MAX = 9;
-const PRIORITY_MIN = 0;
-
 interface RetryableEntry {
   /** Number of retries */
   r: number;
   /** The entry payload */
   e: Entry;
-  /**
-   * The entry's priority
-   *
-   * See {@link PRIORITY_MIN} and {@link PRIORITY_MAX} */
-  p: number;
 }
 
 export type Processor<T extends Entry> = (data: T[]) => Promise<ProcessorResult>;
@@ -91,13 +83,9 @@ export class Queue<T extends Entry> {
     this._processNow(this._store.get());
   }
 
-  append(entry: Entry, opts?: { highPriority: boolean }): void {
+  append(entry: Entry): void {
     let entries = this._store.get();
-    entries.push({
-      e: entry,
-      r: 0,
-      p: opts?.highPriority ? PRIORITY_MAX : PRIORITY_MIN,
-    });
+    entries.push({ e: entry, r: 0 });
     // TODO: allow custom trim, so that clients can control which entries get dropped
     entries = entries.slice(-MAX_SIZE);
     this._setEntries(entries);
@@ -172,11 +160,9 @@ export class Queue<T extends Entry> {
     if (!entries.length) {
       return;
     }
-    if (entries.some((e) => e.p === PRIORITY_MAX) || this._store instanceof MemoryStore) {
-      this._processNow(entries);
-    } else {
-      this._scheduleProcessing();
-    }
+    // Send right away: a page that unloads would cancel a pending timer, and the request
+    // itself survives navigation because the SDK sends it with `keepalive`.
+    this._processNow(entries);
   }
 
   private _scheduleProcessing(): void {

@@ -576,6 +576,9 @@ function start() {
   });
   if (!window.TS.token) {
     watchForToken();
+  } else {
+    // Send events a previous page stored but could not send before it unloaded.
+    queue.drain();
   }
 }
 

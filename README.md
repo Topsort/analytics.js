@@ -208,7 +208,7 @@ To keep the library's cookie-based ID instead, you can call `window.TS.setUserId
 
 ### Deduplication and Delivery
 
-Within one page load, the library reports each combination of route, event type, product, bid and purchase items only once. The route is the path plus the query string (or the hash, for hash routers), so navigating to another route allows the same product to be reported again, and a page reload resets everything. Requests that fail with a network error or a 4xx response are dropped. A 429 or 5xx response is retried up to 3 times with exponential backoff.
+Within one page load, the library reports each combination of route, event type, product, bid and purchase items only once. The route is the path plus the query string (or the hash, for hash routers), so navigating to another route allows the same product to be reported again, and a page reload resets everything. Each event is sent as soon as it is detected, so a click that navigates away is still delivered. Events are stored in `localStorage` until they are delivered, and events a page could not send before it unloaded are sent when the next page of the site loads the library. Requests that fail with a network error or a 4xx response are dropped. A 429 or 5xx response is retried up to 3 times with exponential backoff.
 
 ## 10. Tracking Organic Products
 

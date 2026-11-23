@@ -55,35 +55,21 @@ afterEach(() => {
   (new Queue<Entry>(processor) as any)._store.set([]);
 });
 
-test("high priority event triggers immediate processing", async () => {
+test("appended entry is processed immediately", async () => {
   const q = new Queue(processor);
   const entry = { id: "id-1-done", t: now() };
-  q.append(entry, { highPriority: true });
+  q.append(entry);
   expect(processedEvents).toEqual([entry]);
 
   await flushPromises();
 
-  expectEmptyQueue(q);
-});
-
-test("low priority event triggers delayed processing", async () => {
-  const q = new Queue(processor);
-  const entry = { id: "id-1-done", t: now() };
-  q.append(entry, { highPriority: false });
-  await flushPromises(249);
-  expect(processedEvents).toEqual([]);
-  await flushPromises(1);
-  expect(processedEvents).toEqual([entry]);
-
-  await flushPromises();
   expectEmptyQueue(q);
 });
 
 test("retry entries", async () => {
   const q = new Queue(processor);
   const entry = { id: "id-2-retry", t: now() };
-  q.append(entry, { highPriority: false });
-  await flushPromises(250);
+  q.append(entry);
   expect(processedEvents).toEqual([entry]);
 
   await flushPromises(250);
@@ -93,10 +79,11 @@ test("retry entries", async () => {
   await flushPromises(3500);
   expect(processedEvents).toEqual([entry, entry]);
 
+  // The first attempt plus MAX_RETRIES (3) retries.
   await flushPromises(15000);
-  expect(processedEvents).toEqual([entry, entry, entry]);
+  expect(processedEvents).toEqual([entry, entry, entry, entry]);
 
-  // After the third try, we should remove the entry from the queue.
+  // After the last retry, we should remove the entry from the queue.
   await flushPromises();
   expectEmptyQueue(q);
 });
@@ -108,17 +95,16 @@ test("simultaneous entries", async () => {
   const entry3 = { id: "id-3-done", t: now() };
   const entry4 = { id: "id-4-done", t: now() };
   const entry5 = { id: "id-5-done", t: now() };
-  q.append(entry1, { highPriority: false });
-  q.append(entry2, { highPriority: false });
-  q.append(entry3, { highPriority: true });
-  q.append(entry4, { highPriority: false });
-  q.append(entry5, { highPriority: true });
-  await flushPromises(250);
-  // When we append the first priority, it forces the processing of all entries.
-  // Subsequent ones will be considered priority ones, until the high priority
-  // entry is resolved.
-  expect(processedEvents).toEqual([entry3, entry2, entry1, entry4, entry5]);
-  await flushPromises(250);
+  q.append(entry1);
+  q.append(entry2);
+  q.append(entry3);
+  q.append(entry4);
+  q.append(entry5);
+  // Each entry is sent as it is appended; entries already in flight are not sent again.
+  expect(processedEvents).toEqual([entry1, entry2, entry3, entry4, entry5]);
+  // Resolving the requests leaves one poll scheduled; it finds an empty store and stops.
+  await flushPromises();
+  await flushPromises();
   expectEmptyQueue(q);
 });
 
@@ -140,7 +126,7 @@ test("marks entries done when processor throws", async () => {
   const q = new Queue(failingProcessor);
   const entry = { id: "id-throw", t: now() };
 
-  q.append(entry, { highPriority: true });
+  q.append(entry);
   await flushPromises();
 
   expect(failingProcessor).toHaveBeenCalledWith([entry]);
@@ -159,7 +145,7 @@ test("pause keeps entries in queue with retry count unchanged and no scheduling"
 
   const q = new Queue(pausingProcessor);
   const entry = { id: "entry-paused", t: now() };
-  q.append(entry, { highPriority: true });
+  q.append(entry);
   await flushPromises();
 
   // Entry is still in queue with retry count = 0 (not incremented)
@@ -186,7 +172,7 @@ test("drain() triggers immediate processing after pause", async () => {
 
   const q = new Queue(pausingProcessor);
   const entry = { id: "entry-drain", t: now() };
-  q.append(entry, { highPriority: true });
+  q.append(entry);
   await flushPromises();
 
   expect(processedEvents).toEqual([]);
@@ -211,7 +197,7 @@ test("pause does not consume retry budget", async () => {
 
   const q = new Queue(pausingProcessor);
   const entry = { id: "entry-budget", t: now() };
-  q.append(entry, { highPriority: true });
+  q.append(entry);
   await flushPromises();
 
   expect(pausingProcessor).toHaveBeenCalledTimes(1);

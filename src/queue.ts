@@ -30,6 +30,8 @@ interface RetryableEntry {
   r: number;
   /** The entry payload */
   e: Entry;
+  /** Timestamp of the last attempt, the base for the retry backoff */
+  a?: number;
 }
 
 export type Processor<T extends Entry> = (data: T[]) => Promise<ProcessorResult>;
@@ -78,7 +80,7 @@ export class Queue<T extends Entry> {
     this._processor = processor;
   }
 
-  /** Force-trigger processing immediately, bypassing the scheduled delay. */
+  /** Processes the stored entries now, e.g. on load or once a token is set. */
   drain(): void {
     this._processNow(this._store.get());
   }
@@ -95,16 +97,16 @@ export class Queue<T extends Entry> {
     if (!entries.length) {
       return;
     }
-    const chunk: T[] = [];
+    const chunk: RetryableEntry[] = [];
     for (let i = entries.length - 1; i >= 0 && chunk.length < MAX_PROCESSING_SIZE; i--) {
       const retryableEntry = entries[i];
       const entry = retryableEntry?.e;
       if (
         entry &&
         !this._processing.has(entry.id) &&
-        expBackoff(entry.t, retryableEntry.r) <= Date.now()
+        expBackoff(retryableEntry.a ?? entry.t, retryableEntry.r) <= Date.now()
       ) {
-        chunk.push(entry as T);
+        chunk.push(retryableEntry);
         this._processing.add(entry.id);
       }
     }
@@ -112,45 +114,38 @@ export class Queue<T extends Entry> {
       this._scheduleProcessing();
       return;
     }
+    // Take the chunk out of the shared store while its requests are in flight. Otherwise another
+    // tab, or the next page if this one unloads before the requests resolve, would send it again.
+    this._store.set(this._store.get().filter((entry) => !this._processing.has(entry.e.id)));
     let r: ProcessorResult = { done: new Set(), retry: new Set() };
     try {
-      r = await this._processor(chunk);
+      r = await this._processor(chunk.map((entry) => entry.e as T));
     } catch (_error) {
       // Mark all as failed
       for (const entry of chunk) {
-        r.done.add(entry.id);
+        r.done.add(entry.e.id);
       }
     }
+    // Put back the entries that still have to be sent
+    const requeued: RetryableEntry[] = [];
+    for (const entry of chunk) {
+      this._processing.delete(entry.e.id);
+      if (r.pause) {
+        requeued.push(entry);
+      } else if (r.retry.has(entry.e.id)) {
+        if (entry.r < MAX_RETRIES) {
+          requeued.push({ e: entry.e, r: entry.r + 1, a: Date.now() });
+        }
+      } else if (!r.done.has(entry.e.id)) {
+        requeued.push(entry);
+      }
+    }
+    const newEntries = requeued.concat(this._store.get()).slice(-MAX_SIZE);
     if (r.pause) {
       // Processor is not ready — release chunk back to queue without retrying or scheduling.
       // Processing resumes only when drain() is called externally (e.g. once a token is set).
-      for (const entry of chunk) {
-        this._processing.delete(entry.id);
-      }
+      this._store.set(newEntries);
       return;
-    }
-    // Remove entries from processing
-    const newProcessing: string[] = [];
-    for (const entryId of this._processing) {
-      if (!chunk.find((e) => e.id === entryId)) {
-        newProcessing.push(entryId);
-      }
-    }
-    this._processing = new Set(newProcessing);
-    // Modify entries
-    const oldEntries = this._store.get();
-    const newEntries: RetryableEntry[] = [];
-    for (const entry of oldEntries) {
-      if (r.done.has(entry.e.id)) {
-        // do nothing
-      } else if (r.retry.has(entry.e.id)) {
-        if (entry.r < MAX_RETRIES) {
-          entry.r += 1;
-          newEntries.push(entry);
-        }
-      } else {
-        newEntries.push(entry);
-      }
     }
     this._setEntries(newEntries);
   }

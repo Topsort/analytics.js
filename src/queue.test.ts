@@ -79,13 +79,55 @@ test("retry entries", async () => {
   await flushPromises(3500);
   expect(processedEvents).toEqual([entry, entry]);
 
-  // The first attempt plus MAX_RETRIES (3) retries.
-  await flushPromises(15000);
+  // The first attempt plus MAX_RETRIES (3) retries, each backoff counted from the last attempt.
+  await flushPromises(5500);
+  expect(processedEvents).toEqual([entry, entry, entry]);
+
+  await flushPromises(9500);
   expect(processedEvents).toEqual([entry, entry, entry, entry]);
 
   // After the last retry, we should remove the entry from the queue.
   await flushPromises();
   expectEmptyQueue(q);
+});
+
+test("in-flight entries are out of storage, so another queue does not send them again", async () => {
+  let resolve: (r: ProcessorResult) => void = () => {};
+  const slowProcessor = vi.fn(
+    (_chunk: Entry[]) =>
+      new Promise<ProcessorResult>((res) => {
+        resolve = res;
+      }),
+  );
+  const q = new Queue(slowProcessor);
+  const entry = { id: "id-in-flight", t: now() };
+  q.append(entry);
+  expect(slowProcessor).toHaveBeenCalledWith([entry]);
+  expect((q as any)._store.get()).toEqual([]);
+
+  // A second queue on the same storage stands in for the next page or another tab.
+  const other = new Queue(processor);
+  other.drain();
+  expect(processedEvents).toEqual([]);
+
+  resolve({ done: new Set([entry.id]), retry: new Set() });
+  await flushPromises();
+  expectEmptyQueue(q);
+});
+
+test("retry backoff counts from the last attempt, not from when the event was created", async () => {
+  const q = new Queue(processor);
+  const entry = { id: "id-old-retry", t: now() - 60_000 };
+  q.append(entry);
+  expect(processedEvents).toEqual([entry]);
+
+  await flushPromises(500);
+  // The event is a minute old, but the retry still waits for its backoff.
+  expect(processedEvents).toEqual([entry]);
+  expect((q as any)._store.get()).toEqual([{ e: entry, r: 1, a: expect.any(Number) }]);
+
+  await flushPromises(3500);
+  expect(processedEvents).toEqual([entry, entry]);
 });
 
 test("simultaneous entries", async () => {

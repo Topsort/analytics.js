@@ -93,7 +93,7 @@ tests/
    - Caps at 250 entries (drops oldest on overflow).
    - Processes up to 25 events per batch.
    - Uses exponential backoff for retries (max 3 retries).
-   - High-priority events (purchases) are processed immediately; low-priority events are batched with a 250ms delay.
+   - Every event is sent as soon as it is appended. Entries in flight are kept out of storage, and entries waiting on a retry backoff are picked up by a 250ms poll.
 
 5. **Dispatch**: The `processor` function creates a `TopsortClient` from `@topsort/sdk` and calls `reportEvent()` for each queued event. On success, the event is removed from the queue. On retryable failure, it is kept for retry. On permanent failure or after max retries, it is dropped.
 

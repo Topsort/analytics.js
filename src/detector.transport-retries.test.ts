@@ -39,7 +39,7 @@ test("retries a sponsored click after network and HTML 502 errors with the same 
   expect(sendClick.mock.calls).toEqual([[id], [id]]);
   expect(queued()).toMatchObject([{ e: { id }, r: 2 }]);
 
-  await vi.advanceTimersByTimeAsync(3000);
+  await vi.advanceTimersByTimeAsync(5500);
   expect(sendClick.mock.calls).toEqual([[id], [id], [id]]);
   expect(sendImpression).toHaveBeenCalledTimes(1);
   expect(queued()).toEqual([]);

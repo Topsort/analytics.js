@@ -6,6 +6,14 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 We follow the format used by [Open Telemetry](https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md).
 
+## Version 2.12.2 (2026-11-24)
+
+### Fixed
+
+- Events are sent as soon as they are queued instead of waiting for the next batch, so clicks that navigate away are no longer sent late or lost. Events stored by a previous page are sent on load, and events in flight are kept out of storage so they are not sent twice ([#467](https://github.com/Topsort/analytics.js/pull/467))
+- Network errors and non-JSON error responses (for example an HTML 502) are retried instead of dropping the event, through `@topsort/sdk` 0.6.2 ([#456](https://github.com/Topsort/analytics.js/pull/456))
+- README: which event failures are retried, and immediate sending ([#467](https://github.com/Topsort/analytics.js/pull/467))
+
 ## Version 2.12.1 (2026-10-16)
 
 ### Fixed

@@ -61,7 +61,7 @@ window.TS.token = "<YOUR-TOPSORT-API-KEY>";
 
 If you are not using a bundler, you can include the library by serving the file yourself.
 
-Locate `@topsort/analytics.js/dist/ts.iife.js` in your `node_modules` directory. It includes the SDK and can be served directly to the browser. Copy it and the package's `LICENSE` file to a public directory in your project (e.g., `public/` or `assets/`). Pin the package version and update the copied files when you upgrade.
+First, you'll need to locate the `ts.iife.js` file in your `node_modules` directory at `@topsort/analytics.js/dist/ts.iife.js`. It bundles everything the library needs; `dist/ts.js` expects `@topsort/sdk` to be loaded separately and does not work on its own. Copy this file to a public directory in your project that is served to the client (e.g., `public/` or `assets/`). The file belongs to the version you installed, so pin that version in `package.json` and update the copied file when you upgrade.
 
 To load the file from a CDN instead, pin the version in the URL, for example `https://unpkg.com/@topsort/analytics.js@2.12.1/dist/ts.iife.js`. Do not use `@latest` or an unversioned URL.
 

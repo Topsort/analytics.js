@@ -1,4 +1,0 @@
-# The patched JS files are built from Topsort/topsort.js@9fa813d (PR #330) with Bun 1.3.3.
-# Remove this build-time backport when upgrading to an SDK release that contains the fix.
-patchedDependencies:
-  '@topsort/sdk@0.6.1': patches/@topsort__sdk@0.6.1.patch

@@ -3,10 +3,9 @@ import { resolve } from "node:path";
 import dts from "vite-plugin-dts";
 import { defineConfig } from "vitest/config";
 
-const isExternalDependency = (id: string) => {
-  if (id === "@topsort/sdk" || id.startsWith("@topsort/sdk/")) return false;
-  return !id.startsWith(".") && !id.startsWith("/") && !id.includes(":") && !id.startsWith("\0");
-};
+const isDependency = (id: string) =>
+  id.startsWith("@topsort/sdk") ||
+  (!id.startsWith(".") && !id.startsWith("/") && !id.includes(":") && !id.startsWith("\0"));
 
 export default defineConfig(({ mode }) => {
   const isIIFE = mode === "iife";
@@ -22,15 +21,8 @@ export default defineConfig(({ mode }) => {
           format === "iife" ? "ts.iife.js" : `ts.${format === "es" ? "mjs" : "js"}`,
       },
       emptyOutDir: !isIIFE,
-      rolldownOptions: {
-        // The SDK transport fix is part of every browser entry point.
-        external: isIIFE ? [] : isExternalDependency,
-        output: {
-          minify: true,
-          comments: { legal: true },
-          banner:
-            "/*! analytics.js (c) 2022 Topsort | @topsort/sdk (c) 2024 Topsort | MIT License */",
-        },
+      rollupOptions: {
+        external: isIIFE ? [] : isDependency,
       },
     },
     plugins: [

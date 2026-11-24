@@ -5,7 +5,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test("retries a sponsored click with its original ID and discards a rejected impression", async () => {
+test("retries a sponsored click after network and HTML 502 errors with the same ID", async () => {
   vi.useFakeTimers();
   window.TS = { token: "token", url: "https://events.example.invalid" };
   const ad = document.createElement("button");

@@ -34,9 +34,9 @@ so in the PR body.
 | Bundler | Vite (builds UMD, ESM, and IIFE formats) |
 | Testing | Vitest with jsdom environment |
 | HTTP mocking | MSW (Mock Service Worker) |
-| Linting/Formatting | Biome (v2.3.5) |
+| Linting/Formatting | Biome (v2.5.15) |
 | SDK dependency | `@topsort/sdk` (the only runtime dependency) |
-| Node version | >=20.0.0 |
+| Node version | >=24.0.0 |
 
 ## Key Commands
 
@@ -60,6 +60,7 @@ so in the PR body.
 ```
 src/
   detector.ts              # Main entry point: DOM observation, event detection, API dispatch
+  visibility.ts            # Paint check (isRendered) that gates impressions
   queue.ts                 # Persistent event queue with retry + exponential backoff
   store.ts                 # Storage abstraction (LocalStorage with MemoryStore fallback, BidStore for session)
   set.ts                   # Utility to truncate a Set to a max size (keeps newest entries)
@@ -82,7 +83,7 @@ tests/
 
 2. **Detection**: Several mechanisms detect events:
    - **Render**: Fired synchronously, as soon as a node with an explicit `data-ts-resolved-bid` (not `"inherit"`) is processed — i.e. the ad was inserted into the page, regardless of visibility. Unlike impressions, it is not gated by the IntersectionObserver or the paint check.
-   - **IntersectionObserver** (threshold 0.5): Fires `Impression` events when a product element becomes 50% visible. Each element is unobserved after its first impression.
+   - **IntersectionObserver** (threshold 0.5): Fires `Impression` events when a product element is at least 50% visible, painted (`isRendered` in `visibility.ts`), and has stayed so for a continuous 1 second. The dwell pauses while the tab is hidden and is cancelled if the node stops matching or disconnects. Each element is unobserved after its first impression.
    - **MutationObserver**: Watches for new child elements and attribute changes (`data-ts-product`, `data-ts-action`, `data-ts-items`, `data-ts-resolved-bid`) to detect dynamically added or modified products.
    - **Click listeners**: Attached to product elements (or their `[data-ts-clickable]` children for granular control). Clicks on banners store the `resolvedBidId` in session storage (`BidStore`) for cross-page attribution via `data-ts-resolved-bid="inherit"`.
    - **Purchase events**: Triggered when elements with `data-ts-action="purchase"` are detected; item data is parsed from `data-ts-items` JSON attribute.
@@ -128,10 +129,12 @@ tests/
 
 ### On Pull Requests and Push to `main` (`checkpr.yml`)
 
-Three parallel jobs:
+Five jobs:
 1. **lint** — `pnpm install` + `pnpm run lint:ci` + `pnpm run types:check`
 2. **test** — `pnpm install` + `pnpm run test`
 3. **format** (Biome Lint) — Uses `biomejs/setup-biome@v2` action + `biome ci --reporter=github`
+4. **size** (Bundle Size) — `pnpm run build` + `pnpm size` against the `size-limit` budgets in `package.json`
+5. **size-report** (Bundle Size Report) — Comments on the PR when the budget is exceeded
 
 Concurrency: grouped by workflow + ref, cancels in-progress runs on new pushes.
 
@@ -140,14 +143,14 @@ Concurrency: grouped by workflow + ref, cancels in-progress runs on new pushes.
 1. Install + lint + test + type-check + build
 2. Publish to npm via `npm publish --provenance`, authenticated with npm trusted publishing (OIDC, no token). Needs the npm bundled with Node 24 (11.5.1 or later). `npm publish` does not build, so `package.json` must already carry the release version.
 
-### Dependabot
+### Renovate
 
-- Monthly updates for npm dev dependencies and GitHub Actions.
+- `.github/renovate.json`: weekly updates (before 9pm on Sunday); patch, minor, pin and digest updates automerge once CI passes, except runtime `dependencies`.
 
 ## Gotchas
 
 - **Module side effects**: Importing `detector.ts` immediately starts DOM observation. Tests must set up `window.TS` and inject DOM HTML *before* the dynamic `import("./detector")` call.
-- **IntersectionObserver in jsdom**: jsdom does not implement `IntersectionObserver`, so in the test environment, impressions fire synchronously on DOM insertion instead of on visibility. This means test behavior differs from real browser behavior for impression timing.
+- **IntersectionObserver in jsdom**: jsdom does not implement `IntersectionObserver`, so in the test environment, impressions skip the viewport gate (`reportWhenVisible`) but the paint check and the 1 second dwell still apply, so tests use fake timers. Tests that need the viewport gate install a mock `IntersectionObserver`.
 - **Cookie parsing**: The user ID cookie parser uses a regex that expects the cookie name at the start or after a semicolon. Custom `cookieName` values with special regex characters could cause issues.
 - **Queue persistence**: The queue persists to `localStorage` under key `ts-q`. If localStorage is unavailable (e.g., private browsing in some browsers), it falls back to an in-memory store, meaning events are lost on page refresh.
 - **`window.TS.loaded` guard**: The `start()` function sets `window.TS.loaded = true` to prevent double initialization. If you need to re-initialize in tests, you must reset this flag.

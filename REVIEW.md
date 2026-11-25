@@ -26,7 +26,8 @@ Report at most five nits per review.
 ## Skip
 
 - `pnpm-lock.yaml` content, but check that it matches `package.json`.
-- `demo/index.html` is hand-written and is reviewed.
+
+Nothing else is generated: `demo/index.html` is hand-written and must be reviewed.
 
 ## Repository rules
 

@@ -31,4 +31,3 @@ Report at most five nits per review.
 ## Repository rules
 
 @AGENTS.md
-@README.md

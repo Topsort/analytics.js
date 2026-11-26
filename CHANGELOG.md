@@ -10,8 +10,9 @@ We follow the format used by [Open Telemetry](https://github.com/open-telemetry/
 
 ### Fixed
 
-- Events are sent as soon as they are queued instead of waiting for the next batch, so clicks that navigate away are no longer sent late or lost. Events stored by a previous page are sent on load, and events in flight are kept out of storage so they are not sent twice ([#467](https://github.com/Topsort/analytics.js/pull/467))
-- Network errors and non-JSON error responses (for example an HTML 502) are retried instead of dropping the event, through `@topsort/sdk` 0.6.2 ([#456](https://github.com/Topsort/analytics.js/pull/456))
+- Events are sent as soon as they are queued. Before, they waited on a 250 ms timer that a navigation cancelled, so clicks that navigate away were sent late or never. Events stored by a previous page are sent on load, and events in flight are kept out of storage so another tab or the next page does not send them again ([#467](https://github.com/Topsort/analytics.js/pull/467))
+- Retries back off from the last attempt instead of from when the event was queued ([#467](https://github.com/Topsort/analytics.js/pull/467))
+- Network errors, timeouts and 5xx responses with a non-JSON body (for example an HTML 502 from a proxy) are retried instead of dropping the event, through `@topsort/sdk` 0.6.2 ([#456](https://github.com/Topsort/analytics.js/pull/456))
 - README: which event failures are retried, and immediate sending ([#467](https://github.com/Topsort/analytics.js/pull/467))
 
 ## Version 2.12.1 (2026-10-16)

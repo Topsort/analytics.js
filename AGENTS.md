@@ -7,7 +7,7 @@ Topsort's analytics.js is a browser-side JavaScript library that auto-detects DO
 - **Never commit directly to `main`.** All changes go through PRs from a dedicated branch.
 - Branch names should be descriptive (e.g., `feat/add-google-environment`, `fix/merge-pagination-offset`).
 - **Large changes must be broken into stacked PRs** — each PR should be independently reviewable and represent a single logical unit of work (e.g., one PR adds the config, the next adds the validation schema, the next adds tests). Avoid monolithic PRs that touch many unrelated things at once.
-- Each PR in a stack should be based on the previous branch, not `main`, so they can be reviewed and merged in order.
+- Each PR in a stack should be based on the previous branch, not `main`, so they can be reviewed and merged in order. Each one must build and pass CI on its own.
 - **Admin override** (`gh pr merge --admin`) is only appropriate to bypass the review requirement when all CI checks pass. Never use it to force-merge a PR with failing CI — fix the failures first. Before using `--admin`, check whether the repo allows it (e.g. `gh api repos/{owner}/{repo}` or branch protection settings). If admin override is not permitted or you cannot verify it is, do not merge — ask the user instead.
 - Keep branches up to date with `main` before merging — rebase or merge `main` into your branch to resolve conflicts locally, not in the merge commit.
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages (e.g., `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
@@ -16,6 +16,8 @@ Topsort's analytics.js is a browser-side JavaScript library that auto-detects DO
 
 ## Pull Requests
 
+Claude Code Review checks every pull request. When it passes, the author can merge without a second engineer, except for the paths in `.claude/approvals.yml` that need two people. Plan pull requests so that a person reviews as little as possible, and only what needs a person.
+
 Before creating or updating a PR, check whether the cumulative branch diff
 (`git diff <base>...HEAD`) changes anything the README documents: installation and the pinned
 version in the npm and CDN examples, bundler and script tag usage, `window.TS` configuration
@@ -23,6 +25,15 @@ options, the `data-ts-*` attributes and how renders, impressions, clicks and pur
 banner clicks, user ID overrides, deduplication and delivery, organic products, local playground
 development, or troubleshooting. If it does, update `README.md` in the same PR. If it does not, say
 so in the PR body.
+
+- **One change per pull request.** A bug fix, a feature or a refactor, never more than one. Aim for under about 400 changed lines, excluding generated files and lockfiles. A reviewer can check that much carefully. A larger diff gets skimmed.
+- **Tests ship with the code they cover.** Put the tests for a change in the same pull request as the change, never in a follow-up.
+- **Each pull request is safe to revert on its own.** Once merged, `main` must still build and release, and reverting just this pull request must not break anything that merged after it.
+- **Keep two-person paths in their own pull request.** These include CI workflows, deploy and infrastructure config, Dockerfiles, the review policy and `CODEOWNERS`. A change to one of them makes the whole pull request wait for a second person. Open that change separately, kept small, and let the rest merge on Claude's review.
+- **Separate moves from changes.** Renames, file moves and formatting go in their own pull request, with no behaviour change, so the next diff shows only what changed.
+- **Never hand-edit generated files.** Lockfiles, API dumps, codegen output and snapshots come from their tool, and CI checks that they match. Regenerate them in the same pull request as the change that caused them. Mark generated paths `linguist-generated=true` in `.gitattributes` so GitHub collapses them in the diff.
+- **Say why in the description.** Give the reason for the change, how it was tested, and what a reviewer should look at first. Name any risk you know of.
+- **Fix review findings in new commits.** Do not rewrite history the reviewer has already seen, until it merges.
 
 ## Tech Stack
 
@@ -155,15 +166,3 @@ Concurrency: grouped by workflow + ref, cancels in-progress runs on new pushes.
 - **Queue persistence**: The queue persists to `localStorage` under key `ts-q`. If localStorage is unavailable (e.g., private browsing in some browsers), it falls back to an in-memory store, meaning events are lost on page refresh.
 - **`window.TS.loaded` guard**: The `start()` function sets `window.TS.loaded = true` to prevent double initialization. If you need to re-initialize in tests, you must reset this flag.
 - **IIFE build bundles all dependencies**: The IIFE format (`dist/ts.iife.js`) inlines `@topsort/sdk`, while the ESM/UMD formats treat it as an external dependency.
-
-## Pull request size and review
-
-Claude Code Review checks every pull request. When it passes, the author can merge without a second engineer, except for the paths in `.claude/approvals.yml` that need two people. Plan pull requests so that a person reviews as little as possible, and only what needs a person.
-
-- **One change per pull request.** A bug fix, a feature or a refactor, never more than one. Aim for under about 400 changed lines, excluding generated files and lockfiles. A reviewer can check that much carefully. A larger diff gets skimmed.
-- **Keep two-person paths in their own pull request.** These include CI workflows, deploy and infrastructure config, Dockerfiles, the review policy and `CODEOWNERS`. A change to one of them makes the whole pull request wait for a second person. Open that change separately, kept small, and let the rest merge on Claude's review.
-- **Separate moves from changes.** Renames, file moves and formatting go in their own pull request, with no behaviour change, so the next diff shows only what changed.
-- **Stack dependent work.** Base each pull request on the previous branch, and merge them in order. Each one must build and pass CI on its own.
-- **Never hand-edit generated files.** Lockfiles, API dumps, codegen output and snapshots come from their tool, and CI checks that they match. Regenerate them in the same pull request as the change that caused them. Mark generated paths `linguist-generated=true` in `.gitattributes` so GitHub collapses them in the diff.
-- **Say why in the description.** Give the reason for the change, how it was tested, and what a reviewer should look at first. Name any risk you know of.
-- **Fix review findings in new commits.** Do not rewrite history the reviewer has already seen, until it merges.

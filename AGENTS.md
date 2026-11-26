@@ -155,3 +155,15 @@ Concurrency: grouped by workflow + ref, cancels in-progress runs on new pushes.
 - **Queue persistence**: The queue persists to `localStorage` under key `ts-q`. If localStorage is unavailable (e.g., private browsing in some browsers), it falls back to an in-memory store, meaning events are lost on page refresh.
 - **`window.TS.loaded` guard**: The `start()` function sets `window.TS.loaded = true` to prevent double initialization. If you need to re-initialize in tests, you must reset this flag.
 - **IIFE build bundles all dependencies**: The IIFE format (`dist/ts.iife.js`) inlines `@topsort/sdk`, while the ESM/UMD formats treat it as an external dependency.
+
+## Pull request size and review
+
+Claude Code Review checks every pull request. When it passes, the author can merge without a second engineer, except for the paths in `.claude/approvals.yml` that need two people. Plan pull requests so that a person reviews as little as possible, and only what needs a person.
+
+- **One change per pull request.** A bug fix, a feature or a refactor, never more than one. Aim for under about 400 changed lines, excluding generated files and lockfiles. A reviewer can check that much carefully. A larger diff gets skimmed.
+- **Keep two-person paths in their own pull request.** These include CI workflows, deploy and infrastructure config, Dockerfiles, the review policy and `CODEOWNERS`. A change to one of them makes the whole pull request wait for a second person. Open that change separately, kept small, and let the rest merge on Claude's review.
+- **Separate moves from changes.** Renames, file moves and formatting go in their own pull request, with no behaviour change, so the next diff shows only what changed.
+- **Stack dependent work.** Base each pull request on the previous branch, and merge them in order. Each one must build and pass CI on its own.
+- **Never hand-edit generated files.** Lockfiles, API dumps, codegen output and snapshots come from their tool, and CI checks that they match. Regenerate them in the same pull request as the change that caused them. Mark generated paths `linguist-generated=true` in `.gitattributes` so GitHub collapses them in the diff.
+- **Say why in the description.** Give the reason for the change, how it was tested, and what a reviewer should look at first. Name any risk you know of.
+- **Fix review findings in new commits.** Do not rewrite history the reviewer has already seen, until it merges.

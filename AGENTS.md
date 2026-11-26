@@ -6,8 +6,7 @@ Topsort's analytics.js is a browser-side JavaScript library that auto-detects DO
 
 - **Never commit directly to `main`.** All changes go through PRs from a dedicated branch.
 - Branch names should be descriptive (e.g., `feat/add-google-environment`, `fix/merge-pagination-offset`).
-- **Large changes must be broken into stacked PRs** — each PR should be independently reviewable and represent a single logical unit of work (e.g., one PR adds the config, the next adds the validation schema, the next adds tests). Avoid monolithic PRs that touch many unrelated things at once.
-- Each PR in a stack should be based on the previous branch, not `main`, so they can be reviewed and merged in order. Each one must build and pass CI on its own.
+- **Large changes must be broken into stacked PRs** — each PR should be independently reviewable and represent a single logical unit of work (e.g., one PR adds the config, the next adds the validation schema, each with its own tests). Avoid monolithic PRs that touch many unrelated things at once. Base each PR in a stack on the previous branch, not `main`, so they can be reviewed and merged in order. Each one must build and pass CI on its own.
 - **Admin override** (`gh pr merge --admin`) is only appropriate to bypass the review requirement when all CI checks pass. Never use it to force-merge a PR with failing CI — fix the failures first. Before using `--admin`, check whether the repo allows it (e.g. `gh api repos/{owner}/{repo}` or branch protection settings). If admin override is not permitted or you cannot verify it is, do not merge — ask the user instead.
 - Keep branches up to date with `main` before merging — rebase or merge `main` into your branch to resolve conflicts locally, not in the merge commit.
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages (e.g., `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).

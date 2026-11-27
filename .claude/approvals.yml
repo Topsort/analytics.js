@@ -44,3 +44,11 @@ rules:
     verdict: { claude: comments, seats: 2 }
     override:
       - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
+  - purpose: "Event payloads, dedup, click attribution, the user id cookie, delivery and the visibility gate decide what advertisers are billed: someone else from Integrations approves, whatever the review says."
+    paths:
+      - "src/detector.ts"
+      - "src/queue.ts"
+      - "src/visibility.ts"
+      - "src/store.ts"
+      - "src/set.ts"
+    verdict: { claude: comments, seats: [{ count: 1, from: [Topsort/integrations, "!pr/authors"] }] }

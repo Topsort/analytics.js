@@ -30,3 +30,9 @@ CLAUDE.local.md @Topsort/integrations
 # Build pipeline
 buildspec.yml @Topsort/integrations
 build.sh @Topsort/integrations
+
+# What gets billed: payloads, dedup, attribution, user id, delivery, visibility
+/src/detector.ts @Topsort/integrations
+/src/queue.ts @Topsort/integrations
+/src/visibility.ts @Topsort/integrations
+/src/store.ts @Topsort/integrations

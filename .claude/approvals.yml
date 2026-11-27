@@ -50,4 +50,5 @@ rules:
       - "src/queue.ts"
       - "src/visibility.ts"
       - "src/store.ts"
+      - "src/set.ts"
     verdict: { claude: comments, seats: [{ count: 1, from: [Topsort/integrations, "!pr/authors"] }] }
